@@ -1,0 +1,11 @@
+name: cLibraries
+main: com.conaxgames.libraries.LibraryPlugin
+version: ${git.commit.id.describe-short}
+author: ConaxGames Development Team
+loadbefore: [cSuite, Lime]
+softdepend:
+  - TitleManager
+  - Vault
+  - PlaceholderAPI
+  - WorldGuard
+description: Library plugin created by conaxgames.com

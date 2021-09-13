@@ -1,0 +1,6 @@
+serverdata:
+  license: "your-license-here"
+  auto-update: true
+
+settings:
+  tab: false
