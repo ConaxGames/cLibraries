@@ -1,17 +1,13 @@
 package com.conaxgames.libraries.nms.management;
 
 import com.conaxgames.libraries.nms.management.utility.UtilityNMSManager;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public abstract class LibNMSManagers {
 
-    protected UtilityNMSManager utilityManager;
-
-    public LibNMSManagers(UtilityNMSManager utilityManager) {
-        this.utilityManager = utilityManager;
-    }
-
-    public UtilityNMSManager getUtilityManager() {
-        return this.utilityManager;
-    }
+    protected UtilityNMSManager utilityNMSManager;
 }
 

@@ -1,16 +1,7 @@
 package com.conaxgames.libraries.message;
 
-import com.conaxgames.libraries.util.CC;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.WordUtils;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;

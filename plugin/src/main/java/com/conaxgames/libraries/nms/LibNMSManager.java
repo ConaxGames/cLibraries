@@ -1,16 +1,21 @@
 package com.conaxgames.libraries.nms;
 
 import com.conaxgames.libraries.nms.management.LibNMSManagers;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 
+@Getter
+@Setter
+@RequiredArgsConstructor
 public abstract class LibNMSManager {
     private static LibNMSManager nmsManager;
     private LibServerVersion serverVersion;
 
-    public LibNMSManager(LibNMSManagers libNMSManagers) {
-    }
-
-
+    @NonNull
+    protected LibNMSManagers managers;
 
     public static LibNMSManager getInstance() {
         return LibNMSManager.nmsManager == null ? LibNMSManager.nmsManager = newInstance() : LibNMSManager.nmsManager;
