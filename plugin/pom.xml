@@ -8,7 +8,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>clibraries-plugin-test</artifactId>
+    <artifactId>clibraries-plugin</artifactId>
     <version>0.2</version>
     <name>cLibraries Plugin</name>
 
