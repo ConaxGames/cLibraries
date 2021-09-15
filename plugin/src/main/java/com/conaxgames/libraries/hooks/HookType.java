@@ -9,6 +9,7 @@ public enum HookType {
     WORLD_GUARD(GamemodeType.UNKNOWN),
 
     /* CONAX */
+    CSUITE(GamemodeType.UNKNOWN),
     ARENAPVP(GamemodeType.ARENA_PVP),
     UHC(GamemodeType.UHC),
     MANGO(GamemodeType.HUB),

@@ -33,6 +33,7 @@ public class HookManager implements Listener {
         registerHook(new TitleManagerHook(HookType.TITLE_MANAGER));
         registerHook(new WorldGuardHook(HookType.WORLD_GUARD));
 
+        registerHook(new cSuiteHook(HookType.CSUITE));
         registerHook(new ArenaPvPHook(HookType.ARENAPVP));
         registerHook(new KitPvPHook(HookType.KITPVP));
         registerHook(new MangoHook(HookType.MANGO));
