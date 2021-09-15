@@ -17,11 +17,6 @@ public abstract class Hook implements Listener {
      */
     public abstract HookType getHookType();
 
-    /**
-     * Sets value of {@link Plugin} linked to this {@link Hook}.
-     */
-    public abstract void setPlugin(Plugin plugin);
-
     public String getPluginFromAnnotation() {
         return this.pluginFromAnnotation;
     }

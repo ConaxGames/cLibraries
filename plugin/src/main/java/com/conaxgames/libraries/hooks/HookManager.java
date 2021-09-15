@@ -2,18 +2,13 @@ package com.conaxgames.libraries.hooks;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
-import com.conaxgames.libraries.hooks.impl.conax.*;
-import com.conaxgames.libraries.hooks.impl.spigot.PlaceholderHook;
-import com.conaxgames.libraries.hooks.impl.spigot.TitleManagerHook;
-import com.conaxgames.libraries.hooks.impl.spigot.VaultHook;
-import com.conaxgames.libraries.hooks.impl.spigot.WorldGuardHook;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,27 +23,24 @@ public class HookManager implements Listener {
     public HookManager(LibraryPlugin plugin) {
         this.plugin = plugin;
 
-        registerHook(new PlaceholderHook(HookType.PAPI));
-        registerHook(new VaultHook(HookType.VAULT));
-        registerHook(new TitleManagerHook(HookType.TITLE_MANAGER));
-        registerHook(new WorldGuardHook(HookType.WORLD_GUARD));
+        for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
+            LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Attempting to hook into " + CC.SECONDARY + p.getName() + CC.PRIMARY + ".");
+            HookType type = Arrays.stream(HookType.values()).filter(t -> t.name().equalsIgnoreCase(p.getName())).findFirst().orElse(null);
+            if (type == null) {
+                LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hook type was not valid but plugin name was " + CC.SECONDARY + p.getName());
+                LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Available hooks: " + CC.SECONDARY + Arrays.toString(HookType.values()));
+                continue;
+            }
 
-        registerHook(new cSuiteHook(HookType.CSUITE));
-        registerHook(new ArenaPvPHook(HookType.ARENAPVP));
-        registerHook(new KitPvPHook(HookType.KITPVP));
-        registerHook(new MangoHook(HookType.MANGO));
-        registerHook(new NeonUHCHook(HookType.UHC));
-        registerHook(new PearHCFHook(HookType.HCF));
-        registerHook(new SkyblockHook(HookType.SKYBLOCK));
+            registerHook(new HookWrapper(type, p));
+        }
     }
 
     @EventHandler
     public void onPluginEnable(LibraryPluginEnableEvent event) {
-
         loadGamemodeTypeFromHooks();
 
         if (serverType == GamemodeType.UNKNOWN) {
-
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 for (Hook disabled : disabledHooks) {
                     if (plugin.isEnabled() && plugin.getName().contains(disabled.getPluginFromAnnotation())) {
@@ -81,38 +73,12 @@ public class HookManager implements Listener {
      */
     public void registerHook(Hook hook) {
         try {
-            Class<?> clazz = hook.getClass();
+            hooks.add(hook);
+            LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
+                    + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
 
-            /* The clazz is not annotated with the @HookAnnotation so we are not going to enable it. */
-            if (!clazz.isAnnotationPresent(HookAnnotation.class)) {
-                plugin.getLogger().info("[cLibraries] The class " + clazz.getSimpleName() + " is not annotated with @HookAnnotation");
-                return;
-            }
-
-            /* The annotation provides a name and description for the hook to display. */
-            HookAnnotation annotation = clazz.getAnnotation(HookAnnotation.class);
-            hook.pluginFromAnnotation = annotation.plugin();
-
-            if (Bukkit.getPluginManager().isPluginEnabled(annotation.plugin())) {
-                hook.setPlugin(Bukkit.getPluginManager().getPlugin(annotation.plugin()));
-
-                Method[] methods = clazz.getMethods();
-                for (Method method : methods) {
-                    if (method.isAnnotationPresent(EventHandler.class)) {
-                        this.plugin.getServer().getPluginManager().registerEvents(hook, this.plugin);
-                        break;
-                    }
-                }
-
-                /* Adding the module to the set as it is enabled and usable. */
-                hooks.add(hook);
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getPluginFromAnnotation() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
-                        + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
-            } else {
-                disabledHooks.add(hook);
-            }
         } catch (Exception e) {
-            plugin.getLogger().info("[cLibraries] Unable to load hook because of exception: ");
+            plugin.getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
             e.printStackTrace();
         }
     }

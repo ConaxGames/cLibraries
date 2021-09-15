@@ -7,9 +7,12 @@ public enum HookType {
     VAULT(GamemodeType.UNKNOWN),
     TITLE_MANAGER(GamemodeType.UNKNOWN),
     WORLD_GUARD(GamemodeType.UNKNOWN),
+    PROTOCOLLIB(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),
+    CADDONS(GamemodeType.UNKNOWN),
+    CMIGRATION(GamemodeType.UNKNOWN),
     ARENAPVP(GamemodeType.ARENA_PVP),
     UHC(GamemodeType.UHC),
     MANGO(GamemodeType.HUB),
