@@ -8,6 +8,7 @@ public enum HookType {
     TITLE_MANAGER(GamemodeType.UNKNOWN),
     WORLD_GUARD(GamemodeType.UNKNOWN),
     PROTOCOLLIB(GamemodeType.UNKNOWN),
+    CMI(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),

@@ -1,4 +1,4 @@
 # Main configuration for cLibraries
 serverdata:
   license: "your-license-here"
-  auto-update: true
+  auto-update: trued
