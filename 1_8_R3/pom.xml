@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>clibraries-plugin</artifactId>
-            <version>0.2</version>
+            <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
