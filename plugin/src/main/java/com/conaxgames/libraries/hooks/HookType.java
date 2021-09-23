@@ -9,6 +9,7 @@ public enum HookType {
     WORLD_GUARD(GamemodeType.UNKNOWN),
     PROTOCOLLIB(GamemodeType.UNKNOWN),
     CMI(GamemodeType.UNKNOWN),
+    TAB(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),

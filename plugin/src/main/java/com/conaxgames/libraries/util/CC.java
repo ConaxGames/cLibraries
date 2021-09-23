@@ -1,18 +1,12 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.nms.LibNMSManager;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class CC {
-
-	private static final Pattern pattern = Pattern.compile("(?<!\\\\)(#[a-fA-F0-9]{6})");
 
 	public static String PRIMARY = ChatColor.YELLOW.toString();
 	public static String SECONDARY = ChatColor.GOLD.toString();
@@ -107,23 +101,12 @@ public final class CC {
 	public static final String B_DARK_AQUA = CC.B + CC.DARK_AQUA;
 
 	public static String translate(String string) {
-		return hex(ChatColor.translateAlternateColorCodes('&', string));
+//		return LibNMSManager.getInstance().getManagers().getUtilityNMSManager().translateHex(string);
+		return ChatColor.translateAlternateColorCodes('&', string);
 	}
 
 	public static List<String> translate(List<String> text) {
 		return text.stream().map(CC::translate).collect(Collectors.toList());
-	}
-
-	public static String hex(String message) {
-		Matcher matcher = pattern.matcher(message); // Creates a matcher with the given pattern & message
-
-		while (matcher.find()) { // Searches the message for something that matches the pattern
-			String color = message.substring(matcher.start(), matcher.end()); // Extracts the color from the message
-			// TODO: BOWP FUCKING NOOB
-			message = message.replace(color, "" + ChatColor.valueOf(color)); // Places the color in the message
-		}
-
-		return message; // Returns the message
 	}
 
 	public CC() {
