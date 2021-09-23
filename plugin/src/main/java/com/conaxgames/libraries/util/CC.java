@@ -101,8 +101,8 @@ public final class CC {
 	public static final String B_DARK_AQUA = CC.B + CC.DARK_AQUA;
 
 	public static String translate(String string) {
-//		return LibNMSManager.getInstance().getManagers().getUtilityNMSManager().translateHex(string);
-		return ChatColor.translateAlternateColorCodes('&', string);
+		String translatedHex = LibNMSManager.getInstance().getManagers().getUtilityNMSManager().translateHex(string);
+		return ChatColor.translateAlternateColorCodes('&', translatedHex);
 	}
 
 	public static List<String> translate(List<String> text) {

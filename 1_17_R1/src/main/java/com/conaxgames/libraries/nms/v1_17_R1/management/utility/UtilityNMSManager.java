@@ -7,16 +7,17 @@ import java.util.regex.Pattern;
 
 public class UtilityNMSManager extends com.conaxgames.libraries.nms.management.utility.UtilityNMSManager {
 
-    private static final Pattern pattern = Pattern.compile("(?<!\\\\)(#[a-fA-F0-9]{6})");
+    private static final Pattern PATTERN = Pattern.compile("&(#\\w{6})");
+
     @Override
     public String translateHex(String message) {
-        Matcher matcher = pattern.matcher(message); // Creates a matcher with the given pattern & message
+        Matcher matcher = PATTERN.matcher(ChatColor.translateAlternateColorCodes('&', message));
+        StringBuffer buffer = new StringBuffer();
 
-        while (matcher.find()) { // Searches the message for something that matches the pattern
-            String color = message.substring(matcher.start(), matcher.end()); // Extracts the color from the message
-            message = message.replace(color, "" + ChatColor.of(color)); // Places the color in the message
+        while (matcher.find()) {
+            matcher.appendReplacement(buffer, ChatColor.of(matcher.group(1)).toString());
         }
 
-        return message; // Returns the message
+        return matcher.appendTail(buffer).toString();
     }
 }
