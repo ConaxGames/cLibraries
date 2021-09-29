@@ -179,11 +179,11 @@ public final class TimeUtil {
         if (minutes > 1) output += minutes + "m ";
         else if (minutes == 1) output += minutes + "m ";
 
-        if (seconds > 1) output += seconds + "s ";
-        else if (seconds == 1) output += seconds + "s ";
+        if (seconds > 1) output += seconds + "s";
+        else if (seconds == 1) output += seconds + "s";
 
         if (output.isEmpty()) {
-            output += "0s ";
+            output += "0s";
         }
 
         return output;
