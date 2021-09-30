@@ -24,14 +24,6 @@
         <maven.compiler.optimize>true</maven.compiler.optimize>
     </properties>
 
-    <repositories>
-        <!-- This adds the BungeeCord Maven repository to the build -->
-        <repository>
-            <id>bungeecord-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
-
     <build>
         <finalName>${project.name}</finalName>
 
