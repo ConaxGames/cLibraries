@@ -2,3 +2,4 @@
 serverdata:
   license: "your-license-here"
   auto-update: true
+  debug: false

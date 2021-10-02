@@ -9,6 +9,7 @@ public class Settings {
 
     public final String license;
     public final Boolean autoupdate;
+    public final Boolean debug;
 
     public Settings() {
         File file = new File(LibraryPlugin.getInstance().getDataFolder(), "settings.yml");
@@ -26,5 +27,6 @@ public class Settings {
 
         license = settings.getString("serverdata.license");
         autoupdate = settings.getBoolean("serverdata.auto-update");
+        debug = settings.getBoolean("serverdata.debug");
     }
 }

@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.util;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.UUID;
 
 public class License {
@@ -43,14 +45,23 @@ public class License {
     public boolean register() {
         ValidationType vt = isValid();
         if (vt == ValidationType.VALID) {
+            LibraryPlugin.getInstance().sendDebug("License Checker", "License key seems to be valid :>");
             return true;
         } else {
-            log(0, "[cLibraries] Oh noes! Error 404.");
-            Bukkit.getScheduler().cancelTasks(plugin);
-            Bukkit.getPluginManager().disablePlugin(plugin);
-            return false;
+            try {
+                final URLConnection connection = new URL("https://conaxgames.com/license/verify.php").openConnection();
+                connection.connect();
+                LibraryPlugin.getInstance().sendDebug("License Checker", "Web server is online! but license is invalid");
+                Bukkit.getScheduler().cancelTasks(plugin);
+                Bukkit.getPluginManager().disablePlugin(plugin);
+                return false;
+            } catch (final IOException e) {
+                LibraryPlugin.getInstance().sendDebug("License Checker", "Web server seems to be unreachable, Ignoring license key");
+                return true;
+            }
         }
     }
+
 
     public boolean isValidSimple() {
         return (isValid() == ValidationType.VALID);
