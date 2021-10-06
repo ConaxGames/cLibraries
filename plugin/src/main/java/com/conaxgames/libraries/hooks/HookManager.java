@@ -78,9 +78,10 @@ public class HookManager implements Listener {
     public void registerHook(Hook hook) {
         try {
             hooks.add(hook);
-            LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
-                    + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
-
+            if (LibraryPlugin.getInstance().getSettings().debug) {
+                LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
+                        + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
+            }
         } catch (Exception e) {
             plugin.getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
             e.printStackTrace();

@@ -57,8 +57,9 @@ public class LibraryPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(hookManager, this);
 
         long finish = System.currentTimeMillis();
-        getLogger().info("Successfully hooked into " + getHooked().size() + " plugin" + (getHooked().size() == 1 ? "" : "s") + " and loaded utilities in " + (finish - start) + " ms.");
-
+        if (LibraryPlugin.getInstance().getSettings().debug) {
+            getLogger().info("Successfully hooked into " + getHooked().size() + " plugin" + (getHooked().size() == 1 ? "" : "s") + " and loaded utilities in " + (finish - start) + " ms.");
+        }
         new LibraryPluginEnableEvent().call();
     }
 
