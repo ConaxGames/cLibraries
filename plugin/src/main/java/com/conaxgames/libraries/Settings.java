@@ -20,7 +20,7 @@ public class Settings {
         CommentedConfiguration settings = CommentedConfiguration.loadConfiguration(file);
 
         try {
-            settings.syncWithConfig(file, LibraryPlugin.getInstance().getResource("settings.yml"),  "serverdata", "settings");
+            settings.syncWithConfig(file, LibraryPlugin.getInstance().getResource("settings.yml"));
         } catch (Exception exception) {
             Bukkit.getLogger().info("Unable to load settings.yml");
         }
