@@ -3,7 +3,7 @@ package com.conaxgames.libraries.hooks;
 public enum HookType {
 
     /* PUBLIC */
-    PAPI(GamemodeType.UNKNOWN),
+    PLACEHOLDERAPI(GamemodeType.UNKNOWN),
     VAULT(GamemodeType.UNKNOWN),
     TITLE_MANAGER(GamemodeType.UNKNOWN),
     WORLD_GUARD(GamemodeType.UNKNOWN),
