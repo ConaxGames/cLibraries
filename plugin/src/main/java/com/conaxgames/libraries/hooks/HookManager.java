@@ -65,7 +65,7 @@ public class HookManager implements Listener {
             if (hook.getHookType().getGamemode() != null && hook.getHookType().getGamemode() != GamemodeType.UNKNOWN) {
                 serverType = hook.getHookType().getGamemode();
                 LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Automatically determined the server is a " + CC.SECONDARY + serverType.getDisplay() + CC.PRIMARY + " server.");
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.GRAY + "(This was determined through the " + hook.getPluginFromAnnotation() + " plugin being enabled.)");
+                LibraryPlugin.getInstance().sendConsoleMessage(CC.GRAY + "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)");
                 break;
             }
         }
