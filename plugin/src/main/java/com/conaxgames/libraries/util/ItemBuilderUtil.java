@@ -2,6 +2,8 @@ package com.conaxgames.libraries.util;
 
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -11,10 +13,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class ItemBuilderUtil {
 
@@ -77,6 +77,21 @@ public class ItemBuilderUtil {
             is.setItemMeta(im);
         } catch (ClassCastException expected) {
         }
+        return this;
+    }
+
+    public ItemBuilderUtil setSkullProfile(String texture) {
+        SkullMeta meta = (SkullMeta) is.getItemMeta();
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        profile.getProperties().put("textures", new Property("textures", texture));
+        try {
+            Field profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+        }
+        is.setItemMeta(meta);
         return this;
     }
 
