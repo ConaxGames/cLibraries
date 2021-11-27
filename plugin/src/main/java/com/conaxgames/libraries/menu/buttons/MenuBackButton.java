@@ -3,6 +3,7 @@ package com.conaxgames.libraries.menu.buttons;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public final class MenuBackButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return Material.BED;
+        return XMaterial.RED_BED.parseMaterial();
     }
 
     @Override

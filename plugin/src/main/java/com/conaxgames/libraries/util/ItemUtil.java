@@ -118,7 +118,6 @@ public final class ItemUtil {
 
 	public static ItemStack renameItem(ItemStack item, String name) {
 		ItemMeta meta = item.getItemMeta();
-
 		meta.setDisplayName(CC.translate(name));
 		item.setItemMeta(meta);
 

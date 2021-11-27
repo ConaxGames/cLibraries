@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.menu;
 
+import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
@@ -157,15 +158,15 @@ public abstract class Button {
     }
 
     public static void playFail(Player player) {
-        player.playSound(player.getLocation(), Sound.DIG_GRASS, 20.0f, 0.1f);
+        XSound.BLOCK_GRASS_BREAK.play(player);
     }
 
     public static void playSuccess(Player player) {
-        player.playSound(player.getLocation(), Sound.NOTE_PIANO, 20.0f, 15.0f);
+        XSound.BLOCK_NOTE_BLOCK_HARP.play(player);
     }
 
     public static void playNeutral(Player player) {
-        player.playSound(player.getLocation(), Sound.CLICK, 20.0f, 1.0f);
+        XSound.UI_BUTTON_CLICK.play(player);
     }
 
 }

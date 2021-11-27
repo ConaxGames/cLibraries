@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.Bukkit;
@@ -41,7 +42,7 @@ public abstract class Menu {
         if (this.isPlaceholder()) {
 
             // Fills gray stained glass in all empty slots (good for panel menus)
-            Button placeholder = Button.placeholder(Material.STAINED_GLASS_PANE, (byte)7, CC.DARK_GRAY + "");
+            Button placeholder = Button.placeholder(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), (byte)7, CC.DARK_GRAY + "");
             for (int index = 0; index < this.size(invButtons); ++index) {
                 if (invButtons.get(index) != null) continue;
                 this.buttons.put(index, placeholder);

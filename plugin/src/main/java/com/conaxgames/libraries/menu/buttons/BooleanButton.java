@@ -4,6 +4,9 @@ import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.Callback;
+import com.conaxgames.libraries.util.WoolUtil;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -49,7 +52,7 @@ public class BooleanButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return Material.STAINED_CLAY;
+        return WoolUtil.convertChatColorToXClay(this.confirm ? ChatColor.GREEN : ChatColor.RED).parseMaterial();
     }
 
     @ConstructorProperties(value={"confirm", "callback"})

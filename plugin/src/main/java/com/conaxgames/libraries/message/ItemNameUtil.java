@@ -691,7 +691,7 @@ public class ItemNameUtil {
 
     public static String enchantLookup(Enchantment enchantment) {
         String result;
-        String key = Integer.toString(enchantment.getId());
+        String key = enchantment.getName();
         result = enchantmentmap.get(key);
         return result;
     }
