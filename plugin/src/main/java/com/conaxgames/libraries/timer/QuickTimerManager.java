@@ -81,7 +81,7 @@ public class QuickTimerManager {
     public static boolean hasAndMessage(Player player, String ability) {
         if(hasTimer(player, ability)) {
             long remaining = QuickTimerManager.getRemaining(player.getUniqueId(), ability);
-            player.sendMessage(CC.RED + "You must wait " + CC.B_RED + TimeUtil.timeAsString(remaining) + CC.RED + "before doing this again.");
+            player.sendMessage(CC.RED + "You must wait " + CC.B_RED + TimeUtil.timeAsString(remaining) + CC.RED + " before doing this again.");
             return true;
         }
         return false;
