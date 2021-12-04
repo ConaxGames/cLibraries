@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>clibraries-plugin</artifactId>
-    <version>0.8</version>
+    <version>0.9</version>
     <name>cLibraries Plugin</name>
 
     <distributionManagement>
@@ -141,6 +141,12 @@
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>clibraries-nms-v1_17_R1</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.conaxgames</groupId>
+            <artifactId>clibraries-nms-v1_18_R1</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
