@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.nms.v1_17_R1.management.utility;
+package com.conaxgames.libraries.nms.v1_18_R1.management.utility;
 
 import net.md_5.bungee.api.ChatColor;
 

@@ -49,7 +49,7 @@ public class License {
             return true;
         } else {
             try {
-                final URLConnection connection = new URL("https://conaxgames.com/license/verify.php").openConnection();
+                final URLConnection connection = new URL("https://cdn.conaxgames.com/license/verify.php").openConnection();
                 connection.connect();
                 LibraryPlugin.getInstance().sendDebug("License Checker", "Web server is online! but license is invalid");
                 Bukkit.getScheduler().cancelTasks(plugin);

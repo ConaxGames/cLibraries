@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.nms.v1_17_R1;
+package com.conaxgames.libraries.nms.v1_18_R1;
 
 import com.conaxgames.libraries.nms.v1_17_R1.management.utility.UtilityNMSManager;
 

@@ -43,7 +43,7 @@ public class LibraryPlugin extends JavaPlugin {
             getLogger().info("Settings handler is null lol");
         }
 
-        if(!new License(this.getSettings().license, "https://conaxgames.com/license/verify.php", this).register()) return;
+        if(!new License(this.getSettings().license, "https://cdn.conaxgames.com/license/verify.php", this).register()) return;
 
         long start = System.currentTimeMillis();
         getLogger().info("Attempting to load utilities...");
