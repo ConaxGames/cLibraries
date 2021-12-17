@@ -2,6 +2,7 @@ package com.conaxgames.libraries.event.impl;
 
 import com.conaxgames.libraries.event.CancellableEvent;
 import lombok.Getter;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -9,9 +10,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class FakeDeathEvent extends CancellableEvent {
     private final EntityDamageByEntityEvent event;
     private final Player dead;
-    private final Player killer;
+    private final Entity killer;
 
-    public FakeDeathEvent(EntityDamageByEntityEvent event, Player dead, Player killer) {
+    public FakeDeathEvent(EntityDamageByEntityEvent event, Player dead, Entity killer) {
         this.event = event;
         this.dead = dead;
         this.killer = killer;

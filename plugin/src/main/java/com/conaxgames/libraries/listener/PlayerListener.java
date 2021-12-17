@@ -49,15 +49,10 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        if (event.isCancelled()) {
-            return;
-        }
-
         Player dead = (Player) event.getEntity();
-        Player damager = (Player) event.getDamager();
 
         if ((event.getDamage()/2) >= dead.getHealth()) {
-            new FakeDeathEvent(event, dead, damager).call();
+            new FakeDeathEvent(event, dead, event.getDamager()).call();
         }
     }
 }
