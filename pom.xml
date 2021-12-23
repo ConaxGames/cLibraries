@@ -10,6 +10,7 @@
     <version>1.0.0</version>
 
     <modules>
+        <module>1_7_R1</module>
         <module>1_8_R3</module>
         <module>1_12_R1</module>
         <module>1_16_R3</module>
