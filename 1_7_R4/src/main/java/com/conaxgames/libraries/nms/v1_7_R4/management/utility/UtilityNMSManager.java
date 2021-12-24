@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.nms.v1_7_R1.management.utility;
+package com.conaxgames.libraries.nms.v1_7_R4.management.utility;
 
 public class UtilityNMSManager extends com.conaxgames.libraries.nms.management.utility.UtilityNMSManager {
 

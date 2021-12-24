@@ -8,8 +8,8 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>clibraries-nms-v1_7_R1</artifactId>
-    <name>Libraries NMS v1_7_R1</name>
+    <artifactId>clibraries-nms-v1_7_R4</artifactId>
+    <name>Libraries NMS v1_7_R4</name>
 
     <repositories>
         <repository>

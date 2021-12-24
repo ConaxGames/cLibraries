@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.nms;
 
 public enum LibServerVersion {
+    v1_7_R4,
     v1_8_R3,
     v1_12_R1,
     v1_16_R3,
