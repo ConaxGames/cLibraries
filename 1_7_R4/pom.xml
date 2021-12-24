@@ -13,17 +13,23 @@
 
     <repositories>
         <repository>
-            <id>spigot-nms-1_7</id>
-            <url>https://maven.elmakers.com/repository/</url>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.conaxgames.local</groupId>
+            <artifactId>paperspigot1_7_10</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- This adds the Spigot API artifact to the build -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.7.10-R0.1-SNAPSHOT</version>
+            <artifactId>spigot</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- This adds the Plugin API artifact to the build -->
