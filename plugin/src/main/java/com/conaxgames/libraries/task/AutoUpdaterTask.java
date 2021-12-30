@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.task;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.License;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -16,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,9 +40,17 @@ public class AutoUpdaterTask extends BukkitRunnable {
             // Get the file to variable, where this jar is running
             File jarFileOnPluginFolder = new File(LibraryPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-            logger.log(Level.INFO, "[cLibraries] Local file has size: " + jarFileOnPluginFolder.length() + " bytes");
-            logger.log(Level.INFO, "[cLibraries] Received file with size: " + httpResponse.getEntity().getContentLength() + " bytes");
-            logger.log(Level.INFO, "[cLibraries] Received file with size1: " + httpResponse.getFirstHeader("Content-Length").getValue() + " bytes");
+            if (LibraryPlugin.getInstance().getSettings().debug) {
+                logger.log(Level.INFO, "[cLibraries] Local file has size: " + jarFileOnPluginFolder.length() + " bytes");
+                logger.log(Level.INFO, "[cLibraries] Received file with size: " + httpResponse.getEntity().getContentLength() + " bytes");
+            }
+
+            if (httpResponse.getEntity().getContentLength() == -1) {
+                if(new License(LibraryPlugin.getInstance().getSettings().license, "https://cdn.conaxgames.com/license/verify.php", LibraryPlugin.getInstance()).register()) {
+                    logger.log(Level.INFO, "[cLibraries] Unable to connect to updater, Please contact our team.");
+                    return;
+                }
+            }
 
             // Let's verify if the length of version on web is different than original on folder
             if (jarFileOnPluginFolder.length() != httpResponse.getEntity().getContentLength()) {
