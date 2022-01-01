@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.event.impl.MenuOpenEvent;
 import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
@@ -74,14 +75,16 @@ public abstract class Menu {
 
     public void openMenu(Player player) {
         Inventory inv = this.createInventory(player);
-        try {
-            //Menu.getOpenInventoryMethod().invoke((Object)player, new Object[]{inv, ep, 0});
 
-            player.openInventory(inv);
-            this.update(player);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
+        if (!openEvent.call()) {
+            try {
+                //Menu.getOpenInventoryMethod().invoke((Object)player, new Object[]{inv, ep, 0});
+                player.openInventory(inv);
+                this.update(player);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
