@@ -3,6 +3,9 @@ package com.conaxgames.libraries.util;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.message.ItemNameUtil;
 import com.conaxgames.libraries.message.TimeUtil;
+import com.conaxgames.libraries.nms.LibNMSManager;
+import com.conaxgames.libraries.nms.LibServerVersion;
+import com.conaxgames.libraries.nms.management.utility.UtilityNMSManager;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -52,7 +55,9 @@ public final class ItemUtil {
 				CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
 
 		meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+		}
 
 		itemStack.setItemMeta(meta);
 		return itemStack;
@@ -103,7 +108,9 @@ public final class ItemUtil {
 
 	public static ItemStack hideEnchants(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+		}
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -111,7 +118,9 @@ public final class ItemUtil {
 	public static ItemStack setUnbreakable(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		meta.spigot().setUnbreakable(true);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+			meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		}
 		item.setItemMeta(meta);
 		return item;
 	}

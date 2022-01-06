@@ -1,5 +1,7 @@
 package com.conaxgames.libraries.menu;
 
+import com.conaxgames.libraries.nms.LibNMSManager;
+import com.conaxgames.libraries.nms.LibServerVersion;
 import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -139,17 +141,23 @@ public abstract class Button {
         }
 
         if (hideAttributes(player)) {
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS,
-                    ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
+            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS,
+                        ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
+            }
         }
 
         if (hideEnchants(player)) {
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
         }
 
         if (shinyItem(player)) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
         }
 
         buttonItem.setItemMeta(meta);
