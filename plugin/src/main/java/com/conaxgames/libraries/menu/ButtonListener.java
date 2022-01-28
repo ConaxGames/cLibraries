@@ -18,6 +18,9 @@ public class ButtonListener implements Listener {
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
             if (event.getSlot() != event.getRawSlot()) {
+                if (event.getClick().equals(ClickType.DOUBLE_CLICK) || event.getClick().equals(ClickType.NUMBER_KEY)) {
+                    event.setCancelled(true);
+                }
                 if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
                     event.setCancelled(true);
                     if (openMenu.isNoncancellingInventory() && event.getCurrentItem() != null) {
