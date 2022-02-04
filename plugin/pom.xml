@@ -131,7 +131,7 @@
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
-            <version>8.5.0</version>
+            <version>8.6.1</version>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
