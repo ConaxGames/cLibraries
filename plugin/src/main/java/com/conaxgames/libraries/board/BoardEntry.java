@@ -1,5 +1,8 @@
 package com.conaxgames.libraries.board;
 
+import com.conaxgames.libraries.nms.LibNMSManager;
+import com.conaxgames.libraries.nms.LibServerVersion;
+import com.conaxgames.libraries.util.CC;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -55,32 +58,37 @@ public class BoardEntry {
 	public BoardEntry send(int position) {
 		Objective objective = board.getObjective();
 
-		if (this.text.length() > 16) {
-			this.team.setPrefix(this.text.substring(0, 16));
+		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_16_R3)){
+			this.team.setSuffix(CC.translate(this.text));
+			this.team.addEntry(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', "&a"));
+		} else {
+			if (this.text.length() > 16) {
+				this.team.setPrefix(this.text.substring(0, 16));
 
-			boolean addOne = this.team.getPrefix().endsWith(ChatColor.COLOR_CHAR + "");
+				boolean addOne = this.team.getPrefix().endsWith(ChatColor.COLOR_CHAR + "");
 
-			if (addOne) {
-				this.team.setPrefix(this.text.substring(0, 15));
-			}
-
-			String suffix = ChatColor.getLastColors(this.team.getPrefix())
-					+ this.text.substring(addOne ? 15 : 16, this.text.length());
-
-			if (suffix.length() > 16) {
-				if (suffix.length() - 2 <= 16) {
-					suffix = this.text.substring(addOne ? 15 : 16, this.text.length());
-					this.team.setSuffix(suffix.substring(0, suffix.length()));
-				} else {
-					this.team.setSuffix(suffix.substring(0, 16));
+				if (addOne) {
+					this.team.setPrefix(this.text.substring(0, 15));
 				}
 
+				String suffix = ChatColor.getLastColors(this.team.getPrefix())
+						+ this.text.substring(addOne ? 15 : 16, this.text.length());
+
+				if (suffix.length() > 16) {
+					if (suffix.length() - 2 <= 16) {
+						suffix = this.text.substring(addOne ? 15 : 16, this.text.length());
+						this.team.setSuffix(suffix.substring(0, suffix.length()));
+					} else {
+						this.team.setSuffix(suffix.substring(0, 16));
+					}
+
+				} else {
+					this.team.setSuffix(suffix);
+				}
 			} else {
-				this.team.setSuffix(suffix);
+				this.team.setSuffix("");
+				this.team.setPrefix(this.text);
 			}
-		} else {
-			this.team.setSuffix("");
-			this.team.setPrefix(this.text);
 		}
 
 		Score score = objective.getScore(this.key);
