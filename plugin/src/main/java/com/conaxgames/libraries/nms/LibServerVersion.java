@@ -6,7 +6,8 @@ public enum LibServerVersion {
     v1_12_R1,
     v1_16_R3,
     v1_17_R1,
-    v1_18_R1;
+    v1_18_R1,
+    v1_18_R2;
 
     public boolean after(LibServerVersion serverVersion) {
         return this.ordinal() > serverVersion.ordinal();
