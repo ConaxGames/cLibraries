@@ -141,23 +141,17 @@ public abstract class Button {
         }
 
         if (hideAttributes(player)) {
-            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS,
-                        ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
-            }
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS,
+                    ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
         }
 
         if (hideEnchants(player)) {
-            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         if (shinyItem(player)) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);
-            if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         buttonItem.setItemMeta(meta);

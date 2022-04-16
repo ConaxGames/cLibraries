@@ -55,10 +55,7 @@ public final class ItemUtil {
 				CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
 
 		meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
-		}
-
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
 		itemStack.setItemMeta(meta);
 		return itemStack;
 	}
@@ -108,9 +105,7 @@ public final class ItemUtil {
 
 	public static ItemStack hideEnchants(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
-		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
-		}
+		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -118,9 +113,7 @@ public final class ItemUtil {
 	public static ItemStack setUnbreakable(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		meta.spigot().setUnbreakable(true);
-		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_7_R4)) {
-			meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		}
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		item.setItemMeta(meta);
 		return item;
 	}
