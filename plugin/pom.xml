@@ -135,12 +135,6 @@
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
-            <artifactId>clibraries-nms-v1_7_R4</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.conaxgames</groupId>
             <artifactId>clibraries-nms-v1_8_R3</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
