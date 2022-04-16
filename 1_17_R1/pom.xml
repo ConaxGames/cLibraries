@@ -8,6 +8,14 @@
         <version>1.0.0</version>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
+        </repository>
+
+    </repositories>
+
     <artifactId>clibraries-nms-v1_17_R1</artifactId>
     <name>Libraries NMS v1_17_R1</name>
 
@@ -20,7 +28,7 @@
         <!-- This adds the Spigot API artifact to the build -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>1.17.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

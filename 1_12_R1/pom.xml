@@ -11,12 +11,19 @@
     <artifactId>clibraries-nms-v1_12_R1</artifactId>
     <name>Libraries NMS v1_12_R1</name>
 
+    <repositories>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- This adds the Spigot API artifact to the build -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <artifactId>spigot</artifactId>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- This adds the Plugin API artifact to the build -->
