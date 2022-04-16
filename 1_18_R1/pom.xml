@@ -8,6 +8,13 @@
         <version>1.0.0</version>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
+        </repository>
+    </repositories>
+
     <artifactId>clibraries-nms-v1_18_R1</artifactId>
     <name>Libraries NMS v1_18_R1</name>
 
