@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.menu.impl;
 
+import com.conaxgames.libraries.hooks.Hook;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Material;
@@ -12,9 +13,11 @@ import java.util.List;
 public class HookButton extends Button {
 
     private final Plugin plugin;
+    private final Hook hook;
 
-    public HookButton(Plugin plugin) {
+    public HookButton(Plugin plugin, Hook hook) {
         this.plugin = plugin;
+        this.hook = hook;
     }
 
     @Override
@@ -30,9 +33,15 @@ public class HookButton extends Button {
         boolean loadBefore = plugin.getDescription().getLoadBefore().contains("cLibraries");
         boolean softDepend = plugin.getDescription().getSoftDepend().contains("cLibraries");
 
-        description.add(CC.GRAY + "Depend: " + hooked);
-        description.add(CC.GRAY + "Soft depend: " + softDepend);
-        description.add(CC.GRAY + "Load before: " + loadBefore);
+        description.add(CC.GRAY + "Depend: " + CC.SECONDARY + hooked);
+        description.add(CC.GRAY + "Soft depend: " + CC.SECONDARY + softDepend);
+        description.add(CC.GRAY + "Load before: " + CC.SECONDARY + loadBefore);
+
+        if (hook != null) {
+            description.add(" ");
+            description.add(CC.GRAY + "Hook Type: " + CC.SECONDARY + hook.getHookType().name());
+            description.add(CC.GRAY + "Plugin Version: " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion());
+        }
 
         return description;
     }

@@ -1,14 +1,17 @@
 package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class ButtonListener implements Listener {
 
@@ -17,6 +20,14 @@ public class ButtonListener implements Listener {
         Player player = (Player)event.getWhoClicked();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
+
+            if (!openMenu.isNoncancellingInventory()) {
+                // Has the player clicked the bottom inventory? Their inventory?..
+                if ((event.getClickedInventory().getHolder() instanceof Player)) {
+                    event.setCancelled(true);
+                }
+            }
+
             if (event.getSlot() != event.getRawSlot()) {
                 if (event.getClick().equals(ClickType.DOUBLE_CLICK) || event.getClick().equals(ClickType.NUMBER_KEY)) {
                     event.setCancelled(true);
@@ -26,10 +37,13 @@ public class ButtonListener implements Listener {
                     if (openMenu.isNoncancellingInventory() && event.getCurrentItem() != null) {
                         player.getOpenInventory().getTopInventory().addItem(event.getCurrentItem());
                         event.setCurrentItem(null);
+                    } else if (event.getCurrentItem() != null) {
+                        event.setCancelled(true);
                     }
                 }
                 return;
             }
+
             if (openMenu.getButtons().containsKey(event.getSlot())) {
                 Menu newMenu;
                 Button button = openMenu.getButtons().get(event.getSlot());
@@ -54,6 +68,8 @@ public class ButtonListener implements Listener {
                 if (openMenu.isNoncancellingInventory() && event.getCurrentItem() != null) {
                     player.getOpenInventory().getTopInventory().addItem(event.getCurrentItem());
                     event.setCurrentItem(null);
+                } else if (event.getCurrentItem() != null) {
+                    event.setCancelled(true);
                 }
             }
         }

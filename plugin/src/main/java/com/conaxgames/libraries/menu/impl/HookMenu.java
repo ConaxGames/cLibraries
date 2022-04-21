@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.menu.impl;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.hooks.Hook;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import org.bukkit.entity.Player;
@@ -22,7 +23,10 @@ public class HookMenu extends Menu {
 
         int index = 0;
         for (Plugin plugin : LibraryPlugin.getInstance().getHooked()) {
-            buttons.put(index++, new HookButton(plugin));
+            buttons.put(index++, new HookButton(plugin, null));
+        }
+        for (Hook hook : LibraryPlugin.getInstance().getHookManager().getHooks()) {
+            buttons.put(index++, new HookButton(hook.getPlugin(), hook));
         }
 
         return buttons;

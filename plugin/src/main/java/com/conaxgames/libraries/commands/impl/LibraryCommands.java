@@ -46,6 +46,7 @@ public class LibraryCommands extends BaseCommand {
             for (Plugin plugin : LibraryPlugin.getInstance().getHooked()) {
                 sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + plugin.getName() + CC.PRIMARY + " (" + plugin.getDescription().getVersion() + ")");
             }
+            LibraryPlugin.getInstance().getHookManager().getHooks().forEach(hook -> sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + hook.getHookType().name() + CC.PRIMARY + " (" + hook.getPlugin().getDescription().getVersion() + ")"));
         } else {
             new HookMenu().openMenu((Player) sender);
         }
