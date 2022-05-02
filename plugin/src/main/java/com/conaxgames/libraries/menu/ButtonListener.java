@@ -23,7 +23,7 @@ public class ButtonListener implements Listener {
 
             if (!openMenu.isNoncancellingInventory()) {
                 // Has the player clicked the bottom inventory? Their inventory?..
-                if ((event.getClickedInventory().getHolder() instanceof Player)) {
+                if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() instanceof Player) {
                     event.setCancelled(true);
                 }
             }
