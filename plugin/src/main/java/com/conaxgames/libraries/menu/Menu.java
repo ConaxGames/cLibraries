@@ -3,6 +3,7 @@ package com.conaxgames.libraries.menu;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.MenuOpenEvent;
 import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.util.TaskUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -41,7 +42,6 @@ public abstract class Menu {
         }
 
         if (this.isPlaceholder()) {
-
             // Fills gray stained glass in all empty slots (good for panel menus)
             Button placeholder = Button.placeholder(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), (byte)7, CC.DARK_GRAY + "");
             for (int index = 0; index < this.size(invButtons); ++index) {
@@ -86,6 +86,10 @@ public abstract class Menu {
                 ex.printStackTrace();
             }
         }
+    }
+
+    public void buttonUpdate(Player player) {
+        player.getOpenInventory().getTopInventory().setContents(this.createInventory(player).getContents());
     }
 
     private void update(final Player player) {
@@ -174,7 +178,6 @@ public abstract class Menu {
     public void setPreviousMenu(Menu menu) {this.previous = menu;}
 
     public Menu getPreviousMenu() {return this.previous;}
-
 
     public void setNoncancellingInventory(boolean noncancellingInventory) {
         this.noncancellingInventory = noncancellingInventory;

@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.util.TaskUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -57,8 +58,11 @@ public class ButtonListener implements Listener {
                     event.setCancelled(cancel);
                 }
                 button.clicked(player, event.getSlot(), event.getClick());
-                if (Menu.currentlyOpenedMenus.containsKey(player.getName()) && (newMenu = Menu.currentlyOpenedMenus.get(player.getName())) == openMenu && newMenu.isUpdateAfterClick()) {
-                    newMenu.openMenu(player);
+                if (Menu.currentlyOpenedMenus.containsKey(player.getName()) &&
+                        (newMenu = Menu.currentlyOpenedMenus.get(player.getName())) == openMenu &&
+                        newMenu.isUpdateAfterClick()) {
+                    newMenu.buttonUpdate(player);
+                    event.setCancelled(cancel);
                 }
                 if (event.isCancelled()) {
                     Bukkit.getScheduler().runTaskLater(LibraryPlugin.getInstance(), player::updateInventory, 1L);
@@ -80,7 +84,11 @@ public class ButtonListener implements Listener {
         Player player = (Player)event.getPlayer();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
-            openMenu.onClose(player);
+            if (openMenu.getPreviousMenu() != null) {
+                TaskUtil.runLater(() -> openMenu.getPreviousMenu().openMenu(player), 1L);
+            } else {
+                openMenu.onClose(player);
+            }
             Menu.cancelCheck(player);
 
             Menu.currentlyOpenedMenus.remove(player.getName());
