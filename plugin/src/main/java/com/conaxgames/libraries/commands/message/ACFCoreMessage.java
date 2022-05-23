@@ -19,7 +19,7 @@ public enum ACFCoreMessage {
 
     private final String message;
 
-    private ACFCoreMessage(String message) {
+    ACFCoreMessage(String message) {
         this.message = message;
     }
 

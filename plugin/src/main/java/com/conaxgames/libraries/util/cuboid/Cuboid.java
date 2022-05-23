@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 @Data
 public class Cuboid implements Iterable<Location> {
@@ -482,5 +483,15 @@ public class Cuboid implements Iterable<Location> {
         }
     }
 
+    public Location getRandomLocation() {
+        return getRandomLocation(this.getLowerCorner(), this.getUpperCorner());
+    }
 
+    public Location getRandomLocation(Location min, Location max) {
+        Location range = new Location(min.getWorld(), Math.abs(max.getX() - min.getX()), min.getY(), Math.abs(max.getZ() - min.getZ()));
+        return new Location(min.getWorld(),
+                (Math.random() * range.getX()) + (Math.min(min.getX(), max.getX())),
+                range.getY(),
+                (Math.random() * range.getZ()) + (Math.min(min.getZ(), max.getZ())));
+    }
 }

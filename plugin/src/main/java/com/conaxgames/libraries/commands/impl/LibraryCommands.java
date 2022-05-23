@@ -80,6 +80,13 @@ public class LibraryCommands extends BaseCommand {
         }
     }
 
+    @Subcommand("reload")
+    @Description("Reload the settings for cLibraries!")
+    public void onReload(CommandSender sender) {
+        LibraryPlugin.getInstance().getSettings().reload();
+        sender.sendMessage(CC.GREEN + "Reloaded settings.yml!");
+    }
+
     @HelpCommand
     @CatchUnknown
     public void onHelp(CommandSender sender, CommandHelp help) {

@@ -46,7 +46,6 @@ public class LibraryPlugin extends JavaPlugin {
         if(!new License(this.getSettings().license, "https://cdn.conaxgames.com/license/verify.php", this).register()) return;
 
         long start = System.currentTimeMillis();
-        getLogger().info("Attempting to load utilities...");
 
         this.hookManager = new HookManager(this);
         this.timerManager = new TimerManager();
