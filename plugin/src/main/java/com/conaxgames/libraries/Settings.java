@@ -1,17 +1,25 @@
 package com.conaxgames.libraries;
 
+import com.conaxgames.libraries.commands.message.ACFCoreMessage;
 import com.conaxgames.libraries.config.CommentedConfiguration;
 import org.bukkit.Bukkit;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Settings {
 
-    public final String license;
-    public final Boolean autoupdate;
-    public final Boolean debug;
+    public String license;
+    public boolean autoupdate;
+    public boolean debug;
+    public Map<ACFCoreMessage, String> acfMessages = new HashMap<>();
 
     public Settings() {
+        reload();
+    }
+
+    public void reload() {
         File file = new File(LibraryPlugin.getInstance().getDataFolder(), "settings.yml");
         if (!file.exists()) {
             LibraryPlugin.getInstance().saveResource("settings.yml", false);
@@ -28,5 +36,18 @@ public class Settings {
         license = settings.getString("serverdata.license");
         autoupdate = settings.getBoolean("serverdata.auto-update");
         debug = settings.getBoolean("serverdata.debug");
+
+        for (ACFCoreMessage enumeration : ACFCoreMessage.values()) {
+            String path = enumeration.name().replace("__", ".");
+            path = path.replace("_", "-");
+            path = path.toLowerCase(java.util.Locale.ROOT);
+            path = "commands." + path;
+
+            if (settings.contains(path)) {
+                acfMessages.put(enumeration, String.valueOf(settings.get(path)));
+            } else {
+                acfMessages.put(enumeration, enumeration.getMessage());
+            }
+        }
     }
 }

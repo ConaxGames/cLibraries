@@ -1,6 +1,8 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.CC;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -79,10 +81,10 @@ public class BoardManager implements Runnable {
 
 						BoardEntry entry = board.getByPosition(positionToSearch);
 						if (entry == null) {
-							new BoardEntry(board, text).send(position);
-						} else {
-							entry.setText(text).setup().send(position);
+							entry = new BoardEntry(board, text).send(position);
 						}
+
+						entry.setText(text).setup().send(position);
 
 						if (board.getEntries().size() > scores.size()) {
 							iter = board.getEntries().iterator();

@@ -3,3 +3,15 @@ serverdata:
   license: "your-license-here"
   auto-update: true
   debug: false
+
+commands:
+  unknown-command: "&cUnknown command, please type /help."
+  invalid-syntax: "&cUsage: {command} {syntax}"
+  help-page-information: "&eShowing page &6{page} &eof &6{totalpages} &7({results} results)&e."
+  help-no-results: "&cError: No more results."
+  help-header: "&6=== &eShowing help for &f{commandprefix}{command} &6==="
+  help-format: "&e{commandprefix}{command} &6{parameters} &f{separator} &7{description}"
+  help-detailed-header: "&6=== &eShowing detailed help for &f{commandprefix}{command} &6==="
+  help-detailed-command-format: "&e{commandprefix}{command} &{parameters} &f{separator} &7{description}"
+  help-detailed-parameter-format: "&e{syntaxorname}: &6{description}"
+  help-search-header: "&6=== &eSearch results for &f{commandprefix}{command} {search} &6==="

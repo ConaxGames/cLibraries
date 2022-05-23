@@ -2,8 +2,7 @@ package com.conaxgames.libraries.commands;
 
 import co.aikar.commands.MessageKeys;
 import co.aikar.commands.PaperCommandManager;
-import com.conaxgames.libraries.commands.message.ACFCoreMessage;
-import com.conaxgames.libraries.commands.message.ACFMinecraftMessage;
+import com.conaxgames.libraries.LibraryPlugin;
 
 import java.util.Locale;
 
@@ -15,11 +14,11 @@ public class CommandMessages {
      * @param commandManager - PaperCommandManager
      */
     public CommandMessages(PaperCommandManager commandManager) {
-        for (ACFCoreMessage message : ACFCoreMessage.values()) {
-            Locale locale = new Locale("en");
-            commandManager.getLocales().addMessage(locale, MessageKeys.valueOf(message.name()), message.getMessage().replace("&", "§"));
-        }
+        Locale locale = new Locale("en");
 
+        LibraryPlugin.getInstance().getSettings().acfMessages.forEach((a,s) -> {
+            commandManager.getLocales().addMessage(locale, MessageKeys.valueOf(a.name()), s.replace("&", "§"));
+        });
 //        for (ACFMinecraftMessage message : ACFMinecraftMessage.values()) {
 //            Locale locale = new Locale("en");
 //            commandManager.getLocales().addMessage(locale, MessageKeys.valueOf(message.name()), message.getMessage().replace("&", "§"));

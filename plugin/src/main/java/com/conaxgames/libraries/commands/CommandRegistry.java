@@ -19,7 +19,6 @@ import java.util.Locale;
 public class CommandRegistry {
 
     public CommandRegistry(PaperCommandManager commandManager) {
-
         new CommandMessages(commandManager);
         commandManager.enableUnstableAPI("help");
         loadContexts(commandManager);
