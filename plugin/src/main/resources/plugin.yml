@@ -3,7 +3,7 @@ main: com.conaxgames.libraries.LibraryPlugin
 version: ${git.commit.id.describe-short}
 api-version: "1.13"
 author: ConaxGames Development Team
-loadbefore: [cSuite, Lime]
+loadbefore: [cSuite]
 softdepend:
   - TitleManager
   - Vault
