@@ -173,6 +173,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.conaxgames</groupId>
+            <artifactId>clibraries-nms-v1_19_R1</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.papermc</groupId>
             <artifactId>paperlib</artifactId>
             <version>1.0.7</version>
