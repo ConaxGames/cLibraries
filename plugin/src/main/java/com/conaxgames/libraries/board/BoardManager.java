@@ -109,7 +109,6 @@ public class BoardManager implements Runnable {
 				player.setScoreboard(scoreboard);
 			} catch (Exception e) {
 				e.printStackTrace();
-
 				LibraryPlugin.getInstance().getLogger()
 						.severe("Something went wrong while updating " + player.getName() + "'s scoreboard " + board + " - " + board.getAdapter() + ")");
 			}
