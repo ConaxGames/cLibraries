@@ -100,7 +100,6 @@ public class BoardEntry {
 		this.team.setPrefix(CC.translate(split[0]));
 		this.team.setSuffix(CC.translate(split[1]));
 		this.team.addEntry(ChatColor.translateAlternateColorCodes('&', "&a"));
-		LibraryPlugin.getInstance().sendDebug("BoardEntry", split[0] + " | " + split[1]);
 
 		Score score = objective.getScore(this.key);
 		score.setScore(position);
@@ -138,7 +137,7 @@ public class BoardEntry {
         return this;
     }
 
-	public String[] splitText(String input) { // allows up-to 32 chars length
+	public String[] splitText(String input) { // allows up-to 32 chars length on under 1.16 server version
 		final int inputLength = input.length();
 		if (inputLength > 16) {
 			// Make the prefix the first 16 characters of our text
@@ -156,8 +155,10 @@ public class BoardEntry {
 				suffix = ChatColor.getLastColors(prefix) + input.substring(16);
 			}
 
-			if (suffix.length() > 16) {
-				suffix = suffix.substring(0, 16);
+			if (LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
+				if (suffix.length() > 16) {
+					suffix = suffix.substring(0, 16);
+				}
 			}
 
 			return new String[] {prefix, suffix};
