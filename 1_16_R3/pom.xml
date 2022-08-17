@@ -5,34 +5,32 @@
     <parent>
         <groupId>com.conaxgames</groupId>
         <artifactId>cLibraries-Parent</artifactId>
-        <version>1.0.0</version>
+        <version>dev</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>nms-repo</id>
-            <url>https://repo.codemc.io/repository/nms/</url>
-        </repository>
-    </repositories>
-
-    <artifactId>clibraries-nms-v1_16_R3</artifactId>
-    <name>Libraries NMS v1_16_R3</name>
+    <name>[NMS] cLibraries v1.16.R3</name>
+    <artifactId>cLibraries-NMS</artifactId>
+    <version>1_16_R3</version>
 
     <dependencies>
-        <!-- This adds the Spigot API artifact to the build -->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- This adds the Plugin API artifact to the build -->
         <dependency>
             <groupId>com.conaxgames</groupId>
-            <artifactId>clibraries-plugin</artifactId>
+            <artifactId>cLibraries-Plugin</artifactId>
             <version>LATEST</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--This adds the Spigot API artifact to the build -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>cLibraries</finalName>
+    </build>
 
 </project>
