@@ -5,12 +5,18 @@
     <parent>
         <groupId>com.conaxgames</groupId>
         <artifactId>cLibraries-Parent</artifactId>
-        <version>dev</version>
+        <version>1.0.0</version>
     </parent>
 
-    <name>[NMS] cLibraries v1.18.R1</name>
-    <artifactId>cLibraries-NMS</artifactId>
-    <version>1_18_R1</version>
+    <repositories>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.io/repository/nms/</url>
+        </repository>
+    </repositories>
+
+    <artifactId>clibraries-nms-v1_18_R1</artifactId>
+    <name>Libraries NMS v1_18_R1</name>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -18,24 +24,20 @@
     </properties>
 
     <dependencies>
-        <!-- This adds the Plugin API artifact to the build -->
-        <dependency>
-            <groupId>com.conaxgames</groupId>
-            <artifactId>cLibraries-Plugin</artifactId>
-            <version>LATEST</version>
-            <scope>compile</scope>
-        </dependency>
-        <!--This adds the Spigot API artifact to the build -->
+        <!-- This adds the Spigot API artifact to the build -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>1.18-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <!-- This adds the Plugin API artifact to the build -->
+        <dependency>
+            <groupId>com.conaxgames</groupId>
+            <artifactId>clibraries-plugin</artifactId>
+            <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-
-    <build>
-        <finalName>cLibraries</finalName>
-    </build>
 
 </project>
