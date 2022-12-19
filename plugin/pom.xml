@@ -144,6 +144,12 @@
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
+            <artifactId>clibraries-nms-v1_9_R1</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.conaxgames</groupId>
             <artifactId>clibraries-nms-v1_12_R1</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
@@ -175,6 +181,12 @@
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>clibraries-nms-v1_19_R1</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.conaxgames</groupId>
+            <artifactId>clibraries-nms-v1_19_R2</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
