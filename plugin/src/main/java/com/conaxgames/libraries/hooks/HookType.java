@@ -10,7 +10,7 @@ public enum HookType {
     PROTOCOLLIB(GamemodeType.UNKNOWN),
     CMI(GamemodeType.UNKNOWN),
     TAB(GamemodeType.UNKNOWN),
-    LUCK_PERMS(GamemodeType.UNKNOWN),
+    LUCKPERMS(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),
