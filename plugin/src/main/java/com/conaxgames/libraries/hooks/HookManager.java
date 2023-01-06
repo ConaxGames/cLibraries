@@ -24,16 +24,8 @@ public class HookManager implements Listener {
         this.plugin = plugin;
 
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-            if (LibraryPlugin.getInstance().getSettings().debug) {
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Attempting to hook into " + CC.SECONDARY + p.getName() + CC.PRIMARY + ".");
-            }
             HookType type = Arrays.stream(HookType.values()).filter(t -> t.name().equalsIgnoreCase(p.getName())).findFirst().orElse(null);
             if (type == null) {
-                if (LibraryPlugin.getInstance().getSettings().debug) {
-                    LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hook type was not valid but plugin name was " + CC.SECONDARY + p.getName());
-                    LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Available hooks: " + CC.SECONDARY + Arrays.toString(HookType.values()));
-
-                }
                 continue;
             }
             registerHook(new HookWrapper(type, p));
