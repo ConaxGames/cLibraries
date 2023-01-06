@@ -13,6 +13,7 @@ public enum GamemodeType {
     SKYBLOCK("Skyblock", Arrays.asList("sb","skyblock")),
     SURVIVAL("Survival", Arrays.asList("survival","smp")),
     KITPVP("KitPvP", Collections.singletonList("kitpvp")),
+    FFA("FFA", Collections.singletonList("ffa")),
     UNKNOWN("Unknown", Arrays.asList("null","unknown"));
 
     private final String display;

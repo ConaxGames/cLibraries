@@ -15,16 +15,14 @@
         <module name="clibraries-nms-v1_19_R2" />
         <module name="clibraries-nms-v1_12_R1" />
         <module name="clibraries-nms-v1_8_R3" />
+        <module name="clibraries-plugin" />
         <module name="clibraries-nms-v1_9_R1" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="clibraries-plugin" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="cLibraries" options="" />
+      <module name="cLibraries" options="-parameters" />
       <module name="cLibraries-Plugin" options="-parameters" />
       <module name="clibraries-nms-v1_12_R1" options="-parameters" />
       <module name="clibraries-nms-v1_16_R3" options="-parameters" />
@@ -35,6 +33,7 @@
       <module name="clibraries-nms-v1_19_R2" options="-parameters" />
       <module name="clibraries-nms-v1_8_R3" options="-parameters" />
       <module name="clibraries-nms-v1_9_R1" options="-parameters" />
+      <module name="clibraries-plugin" options="-parameters" />
     </option>
   </component>
 </project>

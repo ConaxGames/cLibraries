@@ -10,6 +10,7 @@ public enum HookType {
     PROTOCOLLIB(GamemodeType.UNKNOWN),
     CMI(GamemodeType.UNKNOWN),
     TAB(GamemodeType.UNKNOWN),
+    LUCK_PERMS(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),
@@ -20,6 +21,8 @@ public enum HookType {
     MANGO(GamemodeType.HUB),
     HCF(GamemodeType.HCF),
     KITPVP(GamemodeType.KITPVP),
+    FFA(GamemodeType.FFA),
+    CGLOBE(GamemodeType.SURVIVAL),
     SKYBLOCK(GamemodeType.SKYBLOCK);
 
     public final GamemodeType gamemode;
