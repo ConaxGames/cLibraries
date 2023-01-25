@@ -84,13 +84,19 @@ public class ButtonListener implements Listener {
         Player player = (Player)event.getPlayer();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
+
             if (openMenu.getPreviousMenu() != null) {
-                TaskUtil.runLater(() -> openMenu.getPreviousMenu().openMenu(player), 1L);
+                TaskUtil.runLater(() -> {
+                    Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
+                    if (newMenu == null) { // only go back if there isn't a new menu opened?
+                        openMenu.getPreviousMenu().openMenu(player);
+                    }
+                }, 2L);
             } else {
                 openMenu.onClose(player);
             }
-            Menu.cancelCheck(player);
 
+            Menu.cancelCheck(player);
             Menu.currentlyOpenedMenus.remove(player.getName());
         }
     }
