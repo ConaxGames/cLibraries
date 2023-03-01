@@ -90,7 +90,7 @@ public final class CC {
 	public static final String U_GREEN = ChatColor.UNDERLINE + GREEN;
 	public static final String U_GRAY = ChatColor.UNDERLINE + GRAY;
 	public static final String U_WHITE = ChatColor.UNDERLINE + WHITE;
-	public static final String B_DARK_RED = ChatColor.BOLD + ChatColor.DARK_RED.toString();
+	public static final String B_DARK_RED = ChatColor.DARK_RED.toString() + ChatColor.BOLD;
 	public static final String B_DARK_GREEN = CC.B + CC.DARK_GREEN;
 	public static final String B_DARK_PURPLE = CC.B + CC.DARK_PURPLE;
 	public static final String U_GOLD = CC.U + CC.GOLD;
