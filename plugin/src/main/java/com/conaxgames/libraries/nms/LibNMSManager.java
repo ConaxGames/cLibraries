@@ -29,8 +29,9 @@ public abstract class LibNMSManager {
             nmsManager.setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion));
 
             return nmsManager;
-        } catch (Throwable t) {
-            throw new IllegalArgumentException(t);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

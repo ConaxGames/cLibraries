@@ -1,6 +1,6 @@
-package com.conaxgames.libraries.nms.v1_19_R4;
+package com.conaxgames.libraries.nms.v1_19_R3;
 
-import com.conaxgames.libraries.nms.v1_19_R2.LibNMSManagers;
+import com.conaxgames.libraries.nms.v1_19_R3.LibNMSManagers;
 
 public class LibNMSManager extends com.conaxgames.libraries.nms.LibNMSManager {
 
