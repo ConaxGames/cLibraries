@@ -8,8 +8,8 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>clibraries-nms-v1_19_R4</artifactId>
-    <name>Libraries NMS v1_19_R4</name>
+    <artifactId>clibraries-nms-v1_19_R3</artifactId>
+    <name>Libraries NMS v1_19_R3</name>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -28,6 +28,12 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
             <version>1.19.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

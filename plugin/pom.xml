@@ -192,7 +192,7 @@
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
-            <artifactId>clibraries-nms-v1_19_R4</artifactId>
+            <artifactId>clibraries-nms-v1_19_R3</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
