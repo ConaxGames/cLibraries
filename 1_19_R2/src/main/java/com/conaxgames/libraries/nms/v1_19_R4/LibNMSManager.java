@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.nms.v1_19_R2;
+package com.conaxgames.libraries.nms.v1_19_R4;
 
 public class LibNMSManager extends com.conaxgames.libraries.nms.LibNMSManager {
 
