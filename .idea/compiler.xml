@@ -23,7 +23,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="cLibraries" options="" />
+      <module name="cLibraries" options="-parameters" />
       <module name="cLibraries-Plugin" options="-parameters" />
       <module name="clibraries-nms-v1_12_R1" options="-parameters" />
       <module name="clibraries-nms-v1_16_R3" options="-parameters" />
