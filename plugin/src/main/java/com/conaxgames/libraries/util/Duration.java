@@ -13,7 +13,7 @@ public enum Duration {
 	private final long duration;
 	private final String name;
 
-	private Duration(long duration, String name) {
+	Duration(long duration, String name) {
 		this.duration = duration;
 		this.name = name;
 	}

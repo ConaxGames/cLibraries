@@ -5,6 +5,7 @@ import com.conaxgames.libraries.board.BoardManager;
 import com.conaxgames.libraries.commands.CommandRegistry;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
+import com.conaxgames.libraries.inventoryui.UIListener;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.task.AutoUpdaterTask;
 import com.conaxgames.libraries.timer.TimerManager;
@@ -53,6 +54,7 @@ public class LibraryPlugin extends JavaPlugin {
         this.commandRegistry = new CommandRegistry(paperCommandManager);
 
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new UIListener(), this);
         Bukkit.getPluginManager().registerEvents(hookManager, this);
 
         long finish = System.currentTimeMillis();

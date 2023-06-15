@@ -71,13 +71,10 @@ public class ItemBuilderUtil {
         return this;
     }
 
-    public ItemBuilderUtil setSkullOwner(String owner) {
-        try {
-            SkullMeta im = (SkullMeta) is.getItemMeta();
-            im.setOwner(owner);
-            is.setItemMeta(im);
-        } catch (ClassCastException expected) {
-        }
+    public ItemBuilderUtil setSkullOwner(String name) {
+        SkullMeta meta = (SkullMeta) is.getItemMeta();
+        meta.setOwner(name);
+        this.is.setItemMeta(meta);
         return this;
     }
 
@@ -215,6 +212,15 @@ public class ItemBuilderUtil {
             is.setItemMeta(im);
         } catch (ClassCastException expected) {
         }
+        return this;
+    }
+
+    public ItemBuilderUtil setUnbreakable() {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.spigot().setUnbreakable(true);
+        }
+        this.is.setItemMeta(meta);
         return this;
     }
 
