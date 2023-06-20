@@ -33,6 +33,10 @@
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
+        <repository>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -135,6 +139,11 @@
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
             <version>8.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui</artifactId>
+            <version>1.6.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
@@ -270,13 +279,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <relocations>
                         <relocation>
                             <pattern>com.cryptomorin.xseries</pattern>
-                            <!-- Be sure to change the package below -->
                             <shadedPattern>com.conaxgames.libraries.xseries</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.wesjd.anvilgui</pattern>
+                            <shadedPattern>com.conaxgames.libraries.anvilgui</shadedPattern>
                         </relocation>
                     </relocations>
                     <!-- Here you can remove the classes you don't use. -->
@@ -291,6 +303,13 @@
                                 <exclude>com/cryptomorin/xseries/NMSExtras*</exclude>
                                 <exclude>com/cryptomorin/xseries/NoteBlockMusic*</exclude>
                             </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludeDefaults>false</excludeDefaults>
+                            <includes>
+                                <include>com.conaxgames.libraries.anvilgui</include>
+                            </includes>
                         </filter>
                     </filters>
                 </configuration>
