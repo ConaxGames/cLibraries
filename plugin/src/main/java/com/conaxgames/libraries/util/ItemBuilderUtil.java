@@ -9,6 +9,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -221,6 +222,29 @@ public class ItemBuilderUtil {
             meta.spigot().setUnbreakable(true);
         }
         this.is.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilderUtil setFlags(ItemFlag... flags) {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.addItemFlags(flags);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilderUtil removeFlags(ItemFlag... flags) {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.removeItemFlags(flags);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
+    
+    public ItemBuilderUtil setAmount(int amount) {
+        this.is.setAmount(amount);
         return this;
     }
 
