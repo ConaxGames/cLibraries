@@ -183,6 +183,15 @@ public abstract class Menu {
         this.noncancellingInventory = noncancellingInventory;
     }
 
+    public Integer getBorderedIndex(int index) {
+        if (index == 7 || index == 16 || index == 25 || index == 35 || index == 43 || index == 52 || index == 61) {
+            index = index + 3;
+        } else {
+            index++;
+        }
+        return index;
+    }
+
     static {
         LibraryPlugin.getInstance().getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance());
         currentlyOpenedMenus = new HashMap<>();
