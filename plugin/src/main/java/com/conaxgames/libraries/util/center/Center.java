@@ -7,12 +7,12 @@ public class Center {
 
     private final static int CENTER_PX = 154;
 
-    public static void sendCenteredMessage(Player player, String message){
-        if (message == null || message.equals("")) {
-            player.sendMessage("");
-            return;
+    public static String getCentered(String message) {
+        if (message == null || message.isEmpty()) {
+            return message;
         }
 
+        // translate first so that the spacing can be accounted for
         message = CC.translate(message);
 
         int messagePxSize = 0;
@@ -41,6 +41,11 @@ public class Center {
             sb.append(" ");
             compensated += spaceLength;
         }
-        player.sendMessage(sb.toString() + message);
+
+        return sb.toString() + message;
+    }
+
+    public static void sendCenteredMessage(Player player, String message) {
+        player.sendMessage(getCentered(message));
     }
 }
