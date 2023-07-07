@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.util;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
 import com.cryptomorin.xseries.XMaterial;
@@ -219,7 +220,7 @@ public class ItemBuilderUtil {
     public ItemBuilderUtil setUnbreakable() {
         final ItemMeta meta = this.is.getItemMeta();
         if (meta != null) {
-            meta.spigot().setUnbreakable(true);
+            LibNMSManager.getInstance().getManagers().getUtilityNMSManager().setUnbreakable(meta, true);
         }
         this.is.setItemMeta(meta);
         return this;
