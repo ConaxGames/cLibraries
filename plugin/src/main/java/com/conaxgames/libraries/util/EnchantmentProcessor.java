@@ -10,7 +10,7 @@ public class EnchantmentProcessor {
     Receives commonly used Enchantment aliases and returns its Bukkit Enchantment.
     Example: '/enchant sharpness 1' --> DAMAGE_ALL, level 1
      */
-    private static final Map<String,String> enchantmentmap = ImmutableMap.<String,String>builder()
+    public static final Map<String,String> enchantmentmap = ImmutableMap.<String,String>builder()
             .put("0", "PROTECTION_ENVIRONMENTAL")
             .put("prot", "PROTECTION_ENVIRONMENTAL")
             .put("protectionenv", "PROTECTION_ENVIRONMENTAL")
