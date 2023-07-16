@@ -97,5 +97,8 @@ public class CommandRegistry {
             }
             return values;
         });
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("enchantments", c ->
+                EnchantmentProcessor.enchantmentmap.keySet());
     }
 }
