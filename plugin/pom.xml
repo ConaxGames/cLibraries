@@ -135,11 +135,11 @@
             <version>0.5.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.cryptomorin</groupId>
-            <artifactId>XSeries</artifactId>
-            <version>8.6.1</version>
-        </dependency>
+            <dependency>
+                <groupId>com.github.cryptomorin</groupId>
+                <artifactId>XSeries</artifactId>
+                <version>9.4.0</version>
+            </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
