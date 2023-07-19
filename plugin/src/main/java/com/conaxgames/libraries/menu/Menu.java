@@ -192,6 +192,10 @@ public abstract class Menu {
         return index;
     }
 
+    public Integer getBorderedSize() {
+        return (int) (Math.min((Math.ceil(buttons.size() / 7.0)) + 2, 6) * 9);
+    }
+
     static {
         LibraryPlugin.getInstance().getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance());
         currentlyOpenedMenus = new HashMap<>();
