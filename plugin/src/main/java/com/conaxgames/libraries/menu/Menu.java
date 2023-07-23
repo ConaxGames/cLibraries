@@ -192,8 +192,8 @@ public abstract class Menu {
         return index;
     }
 
-    public Integer getBorderedSize() {
-        return (int) (Math.min((Math.ceil(buttons.size() / 7.0)) + 2, 6) * 9);
+    public Integer getBorderedSize(int listSize) {
+        return (int) (Math.min((Math.ceil(listSize / 7.0)) + 2, 6) * 9);
     }
 
     static {
