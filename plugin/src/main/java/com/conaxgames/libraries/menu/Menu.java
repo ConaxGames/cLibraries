@@ -184,7 +184,7 @@ public abstract class Menu {
     }
 
     public Integer getBorderedIndex(int index) {
-        if (index == 7 || index == 16 || index == 25 || index == 35 || index == 43 || index == 52 || index == 61) {
+        if (index == 7 || index == 16 || index == 25 || index == 34 || index == 43 || index == 52 || index == 61) {
             index = index + 3;
         } else {
             index++;
