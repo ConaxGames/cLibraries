@@ -193,7 +193,7 @@ public abstract class Menu {
     }
 
     public Integer getBorderedSize(int listSize) {
-        return (int) (Math.min((Math.ceil(listSize / 7.0)) + 2, 6) * 9);
+        return (int) Math.max(27, (Math.min((Math.ceil(listSize / 7.0)) + 2, 6) * 9));
     }
 
     static {
@@ -203,4 +203,3 @@ public abstract class Menu {
     }
 
 }
-
