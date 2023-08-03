@@ -8,6 +8,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class Menu {
 
     private static Method openInventoryMethod;
-    private final ConcurrentHashMap<Integer, Button> buttons = new ConcurrentHashMap();
+    private final ConcurrentHashMap<Integer, Button> buttons = new ConcurrentHashMap<>();
     private boolean autoUpdate = false;
     private boolean updateAfterClick = true;
     private boolean placeholder = false;
@@ -120,11 +121,17 @@ public abstract class Menu {
 
     public int size(Map<Integer, Button> buttons) {
         int highest = 0;
+
         for (int buttonValue : buttons.keySet()) {
+            if (buttonValue > 54) {
+                LibraryPlugin.getInstance().sendConsoleMessage("Button in " + buttonValue + " is an invalid slot in " + this.staticTitle + " menu.", ChatColor.RED);
+            }
+
             if (buttonValue <= highest) continue;
             highest = buttonValue;
         }
-        return (int)(Math.ceil((double)(highest + 1) / 9.0) * 9.0);
+
+        return Math.min(54, (int)(Math.ceil((double)(highest + 1) / 9.0) * 9.0));
     }
 
     public int getSlot(int x, int y) {
