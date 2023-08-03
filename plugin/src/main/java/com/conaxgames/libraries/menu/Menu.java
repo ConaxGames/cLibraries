@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +36,19 @@ public abstract class Menu {
 
     private Inventory createInventory(Player player) {
         Map<Integer, Button> invButtons = this.getButtons(player);
-        Inventory inv = Bukkit.createInventory(player, this.size(invButtons), this.getTitle(player));
+
+        int size = this.size(invButtons);
+        Inventory inv = Bukkit.createInventory(player, size, this.getTitle(player));
 
         for (Map.Entry<Integer, Button> buttonEntry : invButtons.entrySet()) {
             this.buttons.put(buttonEntry.getKey(), buttonEntry.getValue());
-            inv.setItem(buttonEntry.getKey(), buttonEntry.getValue().getButtonItem(player));
+            if (buttonEntry.getKey() > size) continue;
+
+            try {
+                inv.setItem(buttonEntry.getKey(), buttonEntry.getValue().getButtonItem(player));
+            } catch (ArrayIndexOutOfBoundsException e) {
+                LibraryPlugin.getInstance().sendConsoleMessage(e.getMessage(), ChatColor.RED);
+            }
         }
 
         if (this.isPlaceholder()) {
