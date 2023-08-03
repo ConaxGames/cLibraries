@@ -121,16 +121,10 @@ public abstract class Menu {
 
     public int size(Map<Integer, Button> buttons) {
         int highest = 0;
-
         for (int buttonValue : buttons.keySet()) {
-            if (buttonValue > 54) {
-                LibraryPlugin.getInstance().sendConsoleMessage("Button in " + buttonValue + " is an invalid slot in " + this.staticTitle + " menu.", ChatColor.RED);
-            }
-
             if (buttonValue <= highest) continue;
             highest = buttonValue;
         }
-
         return Math.min(54, (int)(Math.ceil((double)(highest + 1) / 9.0) * 9.0));
     }
 
