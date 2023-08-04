@@ -84,6 +84,14 @@ public abstract class Menu {
     }
 
     public void openMenu(Player player) {
+        if (Bukkit.isPrimaryThread()) {
+            open(player);
+        } else {
+            Bukkit.getScheduler().runTask(LibraryPlugin.getInstance(), () -> open(player));
+        }
+    }
+
+    private void open(Player player) {
         Inventory inv = this.createInventory(player);
 
         MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
