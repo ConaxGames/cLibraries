@@ -47,7 +47,16 @@ public class CustomLocation {
 	}
 
 	public static CustomLocation fromBukkitLocation(Location location) {
-		return new CustomLocation(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(),
+		if (location == null) {
+			return null;
+		}
+
+		World world = location.getWorld();
+		if (world == null) {
+			return null;
+		}
+
+		return new CustomLocation(world.getName(), location.getX(), location.getY(), location.getZ(),
 				location.getYaw(), location.getPitch());
 	}
 
@@ -74,6 +83,9 @@ public class CustomLocation {
 	}
 
 	public static String locationToString(CustomLocation loc) {
+		if (loc == null) {
+			throw new IllegalArgumentException("Location cannot be null");
+		}
 		StringJoiner joiner = new StringJoiner(", ");
 		joiner.add(Double.toString(loc.getX()));
 		joiner.add(Double.toString(loc.getY()));
