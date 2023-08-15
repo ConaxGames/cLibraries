@@ -3,19 +3,19 @@ package com.conaxgames.libraries.menu;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.MenuOpenEvent;
 import com.conaxgames.libraries.util.CC;
-import com.conaxgames.libraries.util.TaskUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +28,7 @@ public abstract class Menu {
     private boolean autoUpdate = false;
     private boolean updateAfterClick = true;
     private boolean placeholder = false;
+    private boolean hideItemAttributes = true;
     private boolean noncancellingInventory = false;
     private String staticTitle = null;
     private Menu previous;
@@ -60,6 +61,23 @@ public abstract class Menu {
                 inv.setItem(index, placeholder.getButtonItem(player));
             }
         }
+
+        if (isHidingItemAttributes()) {
+            for (ItemStack item : inv.getContents()) {
+                if (item != null) {
+                    ItemMeta itemMeta = item.getItemMeta();
+                    if (itemMeta != null) {
+                        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+                        item.setItemMeta(itemMeta);
+                    }
+                }
+            }
+        }
+
         return inv;
     }
 
@@ -187,6 +205,14 @@ public abstract class Menu {
 
     public void setPlaceholder(boolean placeholder) {
         this.placeholder = placeholder;
+    }
+
+    public boolean isHidingItemAttributes() {
+        return this.hideItemAttributes;
+    }
+
+    public void setHideItemAttributes(boolean hide) {
+        this.hideItemAttributes = hide;
     }
 
     public boolean isNoncancellingInventory() {
