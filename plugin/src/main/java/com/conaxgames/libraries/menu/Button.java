@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
+import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -126,11 +127,16 @@ public abstract class Button {
     }
 
     public ItemStack getButtonItem(Player player) {
-        ItemStack buttonItem = new ItemStack(this.getMaterial(player), this.getAmount(player), (short)this.getDamageValue(player));
+        Material material = this.getMaterial(player);
+        if (material == null) {
+            material = Material.BEDROCK;
+        }
+
+        ItemStack buttonItem = new ItemStack(material, this.getAmount(player), (short)this.getDamageValue(player));
         ItemMeta meta = buttonItem.getItemMeta();
         meta.setDisplayName(this.getName(player));
         List<String> description = this.getDescription(player);
-
+    
         if (description != null) {
             meta.setLore(description);
         }

@@ -18,7 +18,7 @@ public abstract class PaginatedMenu extends Menu {
     public final void modPage(Player player, int mod) {
         this.page += mod;
         this.getButtons().clear();
-        this.openMenu(player);
+        this.openMenu(player, false);
     }
 
     private boolean hasNext(Player player) {

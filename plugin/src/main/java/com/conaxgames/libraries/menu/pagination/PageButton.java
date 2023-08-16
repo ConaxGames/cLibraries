@@ -1,5 +1,7 @@
 package com.conaxgames.libraries.menu.pagination;
 
+import com.conaxgames.libraries.event.impl.menu.MenuButtonNextEvent;
+import com.conaxgames.libraries.event.impl.menu.MenuButtonPreviousEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Material;
@@ -23,8 +25,15 @@ public class PageButton extends Button {
     @Override
     public void clicked(Player player, int i, ClickType clickType) {
         if (clickType == ClickType.RIGHT) {
-            new ViewAllPagesMenu(this.menu).openMenu(player);
+            new ViewAllPagesMenu(this.menu).openMenu(player, false);
         } else if (this.hasNext(player)) {
+
+            if (this.mod == -1) { // previous
+                new MenuButtonNextEvent(player, menu, this).call();
+            } else if (this.mod == 1) { // next
+                new MenuButtonPreviousEvent(player, menu, this).call();
+            }
+
             this.menu.modPage(player, this.mod);
         }
     }

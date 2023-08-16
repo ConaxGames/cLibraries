@@ -1,20 +1,21 @@
-package com.conaxgames.libraries.event.impl;
+package com.conaxgames.libraries.event.impl.menu;
 
 import com.conaxgames.libraries.event.CancellableEvent;
 import com.conaxgames.libraries.menu.Menu;
 import lombok.Getter;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 @Getter
-public class MenuOpenEvent extends CancellableEvent {
-    private final Player viewer;
-    private final Menu menu;
+public class MenuBackEvent extends CancellableEvent {
 
-    public MenuOpenEvent(Player viewer, Menu menu) {
+    private final Player viewer;
+    private final Menu current;
+    private final Menu back;
+
+    public MenuBackEvent(Player viewer, Menu current, Menu back) {
         this.viewer = viewer;
-        this.menu = menu;
+        this.current = current;
+        this.back = back;
     }
 
     private boolean cancelled;

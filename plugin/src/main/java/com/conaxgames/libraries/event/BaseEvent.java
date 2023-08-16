@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.event;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -19,7 +20,7 @@ public class BaseEvent extends Event {
 	}
 
 	public boolean call() {
-		LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(this);
+		Bukkit.getScheduler().runTask(LibraryPlugin.getInstance(), () -> Bukkit.getServer().getPluginManager().callEvent(this));
 		return this instanceof Cancellable && ((Cancellable) this).isCancelled();
 	}
 

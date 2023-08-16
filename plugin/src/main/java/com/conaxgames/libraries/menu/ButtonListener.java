@@ -1,18 +1,17 @@
 package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
+import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.util.TaskUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class ButtonListener implements Listener {
 
@@ -85,20 +84,28 @@ public class ButtonListener implements Listener {
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
 
-            if (openMenu.getPreviousMenu() != null) {
-                TaskUtil.runLater(() -> {
-                    Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
-                    if (newMenu == null) { // only go back if there isn't a new menu opened?
-                        openMenu.getPreviousMenu().openMenu(player);
+            TaskUtil.runLater(() -> {
+                Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
+
+                if (openMenu.getPreviousMenu() != null) {
+                    MenuBackEvent backEvent = new MenuBackEvent(player, openMenu, openMenu.getPreviousMenu());
+                    backEvent.call();
+                    if (!backEvent.isCancelled()) {
+                        if (newMenu == null) { // only go back if there isn't a new menu opened?
+                            openMenu.getPreviousMenu().openMenu(player);
+                        }
                     }
-                }, 2L);
-            } else {
-                openMenu.onClose(player);
-            }
+                } else if (newMenu == null) { // player didn't open a new menu
+                    new MenuCloseEvent(player, openMenu).call();
+                }
+            }, 2L);
+
+            openMenu.onClose(player);
 
             Menu.cancelCheck(player);
             Menu.currentlyOpenedMenus.remove(player.getName());
         }
     }
+
 }
 
