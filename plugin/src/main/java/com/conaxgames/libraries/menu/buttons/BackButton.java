@@ -37,7 +37,7 @@ public class BackButton extends Button {
 
     @Override
     public void clicked(Player player, int i, ClickType clickType) {
-        this.back.openMenu(player);
+        this.back.openMenu(player, false);
     }
 }
 

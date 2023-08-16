@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.menu.pagination;
 
+import com.conaxgames.libraries.event.impl.menu.MenuButtonJumpToEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Material;
@@ -47,6 +48,8 @@ public class JumpToPageButton extends Button {
 
     @Override
     public void clicked(Player player, int i, ClickType clickType) {
+        new MenuButtonJumpToEvent(player, menu, this).call();
+
         this.menu.modPage(player, this.page - this.menu.getPage());
     }
 

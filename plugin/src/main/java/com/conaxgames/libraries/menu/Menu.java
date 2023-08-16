@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.event.impl.MenuOpenEvent;
+import com.conaxgames.libraries.event.impl.menu.MenuOpenEvent;
 import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
@@ -102,6 +102,17 @@ public abstract class Menu {
     }
 
     public void openMenu(Player player) {
+        openMenu(player, true);
+    }
+
+    public void openMenu(Player player, boolean firstOpen) {
+        if (firstOpen) {
+            MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
+            if (openEvent.call()) {
+                return;
+            }
+        }
+
         if (Bukkit.isPrimaryThread()) {
             open(player);
         } else {
@@ -112,15 +123,12 @@ public abstract class Menu {
     private void open(Player player) {
         Inventory inv = this.createInventory(player);
 
-        MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
-        if (!openEvent.call()) {
-            try {
-                //Menu.getOpenInventoryMethod().invoke((Object)player, new Object[]{inv, ep, 0});
-                player.openInventory(inv);
-                this.update(player);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        try {
+            //Menu.getOpenInventoryMethod().invoke((Object)player, new Object[]{inv, ep, 0});
+            player.openInventory(inv);
+            this.update(player);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -133,7 +141,6 @@ public abstract class Menu {
         currentlyOpenedMenus.put(player.getName(), this);
         this.onOpen(player);
         BukkitRunnable runnable = new BukkitRunnable(){
-
             public void run() {
                 if (!player.isOnline()) {
                     Menu.cancelCheck(player);
