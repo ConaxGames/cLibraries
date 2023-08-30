@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum GamemodeType {
+
     HUB("Hub", Arrays.asList("hub","lobby")),
     ARENA_PVP("ArenaPvP", Arrays.asList("prac","practice","arenapvp")),
     UHC("UHC", Collections.singletonList("uhc")),

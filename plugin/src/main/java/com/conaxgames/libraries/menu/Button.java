@@ -1,13 +1,9 @@
 package com.conaxgames.libraries.menu;
 
-import com.conaxgames.libraries.nms.LibNMSManager;
-import com.conaxgames.libraries.nms.LibServerVersion;
-import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

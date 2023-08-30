@@ -71,7 +71,7 @@ public class HookManager implements Listener {
         try {
             hooks.add(hook);
             if (LibraryPlugin.getInstance().getSettings().debug) {
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.B_RED + "HOOK MANAGER " + CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
+                LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
                         + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
             }
         } catch (Exception e) {

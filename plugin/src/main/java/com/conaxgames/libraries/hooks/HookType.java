@@ -16,6 +16,7 @@ public enum HookType {
     CSUITE(GamemodeType.UNKNOWN),
     CADDONS(GamemodeType.UNKNOWN),
     CMIGRATION(GamemodeType.UNKNOWN),
+    ANTICRASH(GamemodeType.UNKNOWN),
     ARENAPVP(GamemodeType.ARENA_PVP),
     UHC(GamemodeType.UHC),
     MANGO(GamemodeType.HUB),
