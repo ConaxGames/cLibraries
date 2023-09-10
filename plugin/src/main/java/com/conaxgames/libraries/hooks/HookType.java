@@ -24,7 +24,8 @@ public enum HookType {
     KITPVP(GamemodeType.KITPVP),
     FFA(GamemodeType.FFA),
     CGLOBE(GamemodeType.SURVIVAL),
-    SKYBLOCK(GamemodeType.SKYBLOCK);
+    SKYBLOCK(GamemodeType.SKYBLOCK),
+    CITIZENS(GamemodeType.UNKNOWN);
 
     public final GamemodeType gamemode;
 
