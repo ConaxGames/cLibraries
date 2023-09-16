@@ -148,7 +148,7 @@ public class LibraryPlugin extends JavaPlugin {
 
     public void sendDebug(String action, String msg) {
         if (this.settings.debug) {
-            Bukkit.getConsoleSender().sendMessage(CC.PRIMARY + "[cSuite Debug] " + CC.GRAY + "Action Code: " + CC.SECONDARY + action + " " + CC.GRAY + "Message: " + CC.SECONDARY + msg);
+            Bukkit.getConsoleSender().sendMessage(CC.PRIMARY + "[cLib Debug] " + CC.GRAY + "Action Code: " + CC.SECONDARY + action + " " + CC.GRAY + "Message: " + CC.SECONDARY + msg);
         }
     }
 }
