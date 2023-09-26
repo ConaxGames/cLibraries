@@ -18,9 +18,15 @@
         <module name="clibraries-nms-v1_12_R1" />
         <module name="clibraries-plugin" />
         <module name="clibraries-nms-v1_8_R3" />
+        <module name="cLibraries-Jedis" />
         <module name="clibraries-nms-v1_9_R1" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cLib-Jedis" target="1.8" />
+      <module name="cLibraries" target="1.8" />
+      <module name="redis" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -39,6 +45,7 @@
       <module name="clibraries-nms-v1_8_R3" options="-parameters" />
       <module name="clibraries-nms-v1_9_R1" options="-parameters" />
       <module name="clibraries-plugin" options="-parameters" />
+      <module name="redis" options="-parameters" />
     </option>
   </component>
 </project>
