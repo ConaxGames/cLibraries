@@ -1,8 +1,5 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.nms.LibNMSManager;
-import com.conaxgames.libraries.nms.LibServerVersion;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -195,7 +192,8 @@ public class ItemBuilderUtil {
 
     @SuppressWarnings("deprecation")
     public ItemBuilderUtil setDyeColor(DyeColor color) {
-        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        // todo: add libserverversion for checking version :D
+//        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
         return this;
     }
 
@@ -203,7 +201,8 @@ public class ItemBuilderUtil {
     public ItemBuilderUtil setWoolColor(DyeColor color) {
         if (!is.getType().equals(XMaterial.WHITE_WOOL.parseMaterial()))
             return this;
-        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        // todo: add libserverversion for checking version :D
+//        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
         return this;
     }
 
@@ -220,10 +219,15 @@ public class ItemBuilderUtil {
     public ItemBuilderUtil setUnbreakable() {
         final ItemMeta meta = this.is.getItemMeta();
         if (meta != null) {
-            LibNMSManager.getInstance().getManagers().getUtilityNMSManager().setUnbreakable(meta, true);
+            setUnbreakable(meta, true); // Your version-agnostic method
         }
         this.is.setItemMeta(meta);
         return this;
+    }
+
+    public static ItemMeta setUnbreakable(ItemMeta meta, boolean value) {
+        meta.setUnbreakable(value); // Default behavior (1.20 NMS)
+        return meta;
     }
 
     public ItemBuilderUtil setFlags(ItemFlag... flags) {

@@ -6,25 +6,25 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="clibraries-nms-v1_18_R1" />
-        <module name="clibraries-nms-v1_19_R3" />
-        <module name="clibraries-nms-v1_20_R1" />
         <module name="cLibraries-Plugin" />
-        <module name="clibraries-nms-v1_16_R3" />
-        <module name="clibraries-nms-v1_19_R1" />
-        <module name="clibraries-nms-v1_17_R1" />
-        <module name="clibraries-nms-v1_18_R2" />
-        <module name="clibraries-nms-v1_19_R2" />
-        <module name="clibraries-nms-v1_12_R1" />
         <module name="clibraries-plugin" />
-        <module name="clibraries-nms-v1_8_R3" />
         <module name="cLibraries-Jedis" />
-        <module name="clibraries-nms-v1_9_R1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cLib-Jedis" target="1.8" />
       <module name="cLibraries" target="1.8" />
+      <module name="clibraries-nms-v1_12_R1" target="1.8" />
+      <module name="clibraries-nms-v1_16_R3" target="1.8" />
+      <module name="clibraries-nms-v1_17_R1" target="1.8" />
+      <module name="clibraries-nms-v1_18_R1" target="1.8" />
+      <module name="clibraries-nms-v1_18_R2" target="1.8" />
+      <module name="clibraries-nms-v1_19_R1" target="1.8" />
+      <module name="clibraries-nms-v1_19_R2" target="1.8" />
+      <module name="clibraries-nms-v1_19_R3" target="1.8" />
+      <module name="clibraries-nms-v1_20_R1" target="1.8" />
+      <module name="clibraries-nms-v1_8_R3" target="1.8" />
+      <module name="clibraries-nms-v1_9_R1" target="1.8" />
       <module name="redis" target="1.8" />
     </bytecodeTargetLevel>
   </component>
