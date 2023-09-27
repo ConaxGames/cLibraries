@@ -10,8 +10,6 @@ import java.util.Map;
 
 public class Settings {
 
-    public String license;
-    public boolean autoupdate;
     public boolean debug;
     public Map<ACFCoreMessage, String> acfMessages = new HashMap<>();
 
@@ -33,8 +31,6 @@ public class Settings {
             Bukkit.getLogger().info("Unable to load settings.yml");
         }
 
-        license = settings.getString("serverdata.license");
-        autoupdate = settings.getBoolean("serverdata.auto-update");
         debug = settings.getBoolean("serverdata.debug");
 
         for (ACFCoreMessage enumeration : ACFCoreMessage.values()) {
