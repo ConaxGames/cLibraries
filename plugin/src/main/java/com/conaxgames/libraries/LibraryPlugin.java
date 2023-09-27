@@ -7,10 +7,8 @@ import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.inventoryui.UIListener;
 import com.conaxgames.libraries.listener.PlayerListener;
-import com.conaxgames.libraries.task.AutoUpdaterTask;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.conaxgames.libraries.util.CC;
-import com.conaxgames.libraries.util.License;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
@@ -44,8 +42,6 @@ public class LibraryPlugin extends JavaPlugin {
             getLogger().info("Settings handler is null lol");
         }
 
-        if(!new License(this.getSettings().license, "https://cdn.conaxgames.com/license/verify.php", this).register()) return;
-
         long start = System.currentTimeMillis();
 
         this.hookManager = new HookManager(this);
@@ -66,9 +62,6 @@ public class LibraryPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (this.getSettings().autoupdate) {
-            new AutoUpdaterTask().run();
-        }
         super.onDisable();
     }
 
