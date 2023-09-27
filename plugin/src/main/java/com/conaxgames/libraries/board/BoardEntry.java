@@ -1,5 +1,7 @@
 package com.conaxgames.libraries.board;
 
+import com.conaxgames.libraries.nms.LibNMSManager;
+import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.CC;
 import lombok.experimental.Accessors;
 import org.bukkit.ChatColor;
@@ -152,12 +154,11 @@ public class BoardEntry {
 				suffix = ChatColor.getLastColors(prefix) + input.substring(16);
 			}
 
-			// todo: add libserverversion for checking version :D
-//			if (LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
-//				if (suffix.length() > 16) {
-//					suffix = suffix.substring(0, 16);
-//				}
-//			}
+			if (LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
+				if (suffix.length() > 16) {
+					suffix = suffix.substring(0, 16);
+				}
+			}
 
 			return new String[] {prefix, suffix};
 		} else {
