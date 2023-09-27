@@ -1,9 +1,10 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.nms.LibNMSManager;
 import org.bukkit.ChatColor;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class CC {
@@ -103,8 +104,21 @@ public final class CC {
 	public static final String U_DARK_AQUA = CC.U + CC.DARK_AQUA;
 
 	public static String translate(String string) {
-		String translatedHex = LibNMSManager.getInstance().getManagers().getUtilityNMSManager().translateHex(string);
+		String translatedHex = translateHex(string); // Your version-agnostic method
 		return ChatColor.translateAlternateColorCodes('&', translatedHex);
+	}
+
+	public static String translateHex(String message) {
+		Pattern hexPattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+
+		// Handle hexadecimal color codes
+		Matcher hexMatcher = hexPattern.matcher(message);
+		while (hexMatcher.find()) {
+			String hexColor = hexMatcher.group();
+			message = message.replace(hexColor, net.md_5.bungee.api.ChatColor.of(hexColor).toString());
+		}
+
+		return message; // Your default implementation (1.8 NMS behavior)
 	}
 
 	public static List<String> translate(List<String> text) {
