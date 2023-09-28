@@ -6,14 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="cLibraries-Plugin" />
         <module name="clibraries-plugin" />
-        <module name="cLibraries-Jedis" />
+        <module name="cLibraries-Plugin" />
+        <module name="clibraries-jedis" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cLib-Jedis" target="1.8" />
       <module name="cLibraries" target="1.8" />
+      <module name="cLibraries-Jedis" target="1.8" />
       <module name="clibraries-nms-v1_12_R1" target="1.8" />
       <module name="clibraries-nms-v1_16_R3" target="1.8" />
       <module name="clibraries-nms-v1_17_R1" target="1.8" />
@@ -33,6 +34,7 @@
       <module name="cLibraries" options="-parameters" />
       <module name="cLibraries-Parent" options="-parameters" />
       <module name="cLibraries-Plugin" options="-parameters" />
+      <module name="clibraries-jedis" options="-parameters" />
       <module name="clibraries-nms-v1_12_R1" options="-parameters" />
       <module name="clibraries-nms-v1_16_R3" options="-parameters" />
       <module name="clibraries-nms-v1_17_R1" options="-parameters" />
