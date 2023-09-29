@@ -65,7 +65,7 @@ public class CoreButtonProcessor {
             }
 
             if (action.startsWith("BROADCAST:")) {
-                String converted = applyPlaceholders(player, "MESSAGE:", action);
+                String converted = applyPlaceholders(player, "BROADCAST:", action);
                 Bukkit.broadcastMessage(converted);
             }
 

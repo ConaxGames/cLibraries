@@ -154,7 +154,7 @@ public class BoardEntry {
 				suffix = ChatColor.getLastColors(prefix) + input.substring(16);
 			}
 
-			if (LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
+			if (LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
 				if (suffix.length() > 16) {
 					suffix = suffix.substring(0, 16);
 				}

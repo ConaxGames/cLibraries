@@ -1,41 +1,43 @@
 package com.conaxgames.libraries.nms;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 public abstract class LibNMSManager {
-    private static LibNMSManager nmsManager;
-    private LibServerVersion serverVersion;
 
-    public static LibNMSManager getInstance() {
-        return LibNMSManager.nmsManager == null ? LibNMSManager.nmsManager = newInstance() : LibNMSManager.nmsManager;
+    public static LibServerVersion serverVersion;
+
+    public static LibServerVersion getInstance() {
+        return serverVersion == null ? serverVersion = newInstance() : serverVersion;
     }
 
-    private static LibNMSManager newInstance() {
+    private static LibServerVersion newInstance() {
         try {
             String bukkitNMSVersion = Bukkit.getServer().getClass().getName().split("\\.")[3];
 
-            LibNMSManager nmsManager = (LibNMSManager) Class.forName(LibNMSManager.class.getName().replace(".LibNMSManager", "." + bukkitNMSVersion + ".LibNMSManager")).newInstance();
-            nmsManager.setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion));
-
-            return nmsManager;
+            try {
+                setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion)); // set the enum
+            } catch (IllegalArgumentException e) {
+                LibraryPlugin.getInstance().sendConsoleMessage("UNABLE TO FIND NMS VERSION MATCHING " +
+                        bukkitNMSVersion + ". Disabling cLibraries to avoid further complications compatibility issues...", ChatColor.RED);
+                LibraryPlugin.getInstance().getServer().getPluginManager().disablePlugin(LibraryPlugin.getInstance());
+            }
+            return serverVersion;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public LibServerVersion getServerVersion() {
-        return this.serverVersion;
-    }
-
-    public void setServerVersion(LibServerVersion serverVersion) {
-        this.serverVersion = serverVersion;
+    public static void setServerVersion(LibServerVersion version) {
+        serverVersion = version;
     }
 }

@@ -194,7 +194,7 @@ public class ItemBuilderUtil {
 
     @SuppressWarnings("deprecation")
     public ItemBuilderUtil setDyeColor(DyeColor color) {
-        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        this.is.setDurability(LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
         return this;
     }
 
@@ -202,7 +202,7 @@ public class ItemBuilderUtil {
     public ItemBuilderUtil setWoolColor(DyeColor color) {
         if (!is.getType().equals(XMaterial.WHITE_WOOL.parseMaterial()))
             return this;
-        this.is.setDurability(LibNMSManager.getInstance().getServerVersion().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        this.is.setDurability(LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
         return this;
     }
 

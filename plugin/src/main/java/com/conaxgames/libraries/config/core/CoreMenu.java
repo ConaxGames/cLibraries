@@ -16,10 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CoreMenu {
 
@@ -37,6 +34,13 @@ public class CoreMenu {
         this.fileDestination = fileDestination;
         this.alwaysSync = alwaysSync;
         this.syncOnCreation = syncOnCreation;
+
+        // always noSync 'menus'
+        if (noSyncSections != null) {
+            noSyncSections.add("menus");
+        } else {
+            noSyncSections = Collections.singletonList("menus");
+        }
         this.noSyncSections = noSyncSections;
     }
 
@@ -124,12 +128,12 @@ public class CoreMenu {
         return menus.stream().filter(m -> m.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public ConfigMenuData getBaseShopMenu() {
+    public ConfigMenuData getBaseMenu() {
         return menus.stream().filter(m -> m.getName().equalsIgnoreCase(this.baseMenu)).findFirst().orElse(null);
     }
 
     public void openBaseMenu(Player player) {
-        new CoreConfigMenu(this, getBaseShopMenu()).openMenu(player);
+        new CoreConfigMenu(this, getBaseMenu()).openMenu(player);
     }
 
     public void openMenu(Player player, ConfigMenuData data) {
