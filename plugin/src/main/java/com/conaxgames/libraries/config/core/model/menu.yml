@@ -1,0 +1,35 @@
+
+# The base-menu (REQUIRED)
+base-menu: "selector"
+
+menus:
+  selector:
+    title: "Guide"
+    size: 27
+    settings:
+      fillGlass: true
+      hideItemAttributes: true
+      updateOnClick: true
+      autoUpdate: false
+    buttons:
+      1:
+        name: "&aInformation 1"
+        slot: 11
+        material: "DIAMOND_SWORD"
+        shiny: true
+        skull64: ""
+        material-data: 0
+        actions:
+          - "MESSAGE:&aYou clicked the Diamond Sword!"
+          - "BROADCAST:&a%player% clicked the Diamond Sword!"
+          - "CONSOLE:/give %player% DIAMOND_SWORD 1"
+          - "OPEN:selector"
+          - "CLOSE"
+        conditions:
+          - "PERMISSION:csuite.example"
+        lore:
+          - "&f- &7Line of info."
+          - "&f- &7Line of info."
+          - "&f- &7Line of info."
+          - "&f- &7Line of info."
+          - "&f- &7Line of info."
