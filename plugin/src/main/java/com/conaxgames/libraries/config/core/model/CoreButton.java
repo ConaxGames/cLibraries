@@ -1,7 +1,5 @@
 package com.conaxgames.libraries.config.core.model;
 
-import com.conaxgames.libraries.config.core.model.ConfigButtonData;
-import com.conaxgames.libraries.config.core.model.CoreButtonClick;
 import com.conaxgames.libraries.menu.Button;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,6 +21,11 @@ public class CoreButton extends Button {
     @Override public String getName(Player var1) {return null;}
     @Override public List<String> getDescription(Player var1) {return null;}
     @Override public Material getMaterial(Player var1) {return null;}
+
+    @Override
+    public boolean shinyItem(Player player) {
+        return data.isShiny();
+    }
 
     @Override
     public ItemStack getButtonItem(Player player) {
