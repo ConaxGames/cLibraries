@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
@@ -174,7 +173,7 @@ public class CoreButtonProcessor {
 
             if (action.equalsIgnoreCase("OPEN:")) {
                 String name = applyPlaceholders(player, "OPEN:", action);
-                ConfigMenuData data = menu.getShopByName(name);
+                ConfigMenuData data = menu.getMenuByName(name);
                 if (data != null) {
                     menu.openMenu(player, data);
                 } else {

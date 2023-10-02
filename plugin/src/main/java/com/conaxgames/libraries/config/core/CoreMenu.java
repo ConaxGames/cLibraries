@@ -5,14 +5,15 @@ import com.conaxgames.libraries.config.CommentedConfiguration;
 import com.conaxgames.libraries.config.core.model.*;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
-import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.Config;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.NonNull;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.*;
 
 public class CoreMenu {
@@ -24,7 +25,25 @@ public class CoreMenu {
     private final List<String> noSyncSections;
 
     public List<ConfigMenuData> menus = new ArrayList<>();
+    public String name = "Undefined";
     public String baseMenu;
+
+    public List<CoreMenu> loadMenus(boolean loadMenus) {
+        File[] files = new File(this.javaPlugin.getDataFolder() + this.fileDestination).listFiles();
+
+        List<CoreMenu> menus = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                CoreMenu menu = new CoreMenu(this.javaPlugin, this.fileDestination + file.getName(), true, true, null);
+                if (loadMenus) {
+                    menu.reload();
+                }
+                menus.add(menu);
+            }
+        }
+
+        return menus;
+    }
 
     public CoreMenu(JavaPlugin javaPlugin, String fileDestination, boolean alwaysSync, boolean syncOnCreation, List<String> noSyncSections) {
         this.javaPlugin = javaPlugin;
@@ -100,6 +119,8 @@ public class CoreMenu {
         String dest = destination.replace(".yml", "");
 
         Config config = new Config(dest, javaPlugin);
+        this.name = config.getConfigFile().getName().replace(".yml", "");
+
         CommentedConfiguration settings = CommentedConfiguration.loadConfiguration(config.getConfigFile());
 
         if (alwaysSync || (config.isWasCreated() && syncOnCreation)) {
@@ -109,8 +130,10 @@ public class CoreMenu {
                     return null;
                 }
 
-                settings.syncWithConfig(config.getConfigFile(), javaPlugin.getResource(dest + ".yml"), dontSync);
-                LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Sync'd " + dest + ".yml" + " with file.");
+                if (config.getConfigFile() != null) {
+                    settings.syncWithConfig(config.getConfigFile(), javaPlugin.getResource(dest + ".yml"), dontSync);
+                    LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Sync'd " + dest + ".yml" + " with file.");
+                }
             } catch (Exception exception) {
                 LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Unable to sync " + dest + ".yml" + " with file.");
                 exception.printStackTrace();
@@ -121,7 +144,7 @@ public class CoreMenu {
         return settings;
     }
 
-    public ConfigMenuData getShopByName(String name) {
+    public ConfigMenuData getMenuByName(String name) {
         return menus.stream().filter(m -> m.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
