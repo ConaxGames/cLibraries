@@ -4,6 +4,7 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.core.CoreMenu;
 import com.conaxgames.libraries.hooks.HookType;
 import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.util.Formatter;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -114,24 +115,27 @@ public class CoreButtonProcessor {
                             break;
                         }
 
+                        String niceInputValue = Formatter.commaFormatInteger((int) in);
+                        String niceRequiredValue = Formatter.commaFormatInteger((int) res);
+
                         switch (operator) {
                             case "GREATER_THAN": {
-                                if (in > res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if (in > res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + niceInputValue + "/" + niceRequiredValue + CC.RED + "..."));
                             }
                             case "GREATER_THAN_EQUAL_TO": {
-                                if (in >= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if (in >= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + niceInputValue + "/" + niceRequiredValue + CC.RED + "..."));
                             }
                             case "EQUAL_TO": {
-                                if  (in == res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if  (in == res) denial.set(new CoreProcessorDenial(CC.RED + "You need " + CC.YELLOW + niceRequiredValue + " but have " + niceInputValue + CC.RED + "..."));
                             }
                             case "NOT_EQUAL_TO": {
-                                if  (in != res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if  (in != res) denial.set(new CoreProcessorDenial(CC.RED + "You need " + CC.YELLOW + niceRequiredValue + " but have " + niceInputValue + CC.RED + "..."));
                             }
                             case "LESS_THAN_EQUAL_TO": {
-                                if  (in <= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if  (in <= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + niceInputValue + "/" + niceRequiredValue + CC.RED + "..."));
                             }
                             case "LESS_THAN": {
-                                if  (in < res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                                if  (in < res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + niceInputValue + "/" + niceRequiredValue + CC.RED + "..."));
                             }
                         }
 
