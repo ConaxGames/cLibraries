@@ -2,10 +2,7 @@ package com.conaxgames.libraries.config.core;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
-import com.conaxgames.libraries.config.core.model.CoreButtonProcessor;
-import com.conaxgames.libraries.config.core.model.ConfigButtonData;
-import com.conaxgames.libraries.config.core.model.ConfigMenuData;
-import com.conaxgames.libraries.config.core.model.CoreButton;
+import com.conaxgames.libraries.config.core.model.*;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.util.CC;
@@ -177,9 +174,9 @@ public class CoreMenu {
 
                 buttons.put(coreButton.getSlot(), new CoreButton(coreButton, (player, slot, clickType) -> {
                     CoreButtonProcessor processor = new CoreButtonProcessor(this.coreMenu, coreButton, player);
-                    boolean conditionsMet = processor.matches();
-                    if (!conditionsMet) {
-                        player.sendMessage(CC.RED + "You did not meet all the conditions to click this button.");
+                    CoreProcessorDenial denied = processor.conditions();
+                    if (denied != null) {
+                        player.sendMessage(denied.getDenialReason());
                         return;
                     }
 

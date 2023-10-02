@@ -1,13 +1,17 @@
 package com.conaxgames.libraries.config.core.model;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.core.CoreMenu;
+import com.conaxgames.libraries.hooks.HookType;
 import com.conaxgames.libraries.util.CC;
 import lombok.RequiredArgsConstructor;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public class CoreButtonProcessor {
@@ -17,29 +21,144 @@ public class CoreButtonProcessor {
     public final Player player;
 
     // PERMISSION, EMPTY_INVENTORY
-    public boolean matches() {
+    public CoreProcessorDenial conditions() {
         List<String> conditions = data.getConditions();
 
-        AtomicBoolean metAllConditions = new AtomicBoolean(true);
+        AtomicReference<CoreProcessorDenial> denial = new AtomicReference<>(null);
         conditions.forEach(condition -> {
-            String[] split = condition.split(":", 1);
-
+            String[] split = condition.split(" ");
             String type = split[0];
-            String value = null;
-            if (split.length == 2) {
-                value = split[1];
-            }
 
-            if (type.equalsIgnoreCase("PERMISSION") && value != null) {
-                if (!player.hasPermission(value)) metAllConditions.set(false);
-            }
+            switch (type.toUpperCase()) {
+                case "STRING_CONTAINS": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && value != null && input.contains(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " did not contain " + value + "..."));
+                    }
+                    break;
+                }
 
-            if (type.equalsIgnoreCase("EMPTY_INVENTORY")) {
-                if (!player.getInventory().isEmpty()) metAllConditions.set(false);
+                case "STRING_EQUALS": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && value != null && input.equals(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " did not equal " + value + "..."));
+                    }
+                    break;
+                }
+
+                case "STRING_EQUALS_IGNORECASE": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && value != null && input.equalsIgnoreCase(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " did not equal " + value + "..."));
+                    }
+                    break;
+                }
+
+                case "STRING_DOES_NOT_CONTAIN": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && value != null && !input.contains(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " contained " + value + "..."));
+                    }
+                    break;
+                }
+
+                case "STRING_DOES_NOT_EQUAL": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && !input.equals(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " equalled " + value + "..."));
+                    }
+                    break;
+                }
+
+                case "STRING_DOES_NOT_EQUAL_IGNORECASE": {
+                    if (split.length == 3) {
+                        String input = applyPlaceholders(player, null, split[1]);
+                        String value = split[2];
+                        if (input != null && !input.equalsIgnoreCase(value))
+                            denial.set(new CoreProcessorDenial(CC.RED + input + " equalled " + value + "..."));
+                    }
+                    break;
+                }
+
+                case "LOGIC": {
+                    if (split.length == 4) {
+                        String inputValue = parsePAPI(player, split[1]);
+                        String operator = split[2];
+                        String requiredValue = split[3];
+
+                        double in;
+                        try {
+                            in = Double.parseDouble(inputValue);
+                        }
+                        catch (NumberFormatException exception) {
+                            denial.set(new CoreProcessorDenial(CC.YELLOW + inputValue + CC.RED + " is not a valid number..."));
+                            break;
+                        }
+
+                        double res;
+                        try {
+                            res = Double.parseDouble(requiredValue);
+                        }
+                        catch (NumberFormatException exception) {
+                            denial.set(new CoreProcessorDenial(CC.YELLOW + requiredValue + CC.RED + " is not a valid number..."));
+                            break;
+                        }
+
+                        switch (operator) {
+                            case "GREATER_THAN": {
+                                if (in > res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                            case "GREATER_THAN_EQUAL_TO": {
+                                if (in >= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                            case "EQUAL_TO": {
+                                if  (in == res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                            case "NOT_EQUAL_TO": {
+                                if  (in != res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                            case "LESS_THAN_EQUAL_TO": {
+                                if  (in <= res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                            case "LESS_THAN": {
+                                if  (in < res) denial.set(new CoreProcessorDenial(CC.RED + "You have " + CC.YELLOW + in + "/" + res + CC.RED + "..."));
+                            }
+                        }
+
+                    }
+                    break;
+                }
+
+                case "PERMISSION": {
+                    if (split.length == 2) {
+                        String permissionValue = split[1];
+                        if (permissionValue != null && !player.hasPermission(permissionValue))
+                            denial.set(new CoreProcessorDenial(CC.RED + "You required the " + CC.YELLOW + permissionValue + CC.RED + " permission..."));
+                    }
+                    break;
+                }
+
+                case "EMPTY_INVENTORY": {
+                    if (type.equalsIgnoreCase("EMPTY_INVENTORY")) {
+                        if (!player.getInventory().isEmpty())
+                            denial.set(new CoreProcessorDenial(CC.RED + "You need an empty inventory to use this..."));
+                    }
+                    break;
+                }
             }
         });
 
-        return metAllConditions.get();
+        return denial.get();
     }
 
     // CLOSE, OPEN:, MESSAGE:, CONSOLE:, PLAYER:/, BROADCAST:/
@@ -82,14 +201,24 @@ public class CoreButtonProcessor {
     }
 
     public String applyPlaceholders(Player player, String prefix, String action) {
-        action = action.replaceFirst(prefix, "");
+        if (prefix != null) {
+            action = action.replaceFirst(prefix, "");
+        }
+
+        action = parsePAPI(player, action);
         action = CC.translate(action);
         action = action.replace("%player%", player.getName());
         action = action.replace("%PLAYER%", player.getName());
         action = action.replace("%player_display%", player.getDisplayName());
         action = action.replace("%PLAYER_DISPLAY%", player.getDisplayName());
-        // apply papi placeholders
+
         return action;
     }
 
+    public String parsePAPI(Player player, String string) {
+        if (LibraryPlugin.getInstance().getHookManager().isHooked(HookType.PLACEHOLDERAPI)) {
+            return PlaceholderAPI.setPlaceholders(player, string.trim());
+        }
+        return string;
+    }
 }
