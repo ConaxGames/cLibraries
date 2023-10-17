@@ -171,13 +171,14 @@ public class CoreButtonProcessor {
                 player.closeInventory();
             }
 
-            if (action.equalsIgnoreCase("OPEN:")) {
+            if (action.startsWith("OPEN:")) {
                 String name = applyPlaceholders(player, "OPEN:", action);
-                ConfigMenuData data = menu.getMenuByName(name);
+                ConfigMenuData data = menu.getMenuByName(name.trim());
                 if (data != null) {
                     menu.openMenu(player, data);
                 } else {
                     player.sendMessage(CC.RED + "The " + CC.YELLOW + name + CC.RED + " menu could not be found...");
+                    player.sendMessage(CC.RED + "Available menus: " + CC.YELLOW + menu.getMenuNames());
                 }
             }
 

@@ -7,14 +7,15 @@ import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.util.Config;
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.base.Joiner;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CoreMenu {
 
@@ -158,6 +159,10 @@ public class CoreMenu {
 
     public void openMenu(Player player, ConfigMenuData data) {
         new CoreConfigMenu(this, data).openMenu(player);
+    }
+
+    public String getMenuNames() {
+        return Joiner.on(", ").join(this.menus.stream().map(ConfigMenuData::getName).collect(Collectors.toList()));
     }
 
     //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //    //
