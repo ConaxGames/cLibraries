@@ -108,7 +108,7 @@ public final class CC {
 		return ChatColor.translateAlternateColorCodes('&', translatedHex);
 	}
 
-	public static String translateHex(String message) {
+	private static String translateHex(String message) {
 		Pattern hexPattern = Pattern.compile("#[A-Fa-f0-9]{6}");
 
 		// Handle hexadecimal color codes
