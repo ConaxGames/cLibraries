@@ -20,19 +20,27 @@ public class Formatter {
         return String.format("%.2f", number);
     }
 
+    public static String formatMoneyKMBT(long value) {
+        return formatMoneyKMBT((double) value);
+    }
+
+    public static String formatMoneyKMBT(int value) {
+        return formatMoneyKMBT((double) value);
+    }
+
     public static String formatMoneyKMBT(double value) {
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        //Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Double.MIN_VALUE) return formatMoneyKMBT(Double.MIN_VALUE + 1);
         if (value < 0) return "-" + formatMoneyKMBT(-value);
-        if (value < 1000) return Integer.toString((int)value); //deal with easy case
+        if (value < 1000) return Integer.toString((int) value); //deal with easy case
 
         Map.Entry<Double, String> e = suffixes.floorEntry(value);
         Double divideBy = e.getKey();
         String suffix = e.getValue();
 
-        double truncated = value / (divideBy / 10); //the number part of the output times 10
+        long truncated = (long) (value / (divideBy / 10)); //the number part of the output times 10
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-        return hasDecimal ? String.format("%.1f", (truncated / 10d)) + suffix : String.format("%.0f", (truncated / 10)) + suffix;
+        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 
     public static String formatTimeMMSS(long secs) {
@@ -73,5 +81,9 @@ public class Formatter {
         suffixes.put(1_000_000_000_000_000_000_000_000_000D, "O");
         suffixes.put(1_000_000_000_000_000_000_000_000_000_000D, "N");
         suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000D, "D");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000D, "U");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000D, "DU");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000_000D, "TD");
     }
+
 }
