@@ -95,9 +95,10 @@ public class BoardEntry {
 //		}
 
 		// Set Prefix & Suffix.
-		String[] split = this.splitText(CC.translate(text));
-		this.team.setPrefix(CC.translate(split[0]));
-		this.team.setSuffix(CC.translate(split[1]));
+		String preSplit = CC.translate(text);
+		String[] split = this.splitText(preSplit);
+		this.team.setPrefix(split[0]);
+		this.team.setSuffix(split[1]);
 		this.team.addEntry(ChatColor.translateAlternateColorCodes('&', "&a"));
 
 		Score score = objective.getScore(this.key);
