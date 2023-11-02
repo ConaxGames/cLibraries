@@ -107,6 +107,41 @@ public final class WoolUtil {
 		return woolCCs.indexOf(color);
 	}
 
+	public static XMaterial convertCCToXWool(String color) {
+		switch (color) {
+			case "BLACK":
+				return XMaterial.BLACK_WOOL;
+			case "DARK_BLUE":
+			case "BLUE":
+				return XMaterial.BLUE_WOOL;
+			case "DARK_GREEN":
+				return XMaterial.GREEN_WOOL;
+			case "DARK_AQUA":
+				return XMaterial.CYAN_WOOL;
+			case "DARK_RED":
+			case "RED":
+				return XMaterial.RED_WOOL;
+			case "DARK_PURPLE":
+				return XMaterial.PURPLE_WOOL;
+			case "GOLD":
+				return XMaterial.ORANGE_WOOL;
+			case "GRAY":
+				return XMaterial.LIGHT_GRAY_WOOL;
+			case "DARK_GRAY":
+				return XMaterial.GRAY_WOOL;
+			case "GREEN":
+				return XMaterial.LIME_WOOL;
+			case "AQUA":
+				return XMaterial.LIGHT_BLUE_WOOL;
+			case "LIGHT_PURPLE":
+				return XMaterial.PINK_WOOL;
+			case "YELLOW":
+				return XMaterial.YELLOW_WOOL;
+			default:
+				return XMaterial.WHITE_WOOL;
+		}
+	}
+
 	public static XMaterial convertChatColorToXWool(ChatColor color) {
 		switch (color) {
 			case BLACK:
