@@ -253,7 +253,20 @@ public class ItemBuilderUtil {
         return this;
     }
 
+    public ItemBuilderUtil setCustomModelData(int modelData) {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.setCustomModelData(modelData);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
+
     public ItemStack toItemStack() {
+        return is;
+    }
+
+    public ItemStack build() {
         return is;
     }
 }
