@@ -103,6 +103,9 @@ public final class WoolUtil {
 		if (Objects.equals(color, CC.DARK_RED)) {
 			color = CC.RED;
 		}
+		if (Objects.equals(color, CC.DARK_BLUE)) {
+			color = CC.BLUE;
+		}
 
 		return woolCCs.indexOf(color);
 	}
