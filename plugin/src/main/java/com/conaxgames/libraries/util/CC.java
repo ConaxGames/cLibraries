@@ -11,8 +11,10 @@ public final class CC {
 
 	public static String PRIMARY = ChatColor.YELLOW.toString();
 	public static String SECONDARY = ChatColor.GOLD.toString();
+	public static String TERTIARY = ChatColor.GRAY.toString();
 	public static String B_PRIMARY = ChatColor.YELLOW + ChatColor.BOLD.toString();
 	public static String B_SECONDARY = ChatColor.GOLD + ChatColor.BOLD.toString();
+	public static String B_TERTIARY = ChatColor.GRAY + ChatColor.BOLD.toString();
 
 	public static final String U = ChatColor.UNDERLINE.toString();
 	public static final String BLUE = ChatColor.BLUE.toString();
@@ -126,13 +128,12 @@ public final class CC {
 	}
 
 	public CC() {
-		String primary = ChatColor.YELLOW.toString();
-		String secondary = ChatColor.GOLD.toString();
-
-		PRIMARY = primary;
-		SECONDARY = secondary;
-		B_PRIMARY = primary + ChatColor.BOLD;
-		B_SECONDARY = secondary + ChatColor.BOLD;
+		PRIMARY = ChatColor.YELLOW.toString();
+		SECONDARY = ChatColor.GOLD.toString();
+		TERTIARY = ChatColor.GRAY.toString();
+		B_PRIMARY = ChatColor.YELLOW + ChatColor.BOLD.toString();
+		B_SECONDARY = ChatColor.GOLD + ChatColor.BOLD.toString();
+		B_TERTIARY = ChatColor.GRAY + ChatColor.BOLD.toString();
 	}
 
 }
