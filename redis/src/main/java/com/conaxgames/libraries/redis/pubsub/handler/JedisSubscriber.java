@@ -8,12 +8,14 @@ import com.conaxgames.libraries.redis.subscription.model.JedisSubscriptionGenera
 import com.conaxgames.libraries.redis.subscription.model.JedisSubscriptionHandler;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import org.bukkit.scheduler.BukkitRunnable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class JedisSubscriber<K> {
 
@@ -61,7 +63,7 @@ public class JedisSubscriber<K> {
 
         this.jedis = new Jedis(this.jedisSettings.getAddress(), this.jedisSettings.getPort());
         this.authenticate();
-        this.connect();
+        this.attemptConnect();
     }
 
     /**
@@ -77,34 +79,35 @@ public class JedisSubscriber<K> {
     /**
      * Creates the thread for the {@link JedisPubSub} to be subscribed to on the channel which is targeted.
      */
-    private void connect() {
+    private void attemptConnect() {
         new Thread(() -> {
             try {
                 this.jedis.subscribe(this.pubSub, this.channel);
                 this.connection.toConsole("JedisSubscriber: Jedis is now reading on " + this.channel);
             } catch (Exception e) {
-                if (this.connection.getPlugin().isEnabled()) { // can't reconnect if plugin is disabled
+                if (this.connection.isEnabled()) { // can't reconnect if plugin is disabled
                     this.connection.toConsole("JedisSubscriber: Jedis channel (" + this.channel + ") has lost connection...");
 
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
+                    try {
+                        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+                        scheduler.scheduleAtFixedRate(() -> {
                             JedisConnection jedisConnection = JedisConnection.getInstance();
                             jedisConnection.toConsole("JedisSubscriber: Attempting to reconnect JedisSubscriber (" + channel + ")");
 
-                            close();
-                            connect();
+                            this.closeConnection();
+                            this.attemptConnect();
 
                             if (jedis != null && pubSub.isSubscribed()) {
                                 jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
-                                this.cancel();
+                                scheduler.shutdown();
                             } else {
                                 jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") will attempt a reconnect in 15 seconds...");
                             }
-                        }
-                    }.runTaskTimer(this.connection.getPlugin(), 20L * 10L, 20L * 10L);
+                        }, 10, 10, TimeUnit.SECONDS);
+                    } catch (IllegalArgumentException exception) {
+                        this.connection.toConsole("Unable to define thread pool, can't start jedis-reconnect task...");
+                    }
                 }
-                //e.printStackTrace();
             }
         }).start();
     }
@@ -112,7 +115,7 @@ public class JedisSubscriber<K> {
     /**
      * Closes the {@link JedisPubSub} connection and it will close the {@link Jedis} connection
      */
-    public void close() {
+    public void closeConnection() {
         try {
             if (this.pubSub != null) {
                 this.pubSub.unsubscribe();
