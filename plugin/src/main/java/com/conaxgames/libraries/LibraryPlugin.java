@@ -7,6 +7,7 @@ import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.inventoryui.UIListener;
 import com.conaxgames.libraries.listener.PlayerListener;
+import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
@@ -35,6 +36,8 @@ public class LibraryPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        LibNMSManager.getInstance(); // creates a new instance of the NMS manager to determine
+                                     // the server version before we start loading all the other stuff
 
         try {
             settings = new Settings();
