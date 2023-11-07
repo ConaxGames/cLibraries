@@ -1,18 +1,14 @@
 package com.conaxgames.libraries.redis.pubsub;
 
+import com.conaxgames.api.redis.MessageType;
 import com.conaxgames.libraries.redis.JedisConnection;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 @Getter
 public class SubscribeObject {
 
-    public String messageType = "UNKNOWN";
-    public Player target = null;
+    public MessageType messageType = MessageType.UNKNOWN;
     public String message = null;
     public String permission = null;
     public String destination = null;
@@ -27,20 +23,17 @@ public class SubscribeObject {
             return null;
         }
 
-        messageType = object.get("action").getAsString();
+        String action = object.get("action").getAsString();
+        try {
+            messageType = MessageType.valueOf(action);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
 
         if (object.has("destination")) {
             destination = object.get("destination").getAsString();
             String localServer = JedisConnection.getInstance().getInstanceId();
             if (!destination.equalsIgnoreCase(localServer)) return null;
-        }
-
-        if (object.has("target")) {
-            target = Bukkit.getPlayer(UUID.fromString(object.get("target").getAsString()));
-        }
-
-        if (object.has("targetName")) {
-            target = Bukkit.getPlayerExact(object.get("targetName").getAsString());
         }
 
         if (object.has("message")) {

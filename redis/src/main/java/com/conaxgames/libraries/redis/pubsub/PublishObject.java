@@ -3,7 +3,6 @@ package com.conaxgames.libraries.redis.pubsub;
 import com.conaxgames.libraries.redis.JedisConnection;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -29,10 +28,6 @@ public class PublishObject {
         return jsonObject;
     }
 
-    public JsonObject addTarget(Player target) {
-        if (target != null) object.addProperty("target", target.getUniqueId().toString());
-        return object;
-    }
 
     public JsonObject addTarget(UUID target) {
         if (target != null) object.addProperty("target", target.toString());
