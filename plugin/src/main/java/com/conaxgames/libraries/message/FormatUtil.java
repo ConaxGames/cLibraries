@@ -193,11 +193,13 @@ public enum FormatUtil {;
     }
 
     public static String formatTps(double tps) {
-        //TODO FAST MATH BOWP OLIVER WTF
-        return ((tps > 18.0) ? ChatColor.GREEN : (tps > 16.0) ? ChatColor.YELLOW : ChatColor.RED)
-                .toString()
-                + ((tps > 20.0) ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0);
+        double roundedTps = Math.min(tps, 20.0);
+        ChatColor color = (tps > 18.0) ? ChatColor.GREEN : (tps > 16.0) ? ChatColor.YELLOW : ChatColor.RED;
+        String asterisk = (tps > 20.0) ? "*" : "";
+
+        return color + asterisk + String.format("%.2f", roundedTps);
     }
+
 
     private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
 
