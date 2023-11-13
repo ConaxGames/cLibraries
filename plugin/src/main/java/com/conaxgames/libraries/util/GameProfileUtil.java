@@ -2,6 +2,8 @@ package com.conaxgames.libraries.util;
 
 import com.mojang.authlib.GameProfile;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
@@ -18,24 +20,22 @@ public class GameProfileUtil {
 		return newProfile;
 	}
 
-
-	// todo: this wont work anymore witrh jdk 16
 	public static GameProfile setName(GameProfile gameProfile, String newName) {
 		try {
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-
-			// wrapping setAccessible
-			AccessController.doPrivileged((PrivilegedAction) () -> {
-				modifiersField.setAccessible(true);
-				return null;
-			});
-
 			Field nameField = GameProfile.class.getDeclaredField("name");
-			modifiersField.setInt(nameField, nameField.getModifiers() & ~Modifier.FINAL);
+
+			// Make the field accessible
 			nameField.setAccessible(true);
-			nameField.set(gameProfile, newName);
-		} catch (Exception e) {
-			e.printStackTrace();
+
+			// Use MethodHandles to set the value
+			MethodHandles.Lookup lookup = MethodHandles.lookup();
+			MethodHandle setter = lookup.unreflectSetter(nameField);
+
+			setter.invoke(gameProfile, newName);
+		} catch (ReflectiveOperationException e) {
+			e.printStackTrace(); // Handle or log the exception as needed
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
 		}
 		return gameProfile;
 	}
