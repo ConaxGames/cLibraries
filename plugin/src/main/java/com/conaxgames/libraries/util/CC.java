@@ -111,7 +111,7 @@ public final class CC {
 	}
 
 	private static String translateHex(String message) {
-		Pattern hexPattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+		Pattern hexPattern = Pattern.compile("&#[A-Fa-f0-9]{6}");
 
 		// Handle hexadecimal color codes
 		Matcher hexMatcher = hexPattern.matcher(message);
