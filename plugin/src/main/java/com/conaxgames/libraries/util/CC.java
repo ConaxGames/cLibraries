@@ -111,13 +111,14 @@ public final class CC {
 	}
 
 	private static String translateHex(String message) {
-		Pattern hexPattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+		// Handle hexadecimal color codes in the format &#RRGGBB
+		Pattern hexPattern = Pattern.compile("&#[A-Fa-f0-9]{6}");
 
 		// Handle hexadecimal color codes
 		Matcher hexMatcher = hexPattern.matcher(message);
 		while (hexMatcher.find()) {
-			String hexColor = hexMatcher.group();
-			message = message.replace(hexMatcher.group(), net.md_5.bungee.api.ChatColor.of(hexColor).toString());
+			String hexColor = hexMatcher.group().substring(2); // Remove "&#"
+			message = message.replace(hexMatcher.group(), net.md_5.bungee.api.ChatColor.of("#" + hexColor).toString());
 		}
 
 		return message; // Your default implementation (1.8 NMS behavior)
