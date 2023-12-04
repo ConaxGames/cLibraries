@@ -387,7 +387,7 @@ public class InventoryUI {
 				return this.cachedInventory;
 			}
 
-			Inventory inventory = LibraryPlugin.getInstance().getServer().createInventory(new InventoryUIHolder(InventoryUI.this, this.title, this.rows * 9), this.rows * 9, this.title);
+			Inventory inventory = LibraryPlugin.getInstance().getPlugin().getServer().createInventory(new InventoryUIHolder(InventoryUI.this, this.title, this.rows * 9), this.rows * 9, this.title);
 			for (int y = 0; y < this.rows; y++) {
 				for (int x = 0; x < 9; x++) {
 					int slot = y * 9 + x;

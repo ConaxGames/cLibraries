@@ -30,7 +30,7 @@ public class LibraryCommands extends BaseCommand {
     @Description("Prints basic information about the library command.")
     public void onLibrary(CommandSender sender) {
         sender.sendMessage(CC.PRIMARY + "cLibraries is currently on version " + CC.SECONDARY +
-                LibraryPlugin.getInstance().getDescription().getVersion() + CC.PRIMARY + ".");
+                LibraryPlugin.getInstance().getPlugin().getDescription().getVersion() + CC.PRIMARY + ".");
     }
 
     @Subcommand("hooks")

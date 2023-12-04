@@ -98,7 +98,7 @@ public class CoreMenu {
                         try {
                             buttonMaterial = XMaterial.valueOf(buttonSection.getString(button + ".material"));
                         } catch (IllegalArgumentException e) {
-                            LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Invalid button material for " + button);
+                            LibraryPlugin.getInstance().getLibraryLogger().toConsole("CoreConfigMenu", "Invalid button material for " + button);
                         }
 
                         ConfigButtonData buttonData = new ConfigButtonData(actions, conditions, buttonName, permission,
@@ -127,16 +127,16 @@ public class CoreMenu {
         if (alwaysSync || (config.isWasCreated() && syncOnCreation)) {
             try {
                 if (settings == null) {
-                    LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "CommentedConfiguration 'settings' was null... (" + dest + ")");
+                    LibraryPlugin.getInstance().getLibraryLogger().toConsole("CoreConfigMenu", "CommentedConfiguration 'settings' was null... (" + dest + ")");
                     return null;
                 }
 
                 if (config.getConfigFile() != null) {
                     settings.syncWithConfig(config.getConfigFile(), javaPlugin.getResource(dest + ".yml"), dontSync);
-                    LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Sync'd " + dest + ".yml" + " with file.");
+                    LibraryPlugin.getInstance().getLibraryLogger().toConsole("CoreConfigMenu", "Sync'd " + dest + ".yml" + " with file.");
                 }
             } catch (Exception exception) {
-                LibraryPlugin.getInstance().sendDebug("CoreConfigMenu", "Unable to sync " + dest + ".yml" + " with file.");
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("CoreConfigMenu", "Unable to sync " + dest + ".yml" + " with file.");
                 exception.printStackTrace();
             }
             return settings;

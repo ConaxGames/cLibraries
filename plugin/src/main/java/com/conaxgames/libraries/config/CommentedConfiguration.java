@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.config;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;

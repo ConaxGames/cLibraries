@@ -40,9 +40,9 @@ public abstract class PlayerTimer extends Timer {
 		if (runnable != null) {
 			runnable.cancel();
 			if (player == null) {
-				LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(new TimerClearEvent(playerUUID, this));
+				LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(new TimerClearEvent(playerUUID, this));
 			} else {
-				LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(new TimerClearEvent(player, this));
+				LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(new TimerClearEvent(player, this));
 			}
 		}
 
@@ -96,7 +96,7 @@ public abstract class PlayerTimer extends Timer {
 			}
 
 			TimerExtendEvent event = new TimerExtendEvent(player, playerUUID, this, remaining, duration);
-			LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(event);
+			LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				return false;
 			}
@@ -113,7 +113,7 @@ public abstract class PlayerTimer extends Timer {
 			return flag;
 		} else {
 			TimerStartEvent event = new TimerStartEvent(player, playerUUID, this, duration);
-			LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(event);
+			LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				return false;
 			}

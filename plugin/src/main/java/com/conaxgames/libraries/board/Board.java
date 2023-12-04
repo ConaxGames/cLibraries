@@ -31,10 +31,10 @@ public class Board {
 
 	private void init() {
 		if (!this.player.getScoreboard()
-				.equals(LibraryPlugin.getInstance().getServer().getScoreboardManager().getMainScoreboard())) {
+				.equals(LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager().getMainScoreboard())) {
 			this.scoreboard = this.player.getScoreboard();
 		} else {
-			this.scoreboard = LibraryPlugin.getInstance().getServer().getScoreboardManager().getNewScoreboard();
+			this.scoreboard = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager().getNewScoreboard();
 		}
 
 		this.objective = this.scoreboard.registerNewObjective("Default", "dummy");

@@ -45,18 +45,18 @@ public class License {
     public boolean register() {
         ValidationType vt = isValid();
         if (vt == ValidationType.VALID) {
-            LibraryPlugin.getInstance().sendDebug("License Checker", "License key seems to be valid :>");
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("License Checker", "License key seems to be valid :>");
             return true;
         } else {
             try {
                 final URLConnection connection = new URL("https://cdn.conaxgames.com/license/verify.php").openConnection();
                 connection.connect();
-                LibraryPlugin.getInstance().sendDebug("License Checker", "Web server is online! but license is invalid");
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("License Checker", "Web server is online! but license is invalid");
                 Bukkit.getScheduler().cancelTasks(plugin);
                 Bukkit.getPluginManager().disablePlugin(plugin);
                 return false;
             } catch (final IOException e) {
-                LibraryPlugin.getInstance().sendDebug("License Checker", "Web server seems to be unreachable, Ignoring license key");
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("License Checker", "Web server seems to be unreachable, Ignoring license key");
                 return true;
             }
         }

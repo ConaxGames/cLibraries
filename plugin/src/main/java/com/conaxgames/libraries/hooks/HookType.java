@@ -11,6 +11,7 @@ public enum HookType {
     CMI(GamemodeType.UNKNOWN),
     TAB(GamemodeType.UNKNOWN),
     LUCKPERMS(GamemodeType.UNKNOWN),
+    CITIZENS(GamemodeType.UNKNOWN),
 
     /* CONAX */
     CSUITE(GamemodeType.UNKNOWN),
@@ -24,12 +25,11 @@ public enum HookType {
     KITPVP(GamemodeType.KITPVP),
     FFA(GamemodeType.FFA),
     CGLOBE(GamemodeType.SURVIVAL),
-    SKYBLOCK(GamemodeType.SKYBLOCK),
-    CITIZENS(GamemodeType.UNKNOWN);
+    SKYBLOCK(GamemodeType.SKYBLOCK);
 
     public final GamemodeType gamemode;
 
-    private HookType(GamemodeType gamemode) {
+    HookType(GamemodeType gamemode) {
         this.gamemode = gamemode;
     }
 

@@ -18,15 +18,15 @@ public class Settings {
     }
 
     public void reload() {
-        File file = new File(LibraryPlugin.getInstance().getDataFolder(), "settings.yml");
+        File file = new File(LibraryPlugin.getInstance().getPlugin().getDataFolder(), "settings.yml");
         if (!file.exists()) {
-            LibraryPlugin.getInstance().saveResource("settings.yml", false);
+            LibraryPlugin.getInstance().getPlugin().saveResource("settings.yml", false);
         }
 
         CommentedConfiguration settings = CommentedConfiguration.loadConfiguration(file);
 
         try {
-            settings.syncWithConfig(file, LibraryPlugin.getInstance().getResource("settings.yml"));
+            settings.syncWithConfig(file, LibraryPlugin.getInstance().getPlugin().getResource("settings.yml"));
         } catch (Exception exception) {
             Bukkit.getLogger().info("Unable to load settings.yml");
         }
