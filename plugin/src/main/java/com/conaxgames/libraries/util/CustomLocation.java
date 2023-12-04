@@ -123,9 +123,9 @@ public class CustomLocation {
 
 	public World toBukkitWorld() {
 		if (this.world == null) {
-			return LibraryPlugin.getInstance().getServer().getWorlds().get(0);
+			return LibraryPlugin.getInstance().getPlugin().getServer().getWorlds().get(0);
 		} else {
-			return LibraryPlugin.getInstance().getServer().getWorld(this.world);
+			return LibraryPlugin.getInstance().getPlugin().getServer().getWorld(this.world);
 		}
 	}
 

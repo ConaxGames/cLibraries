@@ -64,7 +64,7 @@ public class ButtonListener implements Listener {
                     event.setCancelled(cancel);
                 }
                 if (event.isCancelled()) {
-                    Bukkit.getScheduler().runTaskLater(LibraryPlugin.getInstance(), player::updateInventory, 1L);
+                    Bukkit.getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), player::updateInventory, 1L);
                 }
             } else if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
                 event.setCancelled(true);

@@ -3,6 +3,7 @@ package com.conaxgames.libraries;
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.board.BoardManager;
 import com.conaxgames.libraries.commands.CommandRegistry;
+import com.conaxgames.libraries.debug.LibraryLogger;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.inventoryui.UIListener;
@@ -11,17 +12,18 @@ import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class LibraryPlugin extends JavaPlugin {
+public class LibraryPlugin {
 
     private static LibraryPlugin instance;
+    private JavaPlugin plugin;
+
+    private LibraryLogger libraryLogger;
     private TimerManager timerManager;
     private PaperCommandManager paperCommandManager;
     private CommandRegistry commandRegistry;
@@ -33,46 +35,47 @@ public class LibraryPlugin extends JavaPlugin {
         return LibraryPlugin.instance;
     }
 
-    @Override
-    public void onEnable() {
+    public LibraryPlugin setup(JavaPlugin plugin, String debugPrimary, String debugSecondary) {
+        this.plugin = plugin;
         instance = this;
-        LibNMSManager.getInstance(); // creates a new instance of the NMS manager to determine
-                                     // the server version before we start loading all the other stuff
+
+        // determine the server version before we load other utility classes.
+        LibNMSManager.getInstance();
 
         try {
             settings = new Settings();
         } catch (Exception e) {
-            getLogger().info("Settings handler is null lol");
+            this.plugin.getLogger().info("------------------------------------------------------------------");
+            this.plugin.getLogger().info(" ");
+            this.plugin.getLogger().info("cLibraries settings were unable to load!");
+            this.plugin.getLogger().info(" ");
+            this.plugin.getLogger().info("------------------------------------------------------------------");
         }
 
         long start = System.currentTimeMillis();
 
+        this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.hookManager = new HookManager(this);
         this.timerManager = new TimerManager();
-        this.paperCommandManager = new PaperCommandManager(this);
+        this.paperCommandManager = new PaperCommandManager(this.plugin);
         this.commandRegistry = new CommandRegistry(paperCommandManager);
 
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new UIListener(), this);
-        Bukkit.getPluginManager().registerEvents(hookManager, this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this.plugin);
+        Bukkit.getPluginManager().registerEvents(new UIListener(), this.plugin);
+        Bukkit.getPluginManager().registerEvents(this.hookManager, this.plugin);
 
         long finish = System.currentTimeMillis();
         if (LibraryPlugin.getInstance().getSettings().debug) {
-            getLogger().info("Successfully hooked into " + getHooked().size() + " plugin" + (getHooked().size() == 1 ? "" : "s") + " and loaded utilities in " + (finish - start) + " ms.");
+            this.plugin.getLogger().info("Successfully hooked into " + getHooked().size() + " plugin" + (getHooked().size() == 1 ? "" : "s") + " and loaded utilities in " + (finish - start) + " ms.");
         }
         new LibraryPluginEnableEvent().call();
-    }
 
-    @Override
-    public void onDisable() {
-        super.onDisable();
+        return this;
     }
 
     public List<Plugin> getHooked() {
         List<Plugin> libraryPluginList = new ArrayList<>();
-
-        List<Plugin> bukkitPluginList = new ArrayList<>(Arrays.asList(Bukkit.getPluginManager().getPlugins()));
-
+        Plugin[] bukkitPluginList = Bukkit.getPluginManager().getPlugins();
         for (Plugin plugin : bukkitPluginList) {
             if (plugin.getDescription().getDepend().contains("cLibraries")) {
                 libraryPluginList.add(plugin);
@@ -82,24 +85,18 @@ public class LibraryPlugin extends JavaPlugin {
         return libraryPluginList;
     }
 
-    public void sendConsoleMessage(String msg, ChatColor color) {
-        Bukkit.getConsoleSender().sendMessage(CC.translate(color + "[cLibraries] " + msg));
-    }
-
-    public void sendConsoleMessage(String msg) {
-        Bukkit.getConsoleSender().sendMessage(CC.translate("[cLibraries] " + msg));
-    }
-
     public Settings getSettings() {
         return settings;
     }
 
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
     public void setBoardManager(BoardManager boardManager) {
         this.boardManager = boardManager;
-
         long interval = this.boardManager.getAdapter().getInterval();
-
-        this.getServer().getScheduler().runTaskTimerAsynchronously(this, this.boardManager, 0L, interval);
+        this.plugin.getServer().getScheduler().runTaskTimerAsynchronously(this.plugin, this.boardManager, 0L, interval);
     }
 
     public TimerManager getTimerManager() {
@@ -142,9 +139,7 @@ public class LibraryPlugin extends JavaPlugin {
         this.settings = settings;
     }
 
-    public void sendDebug(String action, String msg) {
-        if (this.settings.debug) {
-            Bukkit.getConsoleSender().sendMessage(CC.PRIMARY + "[cLib Debug] " + CC.GRAY + "Action Code: " + CC.SECONDARY + action + " " + CC.GRAY + "Message: " + CC.SECONDARY + msg);
-        }
+    public LibraryLogger getLibraryLogger() {
+        return libraryLogger;
     }
 }

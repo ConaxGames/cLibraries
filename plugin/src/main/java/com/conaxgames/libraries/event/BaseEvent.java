@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class BaseEvent extends Event {
 
@@ -20,7 +21,8 @@ public class BaseEvent extends Event {
 	}
 
 	public boolean call() {
-		Bukkit.getScheduler().runTask(LibraryPlugin.getInstance(), () -> Bukkit.getServer().getPluginManager().callEvent(this));
+		JavaPlugin plugin = LibraryPlugin.getInstance().getPlugin();
+		plugin.getServer().getScheduler().runTask(plugin, () -> Bukkit.getServer().getPluginManager().callEvent(this));
 		return this instanceof Cancellable && ((Cancellable) this).isCancelled();
 	}
 

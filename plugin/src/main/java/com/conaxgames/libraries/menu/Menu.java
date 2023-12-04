@@ -48,7 +48,7 @@ public abstract class Menu {
             try {
                 inv.setItem(buttonEntry.getKey(), buttonEntry.getValue().getButtonItem(player));
             } catch (ArrayIndexOutOfBoundsException e) {
-                LibraryPlugin.getInstance().sendConsoleMessage(e.getMessage(), ChatColor.RED);
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("Menu", "An item slot in the " + this.staticTitle + " menu was invalid.", e);
             }
         }
 
@@ -116,7 +116,7 @@ public abstract class Menu {
         if (Bukkit.isPrimaryThread()) {
             open(player);
         } else {
-            Bukkit.getScheduler().runTask(LibraryPlugin.getInstance(), () -> open(player));
+            Bukkit.getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
         }
     }
 
@@ -151,7 +151,7 @@ public abstract class Menu {
                 }
             }
         };
-        runnable.runTaskTimer(LibraryPlugin.getInstance(), 10L, 20L);
+        runnable.runTaskTimer(LibraryPlugin.getInstance().getPlugin(), 10L, 20L);
         checkTasks.put(player.getName(), runnable);
     }
 
@@ -248,7 +248,7 @@ public abstract class Menu {
     }
 
     static {
-        LibraryPlugin.getInstance().getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance());
+        LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
         currentlyOpenedMenus = new HashMap<>();
         checkTasks = new HashMap<>();
     }

@@ -23,7 +23,7 @@ public class HookManager implements Listener {
     public HookManager(LibraryPlugin plugin) {
         this.plugin = plugin;
 
-        for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
+        for (Plugin p : plugin.getPlugin().getServer().getPluginManager().getPlugins()) {
             HookType type = Arrays.stream(HookType.values()).filter(t -> t.name().equalsIgnoreCase(p.getName())).findFirst().orElse(null);
             if (type == null) {
                 continue;
@@ -42,8 +42,9 @@ public class HookManager implements Listener {
                     if (plugin.isEnabled() && plugin.getName().contains(disabled.getPluginFromAnnotation())) {
                         if (disabled.getHookType().getGamemode() != GamemodeType.UNKNOWN) {
                             serverType = disabled.getHookType().getGamemode();
-                            LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Automatically determined the server is a " + CC.SECONDARY + serverType.getDisplay() + CC.PRIMARY + " server.");
-                            LibraryPlugin.getInstance().sendConsoleMessage(CC.GRAY + "(This was determined through the " + plugin.getName() + " plugin being enabled.)");
+
+                            LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager", Arrays.asList("Automatically determined the server is a " + serverType.getDisplay() + " server."
+                                    , "(This was determined through the " + plugin.getName() + " plugin being enabled.)"));
                             break;
                         }
                     }
@@ -56,8 +57,8 @@ public class HookManager implements Listener {
         for (Hook hook : hooks) {
             if (hook.getHookType().getGamemode() != null && hook.getHookType().getGamemode() != GamemodeType.UNKNOWN) {
                 serverType = hook.getHookType().getGamemode();
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Automatically determined the server is a " + CC.SECONDARY + serverType.getDisplay() + CC.PRIMARY + " server.");
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.GRAY + "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)");
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager", Arrays.asList("Automatically determined the server is a " + serverType.getDisplay() + " server."
+                        , "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)"));
                 break;
             }
         }
@@ -71,11 +72,12 @@ public class HookManager implements Listener {
         try {
             hooks.add(hook);
             if (LibraryPlugin.getInstance().getSettings().debug) {
-                LibraryPlugin.getInstance().sendConsoleMessage(CC.PRIMARY + "Hooked into " + CC.SECONDARY + hook.getHookType() + CC.PRIMARY + " version " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion() + CC.PRIMARY + "."
-                        + CC.GRAY + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + CC.GRAY + ")");
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager",
+                        "Hooked into " + hook.getHookType() + " version " + hook.getPlugin().getDescription().getVersion() + "."
+                        + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + ")");
             }
         } catch (Exception e) {
-            plugin.getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
+            plugin.getPlugin().getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
             e.printStackTrace();
         }
     }

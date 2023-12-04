@@ -53,10 +53,10 @@ public class TimerCooldown {
 				public void run() {
 					if (TimerCooldown.this.timer instanceof PlayerTimer && owner != null) {
 						((PlayerTimer) timer).handleExpiry(
-								LibraryPlugin.getInstance().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
+								LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
 					}
 
-					LibraryPlugin.getInstance().getServer().getPluginManager().callEvent(
+					LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(
 							new TimerExpireEvent(TimerCooldown.this.owner, TimerCooldown.this.timer));
 				}
 			}.runTaskLater(JavaPlugin.getProvidingPlugin(this.getClass()), ticks);

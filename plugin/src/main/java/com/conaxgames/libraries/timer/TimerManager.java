@@ -16,7 +16,7 @@ public class TimerManager implements Listener {
 	public void registerTimer(Timer timer) {
 		this.timers.add(timer);
 		if (timer instanceof Listener) {
-			LibraryPlugin.getInstance().getServer().getPluginManager().registerEvents((Listener) timer, LibraryPlugin.getInstance());
+			LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().registerEvents((Listener) timer, LibraryPlugin.getInstance().getPlugin());
 		}
 	}
 

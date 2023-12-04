@@ -44,7 +44,7 @@ public class TimerExpireEvent extends Event {
 	public Optional<Player> getPlayer() {
 		if (player == null) {
 			player = this.userUUID.isPresent() ?
-					Optional.of(LibraryPlugin.getInstance().getServer().getPlayer(this.userUUID.get())) : Optional.empty();
+					Optional.ofNullable(LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(this.userUUID.get())) : Optional.empty();
 		}
 
 		return player;

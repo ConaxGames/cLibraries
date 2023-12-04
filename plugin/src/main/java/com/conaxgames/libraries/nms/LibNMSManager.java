@@ -25,9 +25,9 @@ public abstract class LibNMSManager {
             try {
                 setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion)); // set the enum
             } catch (IllegalArgumentException e) {
-                LibraryPlugin.getInstance().sendConsoleMessage("UNABLE TO FIND NMS VERSION MATCHING " +
-                        bukkitNMSVersion + ". Disabling cLibraries to avoid further complications compatibility issues...", ChatColor.RED);
-                LibraryPlugin.getInstance().getServer().getPluginManager().disablePlugin(LibraryPlugin.getInstance());
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole("LibNMSManager", "UNABLE TO FIND NMS VERSION MATCHING " +
+                        bukkitNMSVersion + ". Disabling cLibraries to avoid further complications compatibility issues...", new UnsupportedOperationException(bukkitNMSVersion));
+                LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().disablePlugin(LibraryPlugin.getInstance().getPlugin());
             }
             return serverVersion;
         } catch (Exception e) {

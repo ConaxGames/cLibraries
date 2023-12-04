@@ -23,7 +23,7 @@ public class BoardManager implements Runnable {
 	@Override
 	public void run() {
 		this.adapter.preLoop();
-		for (Player player : LibraryPlugin.getInstance().getServer().getOnlinePlayers()) {
+		for (Player player : LibraryPlugin.getInstance().getPlugin().getServer().getOnlinePlayers()) {
 			Board board = this.playerBoards.get(player.getUniqueId());
 			if (board == null) {
 				continue;
@@ -109,7 +109,7 @@ public class BoardManager implements Runnable {
 				player.setScoreboard(scoreboard);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LibraryPlugin.getInstance().getLogger()
+				LibraryPlugin.getInstance().getPlugin().getLogger()
 						.severe("Something went wrong while updating " + player.getName() + "'s scoreboard " + board + " - " + board.getAdapter() + ")");
 			}
 		}
