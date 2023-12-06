@@ -41,8 +41,13 @@ public class LibraryLogger {
             if (i != 0) console.sendMessage(" ");
             console.sendMessage(CC.translate(this.primary + "------------------------------------------------------------------"));
             console.sendMessage(CC.translate(this.secondary + padding + "| Stacktrace: " + thr.getClass().getName()));
-            for (String stackLine : thr.getMessage().split("\n")) {
-                console.sendMessage(CC.translate(this.primary + padding + "| " + CC.GRAY + stackLine));
+            if (thr.getMessage() != null) {
+                thr.printStackTrace();
+                for (String stackLine : thr.getMessage().split("\n")) {
+                    console.sendMessage(CC.translate(this.primary + padding + "| " + CC.GRAY + stackLine));
+                }
+            } else {
+                thr.printStackTrace();
             }
             console.sendMessage(this.primary + "------------------------------------------------------------------");
         }

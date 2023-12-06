@@ -1,6 +1,8 @@
 package com.conaxgames.libraries.config;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -268,11 +270,11 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @param file The file to load the config from.
      * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
      */
-    public static CommentedConfiguration loadConfiguration(File file) {
+    public static CommentedConfiguration loadConfiguration(@NonNull File file) {
         try {
             FileInputStream stream = new FileInputStream(file);
             return loadConfiguration(new InputStreamReader(stream, StandardCharsets.UTF_8));
-        }catch(FileNotFoundException ex){
+        } catch(FileNotFoundException ex){
             Bukkit.getLogger().warning("File " + file.getName() + " doesn't exist.");
             return new CommentedConfiguration().flagAsFailed();
         }
@@ -284,6 +286,11 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
      */
     public static CommentedConfiguration loadConfiguration(InputStream inputStream) {
+        if (inputStream == null) {
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("CommentedConfiguration", "InputStream cannot be null!");
+            return new CommentedConfiguration().flagAsFailed();
+        }
+
         return loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 
