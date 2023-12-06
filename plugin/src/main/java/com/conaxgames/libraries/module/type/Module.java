@@ -21,6 +21,14 @@ public abstract class Module {
     public JavaPlugin javaPlugin;
     private Config settings;
 
+    /**
+     * Create a module object which can be enabled and disabled
+     * on command. Modules are perfect for small to medium features.
+     *
+     * @param javaPlugin The JavaPlugin which owns this module,
+     *                   including its files which will be found
+     *                   in the /modules/... directory..
+     */
     public Module(JavaPlugin javaPlugin) {
         this.library = LibraryPlugin.getInstance();
         this.javaPlugin = javaPlugin;
@@ -148,8 +156,7 @@ public abstract class Module {
                 settings.syncWithConfig(config.getConfigFile(), javaPlugin.getResource("modules/" + this.getIdentifier() + "/" + dest + ".yml"), dontSync);
                 library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.");
             } catch (Exception exception) {
-                library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.");
-                exception.printStackTrace();
+                library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
             }
         }
 
