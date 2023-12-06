@@ -8,9 +8,9 @@ import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.inventoryui.UIListener;
 import com.conaxgames.libraries.listener.PlayerListener;
+import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.timer.TimerManager;
-import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,13 +29,14 @@ public class LibraryPlugin {
     private CommandRegistry commandRegistry;
     private BoardManager boardManager;
     private HookManager hookManager;
+    private ModuleManager moduleManager;
     private Settings settings = null;
 
     public static LibraryPlugin getInstance() {
         return LibraryPlugin.instance;
     }
 
-    public LibraryPlugin setup(JavaPlugin plugin, String debugPrimary, String debugSecondary) {
+    public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary) {
         this.plugin = plugin;
         instance = this;
 
@@ -57,6 +58,8 @@ public class LibraryPlugin {
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.hookManager = new HookManager(this);
         this.timerManager = new TimerManager();
+        this.moduleManager = new ModuleManager(plugin, this);
+
         this.paperCommandManager = new PaperCommandManager(this.plugin);
         this.commandRegistry = new CommandRegistry(paperCommandManager);
 
@@ -70,6 +73,11 @@ public class LibraryPlugin {
         }
         new LibraryPluginEnableEvent().call();
 
+        return this;
+    }
+
+    public LibraryPlugin onDisable() {
+        this.moduleManager.disableAllModules();
         return this;
     }
 
@@ -141,5 +149,9 @@ public class LibraryPlugin {
 
     public LibraryLogger getLibraryLogger() {
         return libraryLogger;
+    }
+
+    public ModuleManager getModuleManager() {
+        return moduleManager;
     }
 }
