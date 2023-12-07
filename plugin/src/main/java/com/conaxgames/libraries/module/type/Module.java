@@ -42,7 +42,7 @@ public abstract class Module {
     /**
      * The name of this module
      *
-     * @return {@link #getIdentifier()} by default, name of this module if specified
+     * @return The unique name of the module
      */
     public abstract String getName();
 
@@ -133,6 +133,12 @@ public abstract class Module {
         return this.settings.getConfig().getStringList(path);
     }
 
+    public void set(String path, Object value) {
+        this.settings.getConfig().set(path, value);
+        this.settings.save();
+        this.reloadConfig();
+    }
+
     public Config getResource(boolean sync, boolean syncOnCreation) {
         return getResource("settings", sync, syncOnCreation);
     }
@@ -161,11 +167,6 @@ public abstract class Module {
         }
 
         return config;
-    }
-
-    public void registerListener() {
-        Bukkit.getPluginManager().registerEvents((Listener) this, javaPlugin);
-        library.getLibraryLogger().toConsole("Modules", "Registered " + this.getName() + " as a listener");
     }
 
 }
