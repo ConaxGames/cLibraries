@@ -6,12 +6,14 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -27,7 +29,7 @@ public class ModuleManager {
     }
 
     private void register(Module module) {
-        if (module.canRegister()) {
+        if (module.canRegister() && !modules.containsKey(module.getIdentifier().toLowerCase())) {
             modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, false));
         } else {
             String message = module.getIdentifier() + " cannot be registered as one of its required plugins cannot be found.";
@@ -35,7 +37,29 @@ public class ModuleManager {
         }
     }
 
-    public String enableOrReloadModule(Module module, boolean save) {
+    public String enableModule(Module module) {
+        Validate.notNull(module, "Module can not be null");
+        Validate.notNull(module.getIdentifier(), "Identifier can not be null");
+
+        // register the module if it's not already.
+        this.register(module);
+
+        module.setupFiles(); // Sets up the data files which are required for the module.
+        module.reloadConfig(); // Reload the settings.yml data
+
+        // Registers as listener and calls onReload & onEnable.
+        this.setModuleEnabled(module);
+
+        // Save the new value to memory & to file.
+        modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, true));
+        module.set("enabled", true);
+
+        String message = "Enabled " + module.getIdentifier() + "!";
+        library.getLibraryLogger().toConsole("Module Manager", message);
+        return message;
+    }
+
+    public String reloadModule(Module module) {
         Validate.notNull(module, "Module can not be null");
         Validate.notNull(module.getIdentifier(), "Identifier can not be null");
 
@@ -44,23 +68,7 @@ public class ModuleManager {
         module.setupFiles(); // Sets up the data files which are required for the module.
         module.reloadConfig(); // Reload the settings.yml data
 
-        boolean status = false;
-        boolean isEnabled = false;
-        Map.Entry<Module, Boolean> moduleAndStatus = this.modules.get(module.getIdentifier());
-        if (moduleAndStatus != null) {
-            isEnabled = moduleAndStatus.getValue();
-        }
-
-        if (isEnabled) { // Reload
-            module.onReload(); // Call the reload to the module
-            status = true;
-        } else {
-            // enable the module here as it is not already registered.
-            status = setModuleEnabled(module);
-        }
-
-        modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, status));
-        if (save) module.set("enabled", true);
+        module.onReload(); // Call the reload to the module
 
         String message = "Reloaded " + module.getIdentifier() + "!";
         library.getLibraryLogger().toConsole("Module Manager", message);
@@ -150,6 +158,10 @@ public class ModuleManager {
 
     public void disableAllModules() {
         this.getModules().forEach((name, module) -> module.onDisable());
+    }
+
+    public void reloadAllModules() {
+        this.getModules().forEach((name, module) -> this.reloadModule(module));
     }
 
 }

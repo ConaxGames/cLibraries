@@ -1,7 +1,9 @@
 package com.conaxgames.libraries.util;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.net.URL;
@@ -9,13 +11,25 @@ import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public final class ClassUtils {
 
     // Static utility class -- cannot be created.
     private ClassUtils() {
+    }
+
+    public static Set<Class<?>> getClassesInPackage(JavaPlugin plugin, String packageName, boolean isTopLevel) throws IOException {
+        return ClassPath.from(plugin.getClass().getProtectionDomain().getClassLoader())
+                .getAllClasses()
+                .stream()
+                .filter(clazz -> clazz.getPackageName().equalsIgnoreCase(packageName))
+                .filter(clazz -> isTopLevel && clazz.isTopLevel())
+                .map(ClassPath.ClassInfo::load)
+                .collect(Collectors.toSet());
     }
 
     /**
