@@ -2,13 +2,14 @@ package com.conaxgames.libraries.module.type;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
+import com.conaxgames.libraries.nms.LibNMSManager;
+import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.Config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -77,6 +78,16 @@ public abstract class Module {
         return null;
     }
 
+    /**
+     * The minimum server version that must be running for this
+     * module to enable.
+     *
+     * @return the LibServerVersion enum for that version.
+     */
+    public LibServerVersion minimumServerVersion() {
+        return null;
+    }
+
     public abstract String getDescription();
 
     public abstract String getAuthor();
@@ -98,6 +109,11 @@ public abstract class Module {
      * @return true if this hook meets all the requirements to register
      */
     public boolean canRegister() {
+        if (minimumServerVersion() != null) {
+            LibServerVersion currentServerVersion = LibNMSManager.serverVersion;
+            if (currentServerVersion.before(minimumServerVersion())) return false;
+        }
+
         return ((getRequiredPlugin() == null) || (Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null));
     }
 
