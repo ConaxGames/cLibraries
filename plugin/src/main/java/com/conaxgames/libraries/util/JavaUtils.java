@@ -24,7 +24,7 @@ public final class JavaUtils {
     private static final CharMatcher CHAR_MATCHER_ASCII = CharMatcher.inRange('0', '9').
             or(CharMatcher.inRange('a', 'z')).
             or(CharMatcher.inRange('A', 'Z')).
-            or(CharMatcher.WHITESPACE).
+            or(CharMatcher.whitespace()).
             precomputed();
 
     /**
