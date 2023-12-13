@@ -28,21 +28,33 @@ public class ModuleManager {
         this.javaPlugin = plugin;
     }
 
-    private void register(Module module) {
+    public String registerModule(Module module) {
         if (module.canRegister() && !modules.containsKey(module.getIdentifier().toLowerCase())) {
             modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, false));
         } else {
             String message = module.getIdentifier() + " cannot be registered as one of its required plugins cannot be found.";
             library.getLibraryLogger().toConsole("ModuleManager", message);
+            return message;
         }
+
+        if (module.isConfiguredToEnable()) {
+            this.enableModule(module);
+        }
+
+        String message = "Registered " + module.getIdentifier() + "!";
+        library.getLibraryLogger().toConsole("Module Manager", message);
+        return message;
     }
 
     public String enableModule(Module module) {
         Validate.notNull(module, "Module can not be null");
         Validate.notNull(module.getIdentifier(), "Identifier can not be null");
 
-        // register the module if it's not already.
-        this.register(module);
+        // The module has been called to be enabled without being registered.
+        // You should use #registerModule first rather than #enableModule.
+        if (!isRegistered(module.getIdentifier())) {
+            this.registerModule(module);
+        }
 
         module.setupFiles(); // Sets up the data files which are required for the module.
         module.reloadConfig(); // Reload the settings.yml data
@@ -63,7 +75,7 @@ public class ModuleManager {
         Validate.notNull(module, "Module can not be null");
         Validate.notNull(module.getIdentifier(), "Identifier can not be null");
 
-        this.register(module); // register the module with the status of "false"
+        this.registerModule(module); // register the module with the status of "false"
 
         module.setupFiles(); // Sets up the data files which are required for the module.
         module.reloadConfig(); // Reload the settings.yml data
