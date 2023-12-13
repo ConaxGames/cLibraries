@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.*;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.impl.HookMenu;
 import com.conaxgames.libraries.message.FormatUtil;
+import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 @CommandAlias("library|lib|clibrary|clib")
-@CommandPermission("library.admin")
+@CommandPermission("csuite.*")
 
 public class LibraryCommands extends BaseCommand {
 
@@ -33,51 +34,77 @@ public class LibraryCommands extends BaseCommand {
                 LibraryPlugin.getInstance().getPlugin().getDescription().getVersion() + CC.PRIMARY + ".");
     }
 
-    @Subcommand("hooks")
-    @Description("Prints loaded plugins that hook into cLibraries' utilities.")
-    public void onHook(CommandSender sender) {
+//    @Subcommand("hooks")
+//    @Description("Prints loaded plugins that hook into cLibraries' utilities.")
+//    public void onHook(CommandSender sender) {
+//        if (LibraryPlugin.getInstance().getHooked().size() == 0) {
+//            throw new ConditionFailedException("No plugins are hooked.");
+//        }
+//
+//        if (!(sender instanceof Player)) {
+//            sender.sendMessage(CC.PRIMARY + "Hooked plugins: ");
+//            for (Plugin plugin : LibraryPlugin.getInstance().getHooked()) {
+//                sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + plugin.getName() + CC.PRIMARY + " (" + plugin.getDescription().getVersion() + ")");
+//            }
+//            LibraryPlugin.getInstance().getHookManager().getHooks().forEach(hook -> sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + hook.getHookType().name() + CC.PRIMARY + " (" + hook.getPlugin().getDescription().getVersion() + ")"));
+//        } else {
+//            new HookMenu().openMenu((Player) sender);
+//        }
+//
+//    }
 
-        if (LibraryPlugin.getInstance().getHooked().size() <= 0) {
-            throw new ConditionFailedException("No plugins are hooked.");
-        }
+//    @Subcommand("check|c|ishooked")
+//    @CommandCompletion("@plugins")
+//    @Description("Checks whether a plugin requires cLibraries to load.")
+//    public void onCheck(CommandSender sender, Plugin plugin) {
+//
+//        boolean hooked = plugin.getDescription().getDepend().contains("cLibraries");
+//        boolean loadBefore = plugin.getDescription().getLoadBefore().contains("cLibraries");
+//        boolean softDepend = plugin.getDescription().getSoftDepend().contains("cLibraries");
+//
+//        sender.sendMessage(CC.GRAY + FormatUtil.possessiveString(plugin.getName()) + " relation to cLibraries:");
+//        sender.sendMessage(CC.PRIMARY + "Depend: " + CC.SECONDARY + hooked);
+//        sender.sendMessage(CC.PRIMARY + "Soft depend: " + CC.SECONDARY + softDepend);
+//        sender.sendMessage(CC.PRIMARY + "Load before: " + CC.SECONDARY + loadBefore);
+//    }
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(CC.PRIMARY + "Hooked plugins: ");
-            for (Plugin plugin : LibraryPlugin.getInstance().getHooked()) {
-                sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + plugin.getName() + CC.PRIMARY + " (" + plugin.getDescription().getVersion() + ")");
-            }
-            LibraryPlugin.getInstance().getHookManager().getHooks().forEach(hook -> sender.sendMessage(CC.PRIMARY + "- " + CC.SECONDARY + hook.getHookType().name() + CC.PRIMARY + " (" + hook.getPlugin().getDescription().getVersion() + ")"));
-        } else {
-            new HookMenu().openMenu((Player) sender);
-        }
+//    @Subcommand("test")
+//    @Description("Magic command; Tests any function written into this command.")
+//    public void onTest(CommandSender sender, @Single String permission) {
+//
+//        Set<Permissible> users = Bukkit.getPluginManager().getPermissionSubscriptions(permission);
+//        for (Permissible permissible : users) {
+//            if (permissible instanceof Player) {
+//                sender.sendMessage(((Player) permissible).getName() + " is subscribed to " + permission + ".");
+//            }
+//        }
+//    }
 
+    @Subcommand("module|modules|mod enable")
+    @Description("Reload individual modules")
+    @CommandCompletion("@empty @modules")
+    public void onAddonsEnable(CommandSender sender, Module module) {
+        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+        String result = libraryPlugin.getModuleManager().enableModule(module);
+        sender.sendMessage(CC.PRIMARY + result);
     }
 
-    @Subcommand("check|c|ishooked")
-    @CommandCompletion("@plugins")
-    @Description("Checks whether a plugin requires cLibraries to load.")
-    public void onCheck(CommandSender sender, Plugin plugin) {
-
-        boolean hooked = plugin.getDescription().getDepend().contains("cLibraries");
-        boolean loadBefore = plugin.getDescription().getLoadBefore().contains("cLibraries");
-        boolean softDepend = plugin.getDescription().getSoftDepend().contains("cLibraries");
-
-        sender.sendMessage(CC.GRAY + FormatUtil.possessiveString(plugin.getName()) + " relation to cLibraries:");
-        sender.sendMessage(CC.PRIMARY + "Depend: " + CC.SECONDARY + hooked);
-        sender.sendMessage(CC.PRIMARY + "Soft depend: " + CC.SECONDARY + softDepend);
-        sender.sendMessage(CC.PRIMARY + "Load before: " + CC.SECONDARY + loadBefore);
+    @Subcommand("module|modules|modreload")
+    @Description("Reload individual modules")
+    @CommandCompletion("@empty @modules")
+    public void onAddonsReloads(CommandSender sender, Module module) {
+        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+        String result = libraryPlugin.getModuleManager().reloadModule(module);
+        sender.sendMessage(CC.PRIMARY + result);
     }
 
-    @Subcommand("test")
-    @Description("Magic command; Tests any function written into this command.")
-    public void onTest(CommandSender sender, @Single String permission) {
-
-        Set<Permissible> users = Bukkit.getPluginManager().getPermissionSubscriptions(permission);
-        for (Permissible permissible : users) {
-            if (permissible instanceof Player) {
-                sender.sendMessage(((Player) permissible).getName() + " is subscribed to " + permission + ".");
-            }
-        }
+    @Subcommand("module|modules|moddisable")
+    @Description("Reload individual modules")
+    @CommandCompletion("@empty @modules")
+    public void onAddonsDisable(CommandSender sender, Module module, boolean persistent) {
+        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+        String result = libraryPlugin.getModuleManager().disableModule(module, persistent);
+        sender.sendMessage(CC.PRIMARY + result);
     }
 
     @Subcommand("reload")

@@ -20,21 +20,21 @@ import java.util.stream.Collectors;
 public class ModuleManager {
 
     public LibraryPlugin library;
-    public final JavaPlugin javaPlugin;
     public Map<String, Map.Entry<Module, Boolean>> modules = new HashMap<>();
 
-    public ModuleManager(JavaPlugin plugin, LibraryPlugin library) {
+    public ModuleManager(LibraryPlugin library) {
         this.library = library;
-        this.javaPlugin = plugin;
     }
 
     public String registerModule(Module module) {
-        if (module.canRegister() && !modules.containsKey(module.getIdentifier().toLowerCase())) {
-            modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, false));
-        } else {
+        if (!module.canRegister()) {
             String message = module.getIdentifier() + " cannot be registered as one of its required plugins cannot be found.";
             library.getLibraryLogger().toConsole("ModuleManager", message);
             return message;
+        }
+
+        if (!modules.containsKey(module.getIdentifier().toLowerCase())) {
+            modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, false));
         }
 
         if (module.isConfiguredToEnable()) {
@@ -136,7 +136,7 @@ public class ModuleManager {
             boolean listener = false;
             if (module instanceof Listener) {
                 listener = true;
-                Bukkit.getPluginManager().registerEvents((Listener) module, this.getJavaPlugin());
+                Bukkit.getPluginManager().registerEvents((Listener) module, module.getJavaPlugin());
             }
 
             module.onReload();

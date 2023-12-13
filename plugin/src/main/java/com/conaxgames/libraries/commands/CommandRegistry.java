@@ -2,7 +2,9 @@ package com.conaxgames.libraries.commands;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.commands.impl.LibraryCommands;
+import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.EnchantmentProcessor;
 import com.conaxgames.libraries.util.PotionProcessor;
 import org.bukkit.Bukkit;
@@ -15,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
@@ -73,6 +76,17 @@ public class CommandRegistry {
                 throw new InvalidCommandArgument("No potion effect matching " + argument + " could be found.");
             }
         });
+
+        commandManager.getCommandContexts().registerContext(Module.class, c -> {
+            String argument = c.popFirstArg();
+
+            Module module = LibraryPlugin.getInstance().getModuleManager().getModuleByIdentifier(argument);
+            if (module == null) {
+                throw new InvalidCommandArgument("No module matching " + argument + " could be found.");
+            }
+
+            return module;
+        });
     }
 
 
@@ -100,5 +114,12 @@ public class CommandRegistry {
 
         commandManager.getCommandCompletions().registerAsyncCompletion("enchantments", c ->
                 EnchantmentProcessor.enchantmentmap.keySet());
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("modules", c ->
+                LibraryPlugin.getInstance().getModuleManager().getModules()
+                        .keySet()
+                        .stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toList()));
     }
 }
