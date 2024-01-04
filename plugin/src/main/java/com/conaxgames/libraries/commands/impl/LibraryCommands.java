@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.*;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.impl.HookMenu;
 import com.conaxgames.libraries.message.FormatUtil;
+import com.conaxgames.libraries.module.manage.ModuleMenu;
 import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
@@ -80,9 +81,16 @@ public class LibraryCommands extends BaseCommand {
 //        }
 //    }
 
+    @Subcommand("modules")
+    @Description("Open the module management menu.")
+    @CommandCompletion("@modules")
+    public void onAddonsEnable(Player player) {
+        new ModuleMenu().openMenu(player);
+    }
+
     @Subcommand("module|modules|mod enable")
     @Description("Reload individual modules")
-    @CommandCompletion("@empty @modules")
+    @CommandCompletion("@modules")
     public void onAddonsEnable(CommandSender sender, Module module) {
         LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
         String result = libraryPlugin.getModuleManager().enableModule(module);
@@ -91,7 +99,7 @@ public class LibraryCommands extends BaseCommand {
 
     @Subcommand("module|modules|modreload")
     @Description("Reload individual modules")
-    @CommandCompletion("@empty @modules")
+    @CommandCompletion("@modules")
     public void onAddonsReloads(CommandSender sender, Module module) {
         LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
         String result = libraryPlugin.getModuleManager().reloadModule(module);
@@ -100,7 +108,7 @@ public class LibraryCommands extends BaseCommand {
 
     @Subcommand("module|modules|moddisable")
     @Description("Reload individual modules")
-    @CommandCompletion("@empty @modules")
+    @CommandCompletion("@modules")
     public void onAddonsDisable(CommandSender sender, Module module, boolean persistent) {
         LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
         String result = libraryPlugin.getModuleManager().disableModule(module, persistent);

@@ -29,7 +29,7 @@ public class CoreButton extends Button {
 
     @Override
     public ItemStack getButtonItem(Player player) {
-        return data.getItemBuilder().toItemStack();
+        return data.getItemBuilder(player).toItemStack();
     }
 
     @Override
