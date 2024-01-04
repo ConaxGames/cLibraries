@@ -44,7 +44,7 @@ public class CoreButtonProcessor {
                     if (split.length == 3) {
                         String input = applyPlaceholders(player, null, split[1]);
                         String value = split[2];
-                        if (input != null && value != null && input.equals(value))
+                        if (input != null && input.equals(value))
                             denial.set(new CoreProcessorDenial(CC.RED + input + " did not equal " + value + "..."));
                     }
                     break;
@@ -54,7 +54,7 @@ public class CoreButtonProcessor {
                     if (split.length == 3) {
                         String input = applyPlaceholders(player, null, split[1]);
                         String value = split[2];
-                        if (input != null && value != null && input.equalsIgnoreCase(value))
+                        if (input != null && input.equalsIgnoreCase(value))
                             denial.set(new CoreProcessorDenial(CC.RED + input + " did not equal " + value + "..."));
                     }
                     break;

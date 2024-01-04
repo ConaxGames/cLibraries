@@ -8,7 +8,6 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -129,6 +128,12 @@ public class ModuleManager {
         if (entry == null) return null;
         if (entry.getKey() == null) return null;
         return entry.getKey();
+    }
+
+    public boolean getStatus(Module module) {
+        if (!this.modules.containsKey(module.getIdentifier().toLowerCase())) return false;
+
+        return this.modules.get(module.getIdentifier().toLowerCase()).getValue();
     }
 
     protected boolean setModuleEnabled(Module module) {

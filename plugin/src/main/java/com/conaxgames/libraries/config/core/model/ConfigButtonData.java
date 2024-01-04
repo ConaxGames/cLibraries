@@ -1,11 +1,14 @@
 package com.conaxgames.libraries.config.core.model;
 
+import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.hooks.HookType;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.ItemBuilderUtil;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -31,11 +34,18 @@ public class ConfigButtonData {
         this.skull64 = skull;
     }
 
-    public ItemBuilderUtil getItemBuilder() {
+    public ItemBuilderUtil getItemBuilder(Player player) {
         ItemBuilderUtil builder = new ItemBuilderUtil(this.material.parseMaterial());
         builder.setName(CC.translate(this.name));
-        this.lore.forEach(s -> builder.addLoreLineList(FormatUtil.wordWrap(CC.translate(s))));
         builder.setDurability((short) this.materialData);
+
+        this.lore.forEach(s -> {
+            String translated = s;
+            if (LibraryPlugin.getInstance().getHookManager().isHooked(HookType.PLACEHOLDERAPI)) {
+                translated = PlaceholderAPI.setPlaceholders(player, translated);
+            }
+            builder.addLoreLineList(FormatUtil.wordWrap(CC.translate(translated)));
+        });
 
         if (this.getMaterial().equals(XMaterial.PLAYER_HEAD) && this.skull64 != null) {
             builder.setSkullProfile(this.skull64);

@@ -2,6 +2,7 @@ package com.conaxgames.libraries.module.type;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
+import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.Config;
@@ -183,6 +184,10 @@ public abstract class Module {
         }
 
         return config;
+    }
+
+    public boolean getStatus() {
+        return LibraryPlugin.getInstance().getModuleManager().getStatus(this);
     }
 
 }
