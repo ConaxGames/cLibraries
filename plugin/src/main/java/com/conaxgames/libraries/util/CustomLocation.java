@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.LibraryPlugin;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -123,9 +123,9 @@ public class CustomLocation {
 
 	public World toBukkitWorld() {
 		if (this.world == null) {
-			return LibraryPlugin.getInstance().getPlugin().getServer().getWorlds().get(0);
+			return Bukkit.getServer().getWorlds().get(0);
 		} else {
-			return LibraryPlugin.getInstance().getPlugin().getServer().getWorld(this.world);
+			return Bukkit.getServer().getWorld(this.world);
 		}
 	}
 
