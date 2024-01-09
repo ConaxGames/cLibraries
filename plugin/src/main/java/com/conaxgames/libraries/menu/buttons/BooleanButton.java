@@ -39,7 +39,7 @@ public class BooleanButton extends Button {
         if (this.confirm) {
             description.addAll(FormatUtil.wordWrap(CC.GRAY + details));
         } else {
-            description.add(CC.GRAY + "Aborts this process.");
+            description.add(CC.GRAY + "Cancel this action.");
         }
 
         return description;

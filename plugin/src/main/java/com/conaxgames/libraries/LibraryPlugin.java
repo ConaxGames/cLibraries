@@ -33,7 +33,10 @@ public class LibraryPlugin {
     private Settings settings = null;
 
     public static LibraryPlugin getInstance() {
-        return LibraryPlugin.instance;
+        if (instance == null) {
+            LibraryPlugin.instance = new LibraryPlugin();
+        }
+        return instance;
     }
 
     public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary) {

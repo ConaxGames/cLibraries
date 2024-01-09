@@ -248,7 +248,7 @@ public abstract class Menu {
     }
 
     static {
-        LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
+        Bukkit.getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
         currentlyOpenedMenus = new HashMap<>();
         checkTasks = new HashMap<>();
     }
