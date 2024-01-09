@@ -166,6 +166,8 @@ public class CoreButtonProcessor {
 
     // CLOSE, OPEN:, MESSAGE:, CONSOLE:, PLAYER:/, BROADCAST:/
     public void execute() {
+        if (player == null || !player.isOnline()) return;
+
         data.getActions().forEach(action -> {
             if (action.equalsIgnoreCase("CLOSE")) {
                 player.closeInventory();
