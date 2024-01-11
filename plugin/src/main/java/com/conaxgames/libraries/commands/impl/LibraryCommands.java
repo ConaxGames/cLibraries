@@ -97,7 +97,7 @@ public class LibraryCommands extends BaseCommand {
         sender.sendMessage(CC.PRIMARY + result);
     }
 
-    @Subcommand("module|modules|modreload")
+    @Subcommand("module|modules|mod reload")
     @Description("Reload individual modules")
     @CommandCompletion("@modules")
     public void onAddonsReloads(CommandSender sender, Module module) {
@@ -106,7 +106,7 @@ public class LibraryCommands extends BaseCommand {
         sender.sendMessage(CC.PRIMARY + result);
     }
 
-    @Subcommand("module|modules|moddisable")
+    @Subcommand("module|modules|mod disable")
     @Description("Reload individual modules")
     @CommandCompletion("@modules")
     public void onAddonsDisable(CommandSender sender, Module module, boolean persistent) {
