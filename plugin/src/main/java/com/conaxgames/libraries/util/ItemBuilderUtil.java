@@ -2,6 +2,7 @@ package com.conaxgames.libraries.util;
 
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
+import com.cryptomorin.xseries.SkullUtils;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -259,6 +260,16 @@ public class ItemBuilderUtil {
             meta.setCustomModelData(modelData);
         }
         this.is.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilderUtil setSkin(String texture) {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            try {
+                this.is.setItemMeta(SkullUtils.applySkin(meta, texture));
+            } catch (NoSuchFieldError ignored) {}
+        }
         return this;
     }
 
