@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.stream.events.Comment;
+import java.io.InputStream;
 import java.util.List;
 
 @Getter
@@ -168,15 +170,22 @@ public abstract class Module {
         String dest = destination.replace(".yml", "");
         Config config = new Config("/modules/" + this.getIdentifier() + "/" + dest, javaPlugin);
 
+        if (config.getConfigFile() == null) {
+            library.getLibraryLogger().toConsole("Module", "Configuration was null when attempting to getResource. (" + this.getIdentifier() + ", " + this.getJavaPlugin().getName() + ")");
+            return config;
+        }
+
+        InputStream fileStream = javaPlugin.getResource("modules/" + this.getIdentifier() + "/" + dest + ".yml");
+        if (fileStream == null) {
+            library.getLibraryLogger().toConsole("Module", "Input stream was null when attempting to getResource. (Id: " + this.getIdentifier() + ", JavaPlugin: " + this.getJavaPlugin().getName() +
+                    ")");
+            return config;
+        }
+
         if (forceSync || (config.isWasCreated() && syncOnCreation)) {
-            CommentedConfiguration settings = CommentedConfiguration.loadConfiguration(config.getConfigFile());
             try {
                 String[] dontSync = (this.noSync() == null ? new String[0] : this.noSync().toArray(new String[0]));
-                if (settings == null) {
-                    library.getLibraryLogger().toConsole("Module", "Settings during getResource of " + "/modules/" + this.getIdentifier() + "/" + dest + " sync was null, returning config.");
-                    return config;
-                }
-                settings.syncWithConfig(config.getConfigFile(), javaPlugin.getResource("modules/" + this.getIdentifier() + "/" + dest + ".yml"), dontSync);
+                new CommentedConfiguration().syncWithConfig(config.getConfigFile(), fileStream, dontSync);
                 library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.");
             } catch (Exception exception) {
                 library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
@@ -186,7 +195,7 @@ public abstract class Module {
         return config;
     }
 
-    public boolean getStatus() {
+    public boolean isEnabled() {
         return LibraryPlugin.getInstance().getModuleManager().getStatus(this);
     }
 

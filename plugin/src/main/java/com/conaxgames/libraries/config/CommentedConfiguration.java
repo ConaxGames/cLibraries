@@ -58,6 +58,16 @@ public final class CommentedConfiguration extends YamlConfiguration {
     public void syncWithConfig(File file, InputStream resource, String... ignoredSections) throws IOException{
         if(creationFailure) return;
 
+        if (file == null) {
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("CommentedConfiguration", "File cannot be null when using syncWithConfig");
+            return;
+        }
+
+        if (resource == null) {
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("CommentedConfiguration", "Input stream cannot be null when using syncWithConfig");
+            return;
+        }
+
         CommentedConfiguration cfg = loadConfiguration(resource);
         if(syncConfigurationSection(cfg, cfg.getConfigurationSection(""), Arrays.asList(ignoredSections)) && file != null)
             save(file);

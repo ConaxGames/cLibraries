@@ -22,7 +22,7 @@ public class ModuleButton extends Button {
     public ModuleButton(ModuleManager moduleManager, Module module) {
         this.moduleManager = moduleManager;
         this.module = module;
-        this.enabled = module.getStatus();
+        this.enabled = module.isEnabled();
     }
 
     @Override
