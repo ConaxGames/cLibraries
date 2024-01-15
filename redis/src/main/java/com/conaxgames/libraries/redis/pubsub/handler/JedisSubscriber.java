@@ -85,6 +85,7 @@ public class JedisSubscriber<K> {
                 this.jedis.subscribe(this.pubSub, this.channel);
                 this.connection.toConsole("JedisSubscriber: Jedis is now reading on " + this.channel);
             } catch (Exception e) {
+                e.printStackTrace();
                 if (this.connection.isEnabled()) { // can't reconnect if plugin is disabled
                     this.connection.toConsole("JedisSubscriber: Jedis channel (" + this.channel + ") has lost connection...");
 
