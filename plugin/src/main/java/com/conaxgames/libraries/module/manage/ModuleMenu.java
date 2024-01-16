@@ -28,7 +28,7 @@ public class ModuleMenu extends PaginatedMenu {
         Map<Integer, Button> buttons = new HashMap<>();
 
         AtomicInteger index = new AtomicInteger(0);
-        LibraryPlugin.getInstance().getModuleManager().getModules().forEach((id, module) ->
+        moduleManager.getModules().forEach((id, module) ->
                 buttons.put(index.getAndIncrement(), new ModuleButton(this.moduleManager, module)));
 
         return buttons;

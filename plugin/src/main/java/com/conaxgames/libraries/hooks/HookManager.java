@@ -2,15 +2,12 @@ package com.conaxgames.libraries.hooks;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
-import com.conaxgames.libraries.util.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class HookManager implements Listener {
 
@@ -74,13 +71,26 @@ public class HookManager implements Listener {
             if (LibraryPlugin.getInstance().getSettings().debug) {
                 LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager",
                         "Hooked into " + hook.getHookType() + " version " + hook.getPlugin().getDescription().getVersion() + "."
-                        + " (" + (hook.getPlugin().getDescription() == null ? "" : hook.getPlugin().getDescription().getDescription()) + ")");
+                        + " (" + hook.getPlugin().getDescription().getDescription() + ")");
             }
         } catch (Exception e) {
             plugin.getPlugin().getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
             e.printStackTrace();
         }
     }
+
+    public List<Plugin> getDepends() {
+        List<Plugin> libraryPluginList = new ArrayList<>();
+        Plugin[] bukkitPluginList = Bukkit.getPluginManager().getPlugins();
+        for (Plugin plugin : bukkitPluginList) {
+            if (plugin.getDescription().getDepend().contains("cLibraries")) {
+                libraryPluginList.add(plugin);
+            }
+        }
+
+        return libraryPluginList;
+    }
+
 
     public Hook getHookByPluginName(String pluginName) {
        return getHooks().stream().filter(hook -> hook.getPluginFromAnnotation().equals(pluginName)).findFirst().orElse(null);

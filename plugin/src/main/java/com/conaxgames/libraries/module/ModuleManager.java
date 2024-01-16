@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.module;
 
+import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.module.type.Module;
 import com.google.common.collect.ImmutableSet;
@@ -21,8 +22,15 @@ public class ModuleManager {
     public LibraryPlugin library;
     public Map<String, Map.Entry<Module, Boolean>> modules = new HashMap<>();
 
-    public ModuleManager(LibraryPlugin library) {
+    public ModuleManager(LibraryPlugin library, String commandAlias, String commandPermission) {
         this.library = library;
+
+        PaperCommandManager commandManager = this.library.getPaperCommandManager();
+        commandManager.getCommandReplacements().addReplacements(
+                "moduleCommandAlias", commandAlias,
+                "moduleCommandPermission", commandPermission
+        );
+        commandManager.registerCommand(new ModuleCommands(this));
     }
 
     public String registerModule(Module module) {
