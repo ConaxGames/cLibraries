@@ -6,21 +6,31 @@ import com.conaxgames.libraries.commands.CommandRegistry;
 import com.conaxgames.libraries.debug.LibraryLogger;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
-import com.conaxgames.libraries.inventoryui.UIListener;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.timer.TimerManager;
+import com.google.common.base.Joiner;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
+@Getter
+@Setter
 public class LibraryPlugin {
 
+    @Getter @Setter
     private static LibraryPlugin instance;
+
+    /*
+     * The plugin can only be setup once due to managers and listeners being registered.
+     * This can be called
+     */
+    private boolean setup;
+
     private JavaPlugin plugin;
 
     private LibraryLogger libraryLogger;
@@ -34,14 +44,26 @@ public class LibraryPlugin {
 
     public static LibraryPlugin getInstance() {
         if (instance == null) {
-            LibraryPlugin.instance = new LibraryPlugin();
+            instance = new LibraryPlugin();
         }
         return instance;
     }
 
-    public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary) {
+    public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary, String moduleCommandAlias, String moduleCommandPerm) {
+        if (this.setup) {
+            String authors = Joiner.on(", ").join(this.plugin.getDescription().getAuthors());
+            libraryLogger.toConsole(
+                    "cLibraries",
+                    Arrays.asList(
+                            " ",
+                            "cLibraries is already setup!", this.plugin.getName() + " has called onEnable twice!",
+                            "Please nag " + authors + " to fix this!",
+                            " ")
+            );
+            return this;
+        }
+
         this.plugin = plugin;
-        instance = this;
 
         // determine the server version before we load other utility classes.
         LibNMSManager.getInstance();
@@ -49,51 +71,41 @@ public class LibraryPlugin {
         try {
             settings = new Settings();
         } catch (Exception e) {
-            this.plugin.getLogger().info("------------------------------------------------------------------");
-            this.plugin.getLogger().info(" ");
-            this.plugin.getLogger().info("cLibraries settings were unable to load!");
-            this.plugin.getLogger().info(" ");
-            this.plugin.getLogger().info("------------------------------------------------------------------");
+            Bukkit.getLogger().info(" ");
+            Bukkit.getLogger().info("cLibraries settings were unable to load!");
+            Bukkit.getLogger().info(" ");
         }
-
-        long start = System.currentTimeMillis();
 
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
-        this.hookManager = new HookManager(this);
-        this.timerManager = new TimerManager();
-        this.moduleManager = new ModuleManager(this);
 
         this.paperCommandManager = new PaperCommandManager(this.plugin);
-        this.commandRegistry = new CommandRegistry(paperCommandManager);
+        this.commandRegistry = new CommandRegistry(this, paperCommandManager);
 
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this.plugin);
-        Bukkit.getPluginManager().registerEvents(new UIListener(), this.plugin);
-        Bukkit.getPluginManager().registerEvents(this.hookManager, this.plugin);
+        this.hookManager = new HookManager(this);
+        this.timerManager = new TimerManager();
+        this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);
 
-        long finish = System.currentTimeMillis();
-        if (LibraryPlugin.getInstance().getSettings().debug) {
-            this.plugin.getLogger().info("Successfully hooked into " + getHooked().size() + " plugin" + (getHooked().size() == 1 ? "" : "s") + " and loaded utilities in " + (finish - start) + " ms.");
-        }
+        Arrays.asList(
+                new PlayerListener(),
+                this.hookManager
+        ).forEach(l -> Bukkit.getPluginManager().registerEvents(l, this.plugin));
+
         new LibraryPluginEnableEvent().call();
+        this.setup = true;
 
+        String authors = Joiner.on(", ").join(this.plugin.getDescription().getAuthors());
+        this.libraryLogger.toConsole("cLibraries",
+                Arrays.asList(
+                        " ",
+                        "cLibraries instance has been setup for " + this.plugin.getName() + " (" + authors + ")",
+                        " ")
+        );
         return this;
     }
 
     public LibraryPlugin onDisable() {
         this.moduleManager.disableAllModules();
         return this;
-    }
-
-    public List<Plugin> getHooked() {
-        List<Plugin> libraryPluginList = new ArrayList<>();
-        Plugin[] bukkitPluginList = Bukkit.getPluginManager().getPlugins();
-        for (Plugin plugin : bukkitPluginList) {
-            if (plugin.getDescription().getDepend().contains("cLibraries")) {
-                libraryPluginList.add(plugin);
-            }
-        }
-
-        return libraryPluginList;
     }
 
     public Settings getSettings() {
@@ -104,57 +116,4 @@ public class LibraryPlugin {
         return plugin;
     }
 
-    public void setBoardManager(BoardManager boardManager) {
-        this.boardManager = boardManager;
-        long interval = this.boardManager.getAdapter().getInterval();
-        this.plugin.getServer().getScheduler().runTaskTimerAsynchronously(this.plugin, this.boardManager, 0L, interval);
-    }
-
-    public TimerManager getTimerManager() {
-        return this.timerManager;
-    }
-
-    public PaperCommandManager getPaperCommandManager() {
-        return this.paperCommandManager;
-    }
-
-    public CommandRegistry getCommandRegistry() {
-        return this.commandRegistry;
-    }
-
-    public BoardManager getBoardManager() {
-        return this.boardManager;
-    }
-
-    public HookManager getHookManager() {
-        return this.hookManager;
-    }
-
-    public void setTimerManager(TimerManager timerManager) {
-        this.timerManager = timerManager;
-    }
-
-    public void setPaperCommandManager(PaperCommandManager paperCommandManager) {
-        this.paperCommandManager = paperCommandManager;
-    }
-
-    public void setCommandRegistry(CommandRegistry commandRegistry) {
-        this.commandRegistry = commandRegistry;
-    }
-
-    public void setHookManager(HookManager hookManager) {
-        this.hookManager = hookManager;
-    }
-
-    public void setSettings(Settings settings) {
-        this.settings = settings;
-    }
-
-    public LibraryLogger getLibraryLogger() {
-        return libraryLogger;
-    }
-
-    public ModuleManager getModuleManager() {
-        return moduleManager;
-    }
 }

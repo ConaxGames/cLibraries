@@ -18,7 +18,6 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
         if (LibraryPlugin.getInstance().getBoardManager() != null) {
             LibraryPlugin.getInstance().getBoardManager().getPlayerBoards().put(player.getUniqueId(), new Board(player, LibraryPlugin.getInstance().getBoardManager().getAdapter()));
         }
@@ -27,7 +26,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
         Player player = event.getPlayer();
-
         if (LibraryPlugin.getInstance().getBoardManager() != null) {
             LibraryPlugin.getInstance().getBoardManager().getPlayerBoards().remove(player.getUniqueId());
         }
@@ -36,7 +34,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-
         if (LibraryPlugin.getInstance().getBoardManager() != null) {
             LibraryPlugin.getInstance().getBoardManager().getPlayerBoards().remove(player.getUniqueId());
         }

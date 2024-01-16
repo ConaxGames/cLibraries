@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
-    public CommandRegistry(PaperCommandManager commandManager) {
+    public CommandRegistry(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         new CommandMessages(commandManager);
         commandManager.enableUnstableAPI("help");
-        loadContexts(commandManager);
-        loadCompletions(commandManager);
+        loadContexts(libraryPlugin, commandManager);
+        loadCompletions(libraryPlugin, commandManager);
 
         commandManager.registerCommand(new LibraryCommands());
     }
@@ -35,7 +35,7 @@ public class CommandRegistry {
      *
      * @param commandManager - paper command manager
      */
-    public void loadContexts(PaperCommandManager commandManager) {
+    public void loadContexts(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandContexts().registerContext(Plugin.class, c -> {
             String argument = c.popFirstArg();
             Plugin plugin = Bukkit.getPluginManager().getPlugin(argument);
@@ -80,7 +80,7 @@ public class CommandRegistry {
         commandManager.getCommandContexts().registerContext(Module.class, c -> {
             String argument = c.popFirstArg();
 
-            Module module = LibraryPlugin.getInstance().getModuleManager().getModuleByIdentifier(argument);
+            Module module = libraryPlugin.getModuleManager().getModuleByIdentifier(argument);
             if (module == null) {
                 throw new InvalidCommandArgument("No module matching " + argument + " could be found.");
             }
@@ -95,7 +95,7 @@ public class CommandRegistry {
      *
      * @param commandManager - paper command manager
      */
-    public void loadCompletions(PaperCommandManager commandManager) {
+    public void loadCompletions(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandCompletions().registerAsyncCompletion("plugins", c -> {
             List<String> values = new ArrayList<>();
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -116,7 +116,7 @@ public class CommandRegistry {
                 EnchantmentProcessor.enchantmentmap.keySet());
 
         commandManager.getCommandCompletions().registerAsyncCompletion("modules", c ->
-                LibraryPlugin.getInstance().getModuleManager().getModules()
+                libraryPlugin.getModuleManager().getModules()
                         .keySet()
                         .stream()
                         .map(String::toLowerCase)

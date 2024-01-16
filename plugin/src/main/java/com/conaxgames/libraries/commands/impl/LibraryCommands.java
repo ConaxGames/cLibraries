@@ -25,7 +25,6 @@ import java.util.Set;
 
 @CommandAlias("library|lib|clibrary|clib")
 @CommandPermission("csuite.*")
-
 public class LibraryCommands extends BaseCommand {
 
     @Default
@@ -81,39 +80,43 @@ public class LibraryCommands extends BaseCommand {
 //        }
 //    }
 
-    @Subcommand("modules")
-    @Description("Open the module management menu.")
-    @CommandCompletion("@modules")
-    public void onAddonsEnable(Player player) {
-        new ModuleMenu().openMenu(player);
-    }
-
-    @Subcommand("module|modules|mod enable")
-    @Description("Reload individual modules")
-    @CommandCompletion("@modules")
-    public void onAddonsEnable(CommandSender sender, Module module) {
-        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
-        String result = libraryPlugin.getModuleManager().enableModule(module);
-        sender.sendMessage(CC.PRIMARY + result);
-    }
-
-    @Subcommand("module|modules|mod reload")
-    @Description("Reload individual modules")
-    @CommandCompletion("@modules")
-    public void onAddonsReloads(CommandSender sender, Module module) {
-        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
-        String result = libraryPlugin.getModuleManager().reloadModule(module);
-        sender.sendMessage(CC.PRIMARY + result);
-    }
-
-    @Subcommand("module|modules|mod disable")
-    @Description("Reload individual modules")
-    @CommandCompletion("@modules")
-    public void onAddonsDisable(CommandSender sender, Module module, boolean persistent) {
-        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
-        String result = libraryPlugin.getModuleManager().disableModule(module, persistent);
-        sender.sendMessage(CC.PRIMARY + result);
-    }
+//    @Subcommand("modules")
+//    @Description("Open the module management menu.")
+//    @CommandCompletion("@modules")
+//    public void onAddonsEnable(Player player) {
+//        new ModuleMenu().openMenu(player);
+//
+//        LibraryPlugin.getInstance().getModuleManager().getModules().forEach((id, module) -> {
+//            player.sendMessage(id + " -> " + module.getIdentifier());
+//        });
+//    }
+//
+//    @Subcommand("module enable")
+//    @Description("Reload individual modules")
+//    @CommandCompletion("@modules")
+//    public void onAddonsEnable(CommandSender sender, Module module) {
+//        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+//        String result = libraryPlugin.getModuleManager().enableModule(module);
+//        sender.sendMessage(CC.PRIMARY + result);
+//    }
+//
+//    @Subcommand("module reload")
+//    @Description("Reload individual modules")
+//    @CommandCompletion("@modules")
+//    public void onAddonsReloads(CommandSender sender, Module module) {
+//        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+//        String result = libraryPlugin.getModuleManager().reloadModule(module);
+//        sender.sendMessage(CC.PRIMARY + result);
+//    }
+//
+//    @Subcommand("module disable")
+//    @Description("Reload individual modules")
+//    @CommandCompletion("@modules")
+//    public void onAddonsDisable(CommandSender sender, Module module, boolean persistent) {
+//        LibraryPlugin libraryPlugin = LibraryPlugin.getInstance();
+//        String result = libraryPlugin.getModuleManager().disableModule(module, persistent);
+//        sender.sendMessage(CC.PRIMARY + result);
+//    }
 
     @Subcommand("reload")
     @Description("Reload the settings for cLibraries!")

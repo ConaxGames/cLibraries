@@ -22,7 +22,14 @@ public class BaseEvent extends Event {
 
 	public boolean call() {
 		JavaPlugin plugin = LibraryPlugin.getInstance().getPlugin();
-		plugin.getServer().getScheduler().runTask(plugin, () -> Bukkit.getServer().getPluginManager().callEvent(this));
+
+		if (plugin == null) {
+			Bukkit.getServer().getPluginManager().callEvent(this);
+		} else {
+			// force calling sync events
+			plugin.getServer().getScheduler().runTask(plugin, () -> Bukkit.getServer().getPluginManager().callEvent(this));
+		}
+
 		return this instanceof Cancellable && ((Cancellable) this).isCancelled();
 	}
 

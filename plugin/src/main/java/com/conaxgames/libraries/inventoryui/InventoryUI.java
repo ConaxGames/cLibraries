@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
+@Deprecated
 public class InventoryUI {
 
 	@Getter
