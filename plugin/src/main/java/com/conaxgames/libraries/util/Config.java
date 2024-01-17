@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Config {
 
-    private final FileConfiguration config;
+    private final YamlConfiguration config;
     private final File configFile;
     protected boolean wasCreated;
 
@@ -41,6 +41,11 @@ public class Config {
 
     public File getConfigFile() {
         return this.configFile;
+    }
+
+    public void set(String path, Object value) {
+        this.config.set(path, value);
+        this.save();
     }
 
     public boolean isWasCreated() {
