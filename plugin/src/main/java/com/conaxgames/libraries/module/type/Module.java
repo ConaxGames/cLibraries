@@ -2,7 +2,6 @@ package com.conaxgames.libraries.module.type;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
-import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.Config;
@@ -13,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.xml.stream.events.Comment;
 import java.io.InputStream;
 import java.util.List;
 
@@ -153,9 +151,8 @@ public abstract class Module {
     }
 
     public void set(String path, Object value) {
-        this.settings.getConfig().set(path, value);
-        this.settings.save();
-        this.reloadConfig();
+        this.settings.set(path, value);
+        this.getLibrary().getLibraryLogger().toConsole("Module", "Saved " + path + " as " + value + " in " + this.getIdentifier());
     }
 
     public Config getResource(boolean sync, boolean syncOnCreation) {

@@ -14,6 +14,7 @@ import com.google.common.base.Joiner;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class LibraryPlugin {
 
     public static LibraryPlugin getInstance() {
         if (instance == null) {
-            instance = new LibraryPlugin();
+            throw new IllegalPluginAccessException("cLibraries is not registered.");
         }
         return instance;
     }
@@ -63,6 +64,7 @@ public class LibraryPlugin {
             return this;
         }
 
+        instance = this;
         this.plugin = plugin;
 
         // determine the server version before we load other utility classes.
@@ -86,7 +88,7 @@ public class LibraryPlugin {
         this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);
 
         Arrays.asList(
-                new PlayerListener(),
+                new PlayerListener(this),
                 this.hookManager
         ).forEach(l -> Bukkit.getPluginManager().registerEvents(l, this.plugin));
 
@@ -114,6 +116,12 @@ public class LibraryPlugin {
 
     public JavaPlugin getPlugin() {
         return plugin;
+    }
+
+    public void setBoardManager(BoardManager boardManager) {
+        this.boardManager = boardManager;
+        long interval = this.boardManager.getAdapter().getInterval();
+        this.plugin.getServer().getScheduler().runTaskTimerAsynchronously(this.plugin, this.boardManager, 0L, interval);
     }
 
 }

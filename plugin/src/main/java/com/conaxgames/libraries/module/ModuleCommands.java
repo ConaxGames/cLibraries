@@ -37,8 +37,8 @@ public class ModuleCommands extends BaseCommand {
     @Subcommand("enable")
     @Description("Reload individual modules")
     @CommandCompletion("@modules")
-    public void onEnable(CommandSender sender, Module module) {
-        String result = moduleManager.enableModule(module);
+    public void onEnable(CommandSender sender, Module module, boolean persistent) {
+        String result = moduleManager.enableModule(module, persistent);
         sender.sendMessage(CC.PRIMARY + result);
     }
 
