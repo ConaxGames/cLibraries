@@ -182,7 +182,10 @@ public abstract class Module {
         if (forceSync || (config.isWasCreated() && syncOnCreation)) {
             try {
                 String[] dontSync = (this.noSync() == null ? new String[0] : this.noSync().toArray(new String[0]));
-                new CommentedConfiguration().syncWithConfig(config.getConfigFile(), fileStream, dontSync);
+
+                CommentedConfiguration commentedConfiguration = CommentedConfiguration.loadConfiguration(config.getConfigFile());
+                commentedConfiguration.syncWithConfig(config.getConfigFile(), fileStream, dontSync);
+
                 library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.");
             } catch (Exception exception) {
                 library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
