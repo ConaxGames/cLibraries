@@ -50,6 +50,7 @@ public class ModuleButton extends Button {
 
         description.add(" ");
         description.add(CC.YELLOW + (this.enabled ? "Click to disable." : "Click to enable."));
+        description.addAll(FormatUtil.wordWrap(CC.GRAY + "(Use a Shift-Click to not save this change over reboots)"));
         return description;
     }
 
@@ -60,7 +61,9 @@ public class ModuleButton extends Button {
 
     @Override
     public void clicked(Player player, int slot, ClickType clickType) {
-        boolean persistent = clickType.isShiftClick();
+        // shift-click DOESN'T save this change
+        boolean persistent = !clickType.isShiftClick();
+
         if (this.enabled) {
             moduleManager.disableModule(module, persistent);
         } else {
