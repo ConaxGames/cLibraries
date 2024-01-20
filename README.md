@@ -18,9 +18,36 @@ Ensure the scope is set to compile.
     </dependency>
 ```
 
+Remember that you must shade cLibraries into the plugin you are working on with relocation!
+This can be done by using `maven-shade-plugin` inside your build configuration.
+```
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>shade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.conaxgames.libraries</pattern>
+                            <shadedPattern>com.conaxgames.{x}.clib</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
+```
+
 ## ⛏️ How to integrate:
 ### onEnable inside your Java Plugin
-`library = new LibraryPlugin().onEnable(this, CC.RED, CC.WHITE);`
+`library = new LibraryPlugin().onEnable(...);`
 
 ### onDisable inside your Java Plugin
 2. `library.onDisable();`
