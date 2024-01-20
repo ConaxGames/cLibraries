@@ -14,7 +14,7 @@ public class Settings {
     public Map<ACFCoreMessage, String> acfMessages = new HashMap<>();
 
     public Settings() {
-//        reload();
+        reload();
     }
 
     public void reload() {
