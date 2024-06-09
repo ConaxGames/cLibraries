@@ -130,8 +130,6 @@ public final class JavaUtils {
         return new BigDecimal(number.toString()).setScale(decimalPlaces, roundingMode).stripTrailingZeros().toPlainString();
     }
 
-    //TODO: The following below needs to be cleaned up and/or rewritten.
-
     /**
      * Joins a collection of strings together using {@link Joiner#join(Iterable)} as a base
      * with the last object using 'and' just before instead of the selected delimiter as a comma.
