@@ -19,17 +19,24 @@ public abstract class LibNMSManager {
 
     private static LibServerVersion newInstance() {
         try {
+            // Retrieve the NMS version from the server class name
             String bukkitNMSVersion = Bukkit.getServer().getClass().getName().split("\\.")[3];
+            System.out.println("LibNMSManager: Detected NMS version: " + bukkitNMSVersion);
 
             try {
-                setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion)); // set the enum
+                // Attempt to set the server version
+                setServerVersion(LibServerVersion.valueOf(bukkitNMSVersion));
+                System.out.println("LibNMSManager: Successfully set server version to: " + bukkitNMSVersion);
             } catch (IllegalArgumentException e) {
-                LibraryPlugin.getInstance().getLibraryLogger().toConsole("LibNMSManager", "UNABLE TO FIND NMS VERSION MATCHING " +
-                        bukkitNMSVersion + ". Disabling cLibraries to avoid further complications compatibility issues...", new UnsupportedOperationException(bukkitNMSVersion));
+                // Handle the case where the NMS version is not found
+                System.out.println("LibNMSManager: UNABLE TO FIND NMS VERSION MATCHING " +
+                        bukkitNMSVersion + ". Disabling cLibraries to avoid further complications and compatibility issues...");
                 LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().disablePlugin(LibraryPlugin.getInstance().getPlugin());
             }
             return serverVersion;
         } catch (Exception e) {
+            // Catch and log any unexpected exceptions
+            System.out.println("LibNMSManager: Exception occurred while trying to set NMS version: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

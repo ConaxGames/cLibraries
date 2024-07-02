@@ -2,7 +2,6 @@ package com.conaxgames.libraries.util;
 
 import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.nms.LibServerVersion;
-import com.cryptomorin.xseries.SkullUtils;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -267,7 +266,8 @@ public class ItemBuilderUtil {
         final ItemMeta meta = this.is.getItemMeta();
         if (meta != null) {
             try {
-                this.is.setItemMeta(SkullUtils.applySkin(meta, texture));
+                // todo: find out new method for xseries
+//                this.is.setItemMeta(SkullUtils.applySkin(meta, texture));
             } catch (NoSuchFieldError ignored) {}
         }
         return this;
