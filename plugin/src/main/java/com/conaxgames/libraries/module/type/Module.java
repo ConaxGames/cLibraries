@@ -85,7 +85,7 @@ public abstract class Module {
      *
      * @return the LibServerVersion enum for that version.
      */
-    public String minimumServerVersion() {
+    public VersioningChecker minimumServerVersion() {
         return null;
     }
 
