@@ -8,7 +8,6 @@ import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
-import com.conaxgames.libraries.nms.LibNMSManager;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.google.common.base.Joiner;
 import lombok.Getter;
@@ -66,9 +65,6 @@ public class LibraryPlugin {
 
         instance = this;
         this.plugin = plugin;
-
-        // determine the server version before we load other utility classes.
-        LibNMSManager.getInstance();
 
         try {
             settings = new Settings();

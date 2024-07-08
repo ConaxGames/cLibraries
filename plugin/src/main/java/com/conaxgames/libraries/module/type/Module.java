@@ -2,9 +2,8 @@ package com.conaxgames.libraries.module.type;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
-import com.conaxgames.libraries.nms.LibNMSManager;
-import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.Config;
+import com.conaxgames.libraries.util.VersioningChecker;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -79,13 +78,14 @@ public abstract class Module {
         return null;
     }
 
+    // todo: convert to use versioningchecker
     /**
      * The minimum server version that must be running for this
      * module to enable.
      *
      * @return the LibServerVersion enum for that version.
      */
-    public LibServerVersion minimumServerVersion() {
+    public VersioningChecker minimumServerVersion() {
         return null;
     }
 
@@ -110,10 +110,11 @@ public abstract class Module {
      * @return true if this hook meets all the requirements to register
      */
     public boolean canRegister() {
-        if (minimumServerVersion() != null) {
-            LibServerVersion currentServerVersion = LibNMSManager.serverVersion;
-            if (currentServerVersion.before(minimumServerVersion())) return false;
-        }
+        // todo: convert to use versioningchecker
+//        if (minimumServerVersion() != null) {
+//            LibServerVersion currentServerVersion = LibNMSManager.serverVersion;
+//            if (currentServerVersion.before(minimumServerVersion())) return false;
+//        }
 
         return ((getRequiredPlugin() == null) || (Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null));
     }
