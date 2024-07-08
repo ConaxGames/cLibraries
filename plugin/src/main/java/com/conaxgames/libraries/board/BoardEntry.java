@@ -3,7 +3,6 @@ package com.conaxgames.libraries.board;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
 import lombok.experimental.Accessors;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -58,43 +57,6 @@ public class BoardEntry {
 
 	public BoardEntry send(int position) {
 		Objective objective = board.getObjective();
-
-//		if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_16_R3)) {
-//			this.team.setSuffix("");
-//			this.team.setPrefix(CC.translate(this.text));
-////			this.team.setSuffix(CC.translate(this.text));
-////			this.team.addEntry(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', "&a"));
-//		} else {
-
-//		if (this.text.length() > 16) {
-//			this.team.addEntry(this.text.substring(0, 16));
-//
-//			boolean addOne = this.team.getPrefix().endsWith(ChatColor.COLOR_CHAR + "");
-//
-//			if (addOne) {
-//				this.team.addEntry(CC.translate(this.text.substring(0, 15)));
-//			}
-//
-//			String suffix = ChatColor.getLastColors(this.team.getPrefix())
-//					+ this.text.substring(addOne ? 15 : 16);
-//
-//			if (suffix.length() > 16) {
-//				if (suffix.length() - 2 <= 16) {
-//					suffix = this.text.substring(addOne ? 15 : 16);
-//					this.team.addEntry(CC.translate(suffix));
-//				} else {
-//					this.team.addEntry(CC.translate(suffix.substring(0, 16)));
-//				}
-//
-//			} else {
-//				this.team.addEntry(CC.translate(suffix));
-//			}
-//		} else {
-//			this.team.setSuffix("");
-//			this.team.addEntry(CC.translate(this.text));
-//		}
-
-		// Set Prefix & Suffix.
 		String preSplit = CC.translate(text);
 		String[] split = this.splitText(preSplit);
 		this.team.setPrefix(split[0]);
@@ -140,12 +102,8 @@ public class BoardEntry {
 	public String[] splitText(String input) { // allows up-to 32 chars length on under 1.16 server version
 		final int inputLength = input.length();
 		if (inputLength > 16) {
-			// Make the prefix the first 16 characters of our text
 			String prefix = input.substring(0, 16);
-
-			// Get the last index of the color char in the prefix
 			final int lastColorIndex = prefix.lastIndexOf(ChatColor.COLOR_CHAR);
-
 			String suffix;
 
 			if (lastColorIndex >= 14) {
