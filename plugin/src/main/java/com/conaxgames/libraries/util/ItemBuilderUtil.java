@@ -1,7 +1,5 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.nms.LibNMSManager;
-import com.conaxgames.libraries.nms.LibServerVersion;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -194,15 +192,16 @@ public class ItemBuilderUtil {
 
     @SuppressWarnings("deprecation")
     public ItemBuilderUtil setDyeColor(DyeColor color) {
-        this.is.setDurability(LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        this.is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5") ? color.getWoolData() : color.getDyeData());
         return this;
     }
 
     @Deprecated
     public ItemBuilderUtil setWoolColor(DyeColor color) {
-        if (!is.getType().equals(XMaterial.WHITE_WOOL.parseMaterial()))
+        if (!is.getType().equals(XMaterial.WHITE_WOOL.parseMaterial())) {
             return this;
-        this.is.setDurability(LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3) ? color.getWoolData() : color.getDyeData());
+        }
+        this.is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5") ? color.getWoolData() : color.getDyeData());
         return this;
     }
 
