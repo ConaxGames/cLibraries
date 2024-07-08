@@ -1,9 +1,9 @@
 package com.conaxgames.libraries.board;
 
-import com.conaxgames.libraries.nms.LibNMSManager;
-import com.conaxgames.libraries.nms.LibServerVersion;
 import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.util.VersioningChecker;
 import lombok.experimental.Accessors;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -155,16 +155,14 @@ public class BoardEntry {
 				suffix = ChatColor.getLastColors(prefix) + input.substring(16);
 			}
 
-			if (LibNMSManager.getInstance().before(LibServerVersion.v1_16_R3)) { // only substring if server ver pre-hex
+			if (VersioningChecker.getInstance().isServerVersionBefore("1.16.5")) {
 				if (suffix.length() > 16) {
 					suffix = suffix.substring(0, 16);
 				}
 			}
-
 			return new String[] {prefix, suffix};
 		} else {
 			return new String[] {input, ""};
 		}
 	}
-
 }
