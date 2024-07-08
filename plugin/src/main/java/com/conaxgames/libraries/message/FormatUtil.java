@@ -238,11 +238,6 @@ public enum FormatUtil {;
      */
     public static String getItemName(ItemStack item) {
         return item.getType().toString().replace("_", "");
-//        if (LibNMSManager.getInstance().getServerVersion().after(LibServerVersion.v1_8_R3)) {
-//            return org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack.asNMSCopy(item).getName().getString();
-//        }  else {
-//            return CraftItemStack.asNMSCopy(item).getName();
-//        }
     }
 
     public static String andJoin(Collection<String> collection, boolean delimiterBeforeAnd) {
