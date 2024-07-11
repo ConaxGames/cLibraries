@@ -262,12 +262,22 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setSkin(String texture) {
-        final ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            try {
-                // todo: find out new method for xseries
-//                this.is.setItemMeta(SkullUtils.applySkin(meta, texture));
-            } catch (NoSuchFieldError ignored) {}
+        if (is.getType() == Material.PLAYER_HEAD) {
+            final SkullMeta meta = (SkullMeta) is.getItemMeta();
+            if (meta != null) {
+                GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+                profile.getProperties().put("textures", new Property("textures", texture));
+
+                try {
+                    Field profileField = meta.getClass().getDeclaredField("profile");
+                    profileField.setAccessible(true);
+                    profileField.set(meta, profile);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                is.setItemMeta(meta);
+            }
         }
         return this;
     }
