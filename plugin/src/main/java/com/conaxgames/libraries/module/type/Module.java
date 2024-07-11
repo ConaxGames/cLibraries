@@ -78,14 +78,13 @@ public abstract class Module {
         return null;
     }
 
-    // todo: convert to use versioningchecker
     /**
      * The minimum server version that must be running for this
      * module to enable.
      *
-     * @return the LibServerVersion enum for that version.
+     * @return the version string for the minimum server version.
      */
-    public VersioningChecker minimumServerVersion() {
+    public String minimumServerVersion() {
         return null;
     }
 
@@ -110,11 +109,12 @@ public abstract class Module {
      * @return true if this hook meets all the requirements to register
      */
     public boolean canRegister() {
-        // todo: convert to use versioningchecker
-//        if (minimumServerVersion() != null) {
-//            LibServerVersion currentServerVersion = LibNMSManager.serverVersion;
-//            if (currentServerVersion.before(minimumServerVersion())) return false;
-//        }
+        if (minimumServerVersion() != null) {
+            VersioningChecker versionChecker = VersioningChecker.getInstance();
+            if (versionChecker.isServerVersionBefore(minimumServerVersion())) {
+                return false;
+            }
+        }
 
         return ((getRequiredPlugin() == null) || (Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null));
     }
