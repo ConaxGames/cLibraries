@@ -84,9 +84,7 @@ public abstract class Module {
      *
      * @return the version string for the minimum server version.
      */
-    public String minimumServerVersion() {
-        return null;
-    }
+    public abstract String minimumServerVersion();
 
     public abstract String getDescription();
 
