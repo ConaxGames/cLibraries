@@ -78,14 +78,6 @@ public abstract class Module {
         return null;
     }
 
-    /**
-     * The minimum server version that must be running for this
-     * module to enable.
-     *
-     * @return the version string for the minimum server version.
-     */
-    public abstract String minimumServerVersion();
-
     public abstract String getDescription();
 
     public abstract String getAuthor();
@@ -107,13 +99,6 @@ public abstract class Module {
      * @return true if this hook meets all the requirements to register
      */
     public boolean canRegister() {
-        if (minimumServerVersion() != null) {
-            VersioningChecker versionChecker = VersioningChecker.getInstance();
-            if (versionChecker.isServerVersionBefore(minimumServerVersion())) {
-                return false;
-            }
-        }
-
         return ((getRequiredPlugin() == null) || (Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null));
     }
 
