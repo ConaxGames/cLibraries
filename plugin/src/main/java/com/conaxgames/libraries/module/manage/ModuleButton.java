@@ -44,9 +44,6 @@ public class ModuleButton extends Button {
         if (module.getRequiredPlugin() != null) {
             description.add(CC.GRAY + "Requires: " + CC.WHITE + module.getRequiredPlugin());
         }
-        if (module.minimumServerVersion() != null) {
-            description.add(CC.GRAY + "Minimum Version: " + CC.WHITE + module.minimumServerVersion());
-        }
 
         description.add(" ");
         description.add(CC.YELLOW + (this.enabled ? "Click to disable." : "Click to enable."));
