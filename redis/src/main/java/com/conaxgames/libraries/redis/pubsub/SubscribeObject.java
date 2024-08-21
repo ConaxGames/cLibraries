@@ -27,6 +27,7 @@ public class SubscribeObject {
         try {
             messageType = MessageType.valueOf(action);
         } catch (IllegalArgumentException e) {
+            JedisConnection.getInstance().toConsole("Invalid action type: " + action);
             return null;
         }
 
