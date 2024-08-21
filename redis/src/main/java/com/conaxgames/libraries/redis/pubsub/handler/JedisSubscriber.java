@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class JedisSubscriber<K> {
 
-    private static final Map<Class, JedisSubscriptionGenerator> GENERATORS = new HashMap<>();
+    private static final Map<Class<?>, JedisSubscriptionGenerator<?>> GENERATORS = new HashMap<>();
 
     static {
         GENERATORS.put(JsonObject.class, new JsonJedisSubscriptionGenerator());
@@ -50,11 +50,15 @@ public class JedisSubscriber<K> {
         this.pubSub = new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
-                JedisSubscriptionGenerator<K> jedisSubscriptionGenerator = GENERATORS.get(typeParameter);
+                JedisSubscriptionGenerator<K> jedisSubscriptionGenerator = (JedisSubscriptionGenerator<K>) GENERATORS.get(typeParameter);
 
                 if (jedisSubscriptionGenerator != null) {
                     K object = jedisSubscriptionGenerator.generateSubscription(message);
-                    JedisSubscriber.this.jedisSubscriptionHandler.subscribe(object, new SubscribeObject().from((JsonObject) object));
+                    if (object instanceof JsonObject) {
+                        JedisSubscriber.this.jedisSubscriptionHandler.subscribe(object, new SubscribeObject().from((JsonObject) object));
+                    } else {
+                        JedisConnection.getInstance().toConsole("JedisSubscriber: Received object is not of type JsonObject");
+                    }
                 } else {
                     JedisConnection.getInstance().toConsole("JedisSubscriber: Jedis GENERATOR Type was invalid");
                 }
