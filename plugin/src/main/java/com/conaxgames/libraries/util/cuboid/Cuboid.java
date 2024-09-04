@@ -1,6 +1,5 @@
 package com.conaxgames.libraries.util.cuboid;
 
-import com.mongodb.BasicDBObject;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -9,8 +8,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class Cuboid implements Iterable<Location> {
@@ -31,7 +32,6 @@ public class Cuboid implements Iterable<Location> {
         this(l1.getWorld().getName(),
                 l1.getBlockX(), l1.getBlockY(), l1.getBlockZ(),
                 l2.getBlockX(), l2.getBlockY(), l2.getBlockZ());
-
     }
 
     /**
@@ -70,20 +70,24 @@ public class Cuboid implements Iterable<Location> {
         this.z2 = Math.max(z1, z2);
     }
 
-    public Cuboid(BasicDBObject dbo) {
-        this.worldName = dbo.getString("worldName");
-        this.x1 = dbo.getInt("x1");
-        this.x2 = dbo.getInt("x2");
-        this.y1 = dbo.getInt("y1");
-        this.y2 = dbo.getInt("y2");
-        this.z1 = dbo.getInt("z1");
-        this.z2 = dbo.getInt("z2");
-        this.name = dbo.getString("name");
+    /**
+     * Construct a Cuboid from a serialized map structure.
+     *
+     * @param map the serialized cuboid data
+     */
+    public Cuboid(Map<String, Object> map) {
+        this.worldName = (String) map.get("worldName");
+        this.x1 = (int) map.get("x1");
+        this.x2 = (int) map.get("x2");
+        this.y1 = (int) map.get("y1");
+        this.y2 = (int) map.get("y2");
+        this.z1 = (int) map.get("z1");
+        this.z2 = (int) map.get("z2");
+        this.name = (String) map.get("name");
     }
 
     /**
-     * Get the Location of the lower northeast corner of the Region (minimum XYZ
-     * coords).
+     * Get the Location of the lower northeast corner of the Region (minimum XYZ coords).
      *
      * @return Location of the lower northeast corner
      */
@@ -92,8 +96,7 @@ public class Cuboid implements Iterable<Location> {
     }
 
     /**
-     * Get the Location of the upper southwest corner of the Region (maximum XYZ
-     * coords).
+     * Get the Location of the upper southwest corner of the Region (maximum XYZ coords).
      *
      * @return Location of the upper southwest corner
      */
@@ -121,12 +124,29 @@ public class Cuboid implements Iterable<Location> {
      * @throws IllegalStateException if the world is not loaded
      */
     public World getWorld() {
-
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new IllegalStateException("world '" + worldName + "' is not loaded");
         }
         return world;
+    }
+
+    /**
+     * Serialize this Cuboid to a map structure.
+     *
+     * @return a map representing this Cuboid's data
+     */
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("worldName", worldName);
+        map.put("x1", x1);
+        map.put("x2", x2);
+        map.put("y1", y1);
+        map.put("y2", y2);
+        map.put("z1", z1);
+        map.put("z2", z2);
+        map.put("name", name);
+        return map;
     }
 
     /**
@@ -223,7 +243,8 @@ public class Cuboid implements Iterable<Location> {
         Cuboid c;
         switch (dir) {
             case HORIZONTAL:
-                c = expand(RegionDirection.NORTH, amount).expand(RegionDirection.SOUTH, amount).expand(RegionDirection.EASY, amount).expand(RegionDirection.WEST, amount);
+                c = expand(RegionDirection.NORTH, amount).expand(RegionDirection.SOUTH, amount)
+                        .expand(RegionDirection.EASY, amount).expand(RegionDirection.WEST, amount);
                 break;
             case VERTICAL:
                 c = expand(RegionDirection.DOWN, amount).expand(RegionDirection.UP, amount);
@@ -334,7 +355,7 @@ public class Cuboid implements Iterable<Location> {
     /**
      * Get the Region big enough to hold both this Region and the given one.
      *
-     * @param other
+     * @param other the other Cuboid
      * @return a new Region large enough to hold this Region and the given
      * Region
      */
@@ -346,9 +367,9 @@ public class Cuboid implements Iterable<Location> {
         int xMin = Math.min(x1, other.x1);
         int yMin = Math.min(y1, other.y1);
         int zMin = Math.min(z1, other.z1);
-        int xMax = Math.max(x2, other.x1);
-        int yMax = Math.max(y2, other.y1);
-        int zMax = Math.max(z2, other.z1);
+        int xMax = Math.max(x2, other.x2);
+        int yMax = Math.max(y2, other.y2);
+        int zMax = Math.max(z2, other.z2);
 
         return new Cuboid(worldName, xMin, yMin, zMin, xMax, yMax, zMax);
     }
@@ -387,7 +408,7 @@ public class Cuboid implements Iterable<Location> {
      * @return a list of Chunk objects
      */
     public List<Chunk> getChunks() {
-        List<Chunk> chunks = new ArrayList<Chunk>();
+        List<Chunk> chunks = new ArrayList<>();
 
         World w = getWorld();
 
@@ -408,23 +429,12 @@ public class Cuboid implements Iterable<Location> {
         return chunks;
     }
 
-    public BasicDBObject toJSON() {
-        return new BasicDBObject("worldName", worldName)
-                .append("x1", x1)
-                .append("x2", x2)
-                .append("y1", y1)
-                .append("y2", y2)
-                .append("z1", z1)
-                .append("z2", z2)
-                .append("name", name);
-
-    }
-
     /**
-     * @return horizontal walls of the Region
+     * Get the horizontal walls of the Region.
+     *
+     * @return an array of Cuboids representing the walls
      */
     public Cuboid[] getWalls() {
-
         return new Cuboid[]{
                 getFace(RegionDirection.NORTH),
                 getFace(RegionDirection.SOUTH),
@@ -442,14 +452,14 @@ public class Cuboid implements Iterable<Location> {
 
     @Override
     public String toString() {
-        return "Region: " + worldName + "," + x1 + "," + y1 + "," + z1 + "=>" + x2 + "," + y2 + "," + z2;
+        return "Cuboid: " + worldName + "," + x1 + "," + y1 + "," + z1 + "=>" + x2 + "," + y2 + "," + z2;
     }
 
     public class LocationRegionIterator implements Iterator<Location> {
-        private World w;
-        private int baseX, baseY, baseZ;
+        private final World w;
+        private final int baseX, baseY, baseZ;
         private int x, y, z;
-        private int sizeX, sizeY, sizeZ;
+        private final int sizeX, sizeY, sizeZ;
 
         public LocationRegionIterator(World w, int x1, int y1, int z1, int x2, int y2, int z2) {
             this.w = w;
@@ -479,13 +489,26 @@ public class Cuboid implements Iterable<Location> {
         }
 
         public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 
+    /**
+     * Get a random location within this Cuboid.
+     *
+     * @return a random Location within the Cuboid
+     */
     public Location getRandomLocation() {
         return getRandomLocation(this.getLowerCorner(), this.getUpperCorner());
     }
 
+    /**
+     * Get a random location between two specified corners.
+     *
+     * @param min the lower corner
+     * @param max the upper corner
+     * @return a random Location between the corners
+     */
     public Location getRandomLocation(Location min, Location max) {
         Location range = new Location(min.getWorld(), Math.abs(max.getX() - min.getX()), min.getY(), Math.abs(max.getZ() - min.getZ()));
         return new Location(min.getWorld(),
