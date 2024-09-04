@@ -34,12 +34,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.conaxgames</groupId>
-            <artifactId>csuite-api</artifactId>
-            <version>LATEST</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.6.3</version>

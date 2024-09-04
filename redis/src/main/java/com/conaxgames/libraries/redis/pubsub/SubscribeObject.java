@@ -1,14 +1,17 @@
 package com.conaxgames.libraries.redis.pubsub;
 
-import com.conaxgames.api.redis.MessageType;
 import com.conaxgames.libraries.redis.JedisConnection;
+import com.conaxgames.libraries.redis.message.MessageTypeEnum;
+import com.conaxgames.libraries.redis.message.MessageTypeInterface;
+import com.conaxgames.libraries.redis.message.MessageTypeResolver;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 
 @Getter
 public class SubscribeObject {
 
-    public MessageType messageType = MessageType.UNKNOWN;
+    // Now using the interface
+    public MessageTypeInterface messageType = MessageTypeEnum.UNKNOWN;
     public String message = null;
     public String permission = null;
     public String destination = null;
@@ -17,7 +20,7 @@ public class SubscribeObject {
     public SubscribeObject() {
     }
 
-    public SubscribeObject from(JsonObject object) {
+    public SubscribeObject from(JsonObject object, MessageTypeResolver resolver) {
         if (object == null || !object.has("action")) {
             JedisConnection.getInstance().toConsole("Jedis Subscribe Object: Received JsonObject was null...");
             return null;
@@ -25,7 +28,8 @@ public class SubscribeObject {
 
         String action = object.get("action").getAsString();
         try {
-            messageType = MessageType.valueOf(action);
+            // Resolving the message type through the provided resolver
+            messageType = resolver.resolve(action);
         } catch (IllegalArgumentException e) {
             JedisConnection.getInstance().toConsole("Invalid action type: " + action);
             return null;
@@ -51,5 +55,4 @@ public class SubscribeObject {
 
         return this;
     }
-
 }

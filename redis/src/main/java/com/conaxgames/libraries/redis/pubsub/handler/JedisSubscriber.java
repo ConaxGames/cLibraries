@@ -2,6 +2,9 @@ package com.conaxgames.libraries.redis.pubsub.handler;
 
 import com.conaxgames.libraries.redis.JedisConnection;
 import com.conaxgames.libraries.redis.JedisCredentials;
+import com.conaxgames.libraries.redis.message.MessageTypeEnum;
+import com.conaxgames.libraries.redis.message.UniversalMessageTypeResolver;
+import com.conaxgames.libraries.redis.message.MessageTypeResolver;
 import com.conaxgames.libraries.redis.pubsub.SubscribeObject;
 import com.conaxgames.libraries.redis.subscription.generator.JsonJedisSubscriptionGenerator;
 import com.conaxgames.libraries.redis.subscription.model.JedisSubscriptionGenerator;
@@ -55,7 +58,13 @@ public class JedisSubscriber<K> {
                 if (jedisSubscriptionGenerator != null) {
                     K object = jedisSubscriptionGenerator.generateSubscription(message);
                     if (object instanceof JsonObject) {
-                        JedisSubscriber.this.jedisSubscriptionHandler.subscribe(object, new SubscribeObject().from((JsonObject) object));
+                        // Use UniversalMessageTypeResolver with the relevant enums (e.g., MessageTypeEnum from lib)
+                        MessageTypeResolver resolver = new UniversalMessageTypeResolver(MessageTypeEnum.class);
+
+                        JedisSubscriber.this.jedisSubscriptionHandler.subscribe(
+                                object,
+                                new SubscribeObject().from((JsonObject) object, resolver)
+                        );
                     } else {
                         JedisConnection.getInstance().toConsole("JedisSubscriber: Received object is not of type JsonObject");
                     }
