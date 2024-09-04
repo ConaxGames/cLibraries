@@ -7,7 +7,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftHumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -70,7 +70,7 @@ public abstract class Menu {
                         itemMeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
                         itemMeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
                         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-                        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+                        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                         item.setItemMeta(itemMeta);
                     }
                 }
