@@ -52,7 +52,7 @@ public final class ItemUtil {
 				CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
 
 		meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 		itemStack.setItemMeta(meta);
 		return itemStack;
 	}
