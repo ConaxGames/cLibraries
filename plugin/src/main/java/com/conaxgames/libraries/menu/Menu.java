@@ -3,6 +3,7 @@ package com.conaxgames.libraries.menu;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.menu.MenuOpenEvent;
 import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.util.ItemFlagHelper;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
 import net.minecraft.server.level.EntityPlayer;
@@ -70,7 +71,7 @@ public abstract class Menu {
                         itemMeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
                         itemMeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
                         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-                        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+                        itemMeta.addItemFlags(ItemFlagHelper.getHideTooltipFlag());
                         item.setItemMeta(itemMeta);
                     }
                 }

@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.menu;
 
+import com.conaxgames.libraries.util.ItemFlagHelper;
 import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -143,8 +144,8 @@ public abstract class Button {
         }
 
         if (hideAttributes(player)) {
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
-                    ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS,
+                    ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON, ItemFlagHelper.getHideTooltipFlag());
         }
 
         if (hideEnchants(player)) {
