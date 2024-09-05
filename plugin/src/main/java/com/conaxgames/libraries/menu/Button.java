@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.util.ItemFlagHelper;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XSound;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -153,7 +154,7 @@ public abstract class Button {
         }
 
         if (shinyItem(player)) {
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.addEnchant(XEnchantment.UNBREAKING.getEnchant(), 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
