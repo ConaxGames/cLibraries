@@ -52,10 +52,16 @@ public class HookManager implements Listener {
 
     public void loadGamemodeTypeFromHooks() {
         for (Hook hook : hooks) {
-            if (hook.getHookType().getGamemode() != null && hook.getHookType().getGamemode() != GamemodeType.UNKNOWN) {
-                serverType = hook.getHookType().getGamemode();
-                LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager", Arrays.asList("Automatically determined the server is a " + serverType.getDisplay() + " server."
-                        , "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)"));
+            GamemodeType newServerType = hook.getHookType().getGamemode();
+            if (newServerType != null && newServerType != GamemodeType.UNKNOWN && newServerType != serverType) {
+                serverType = newServerType;
+                LibraryPlugin.getInstance().getLibraryLogger().toConsole(
+                        "Hook Manager",
+                        Arrays.asList(
+                                "Automatically determined the server is a " + serverType.getDisplay() + " server.",
+                                "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)"
+                        )
+                );
                 break;
             }
         }
