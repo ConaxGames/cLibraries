@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.CC;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -9,11 +10,10 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BoardManager implements Runnable {
 
-	private final Map<UUID, Board> playerBoards = new ConcurrentHashMap<>();
+	private final Map<UUID, Board> playerBoards = new HashMap<>();
 	private final BoardAdapter adapter;
 
 	public BoardManager(BoardAdapter adapter) {
@@ -28,67 +28,89 @@ public class BoardManager implements Runnable {
 			if (board == null) {
 				continue;
 			}
-
 			try {
 				Scoreboard scoreboard = board.getScoreboard();
-				if (scoreboard == null) {
-					continue;
-				}
-
-				Objective objective = board.getObjective();
-				if (objective == null) {
-					continue;
-				}
 
 				List<String> scores = this.adapter.getScoreboard(player, board);
 
 				if (scores != null) {
 					Collections.reverse(scores);
 
-					String newTitle = this.adapter.getTitle(player);
-					if (!objective.getDisplayName().equals(newTitle)) {
-						objective.setDisplayName(newTitle);
+					Objective objective = board.getObjective();
+
+					if (!objective.getDisplayName().equals(this.adapter.getTitle(player))) {
+						objective.setDisplayName(this.adapter.getTitle(player));
 					}
 
-					Set<String> existingKeys = new HashSet<>();
-					Iterator<BoardEntry> iter = new ArrayList<>(board.getEntries()).iterator();
-
-					while (iter.hasNext()) {
-						BoardEntry boardEntry = iter.next();
-						if (!scores.contains(boardEntry.getText())) {
+					if (scores.isEmpty()) {
+						Iterator<BoardEntry> iter = board.getEntries().iterator();
+						while (iter.hasNext()) {
+							BoardEntry boardEntry = iter.next();
 							boardEntry.remove();
 							iter.remove();
-						} else {
-							existingKeys.add(boardEntry.getKey());
 						}
+						continue;
 					}
 
+					forILoop:
 					for (int i = 0; i < scores.size(); i++) {
 						String text = scores.get(i);
 						int position = i + 1;
 
-						BoardEntry entry = board.getByPosition(i);
-						if (entry == null || !entry.getText().equals(text)) {
-							if (entry != null) {
-								entry.remove();
+						for (BoardEntry boardEntry : new LinkedList<>(board.getEntries())) {
+							Score score = objective.getScore(boardEntry.getKey());
+
+							if (score != null && boardEntry.getText().equals(text)) {
+								if (score.getScore() == position) {
+									continue forILoop;
+								}
 							}
-							entry = new BoardEntry(board, text);
-							entry.setup().send(position);
+						}
+
+						Iterator<BoardEntry> iter = board.getEntries().iterator();
+						while (iter.hasNext()) {
+							BoardEntry boardEntry = iter.next();
+							int entryPosition = scoreboard.getObjective(DisplaySlot.SIDEBAR).getScore(boardEntry.getKey()).getScore();
+							if (entryPosition > scores.size()) {
+								boardEntry.remove();
+								iter.remove();
+							}
+						}
+
+						int positionToSearch = position - 1;
+
+						BoardEntry entry = board.getByPosition(positionToSearch);
+						if (entry == null) {
+							entry = new BoardEntry(board, text).send(position);
+						}
+
+						entry.setText(text).setup().send(position);
+
+						if (board.getEntries().size() > scores.size()) {
+							iter = board.getEntries().iterator();
+							while (iter.hasNext()) {
+								BoardEntry boardEntry = iter.next();
+								if (!scores.contains(boardEntry.getText()) || Collections.frequency(board.getBoardEntriesFormatted(), boardEntry.getText()) > 1) {
+									boardEntry.remove();
+									iter.remove();
+								}
+							}
 						}
 					}
-
 				} else {
-					board.getEntries().forEach(BoardEntry::remove);
-					board.getEntries().clear();
+					if (!board.getEntries().isEmpty()) {
+						board.getEntries().forEach(BoardEntry::remove);
+						board.getEntries().clear();
+					}
 				}
 
 				this.adapter.onScoreboardCreate(player, scoreboard);
-				player.setScoreboard(scoreboard);
 
+				player.setScoreboard(scoreboard);
 			} catch (Exception e) {
 				e.printStackTrace();
 				LibraryPlugin.getInstance().getPlugin().getLogger()
-						.severe("Error updating " + player.getName() + "'s scoreboard: " + board);
+						.severe("Something went wrong while updating " + player.getName() + "'s scoreboard " + board + " - " + board.getAdapter() + ")");
 			}
 		}
 	}
