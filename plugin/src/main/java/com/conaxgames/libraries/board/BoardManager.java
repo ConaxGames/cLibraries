@@ -42,44 +42,43 @@ public class BoardManager implements Runnable {
 
 				List<String> scores = this.adapter.getScoreboard(player, board);
 
-				if (scores != null) {
-					Collections.reverse(scores);
+				synchronized (board.getEntries()) {
+					if (scores != null) {
+						Collections.reverse(scores);
 
-					String newTitle = this.adapter.getTitle(player);
-					if (!objective.getDisplayName().equals(newTitle)) {
-						objective.setDisplayName(newTitle);
-					}
-
-					Set<String> existingKeys = new HashSet<>();
-					Iterator<BoardEntry> iter = new ArrayList<>(board.getEntries()).iterator();
-
-					while (iter.hasNext()) {
-						BoardEntry boardEntry = iter.next();
-						if (!scores.contains(boardEntry.getText())) {
-							boardEntry.remove();
-							iter.remove();
-						} else {
-							existingKeys.add(boardEntry.getKey());
+						String newTitle = this.adapter.getTitle(player);
+						if (!objective.getDisplayName().equals(newTitle)) {
+							objective.setDisplayName(newTitle);
 						}
-					}
 
-					for (int i = 0; i < scores.size(); i++) {
-						String text = scores.get(i);
-						int position = i + 1;
+						List<BoardEntry> entriesCopy = new ArrayList<>(board.getEntries());
 
-						BoardEntry entry = board.getByPosition(i);
-						if (entry == null || !entry.getText().equals(text)) {
-							if (entry != null) {
-								entry.remove();
+						for (BoardEntry boardEntry : entriesCopy) {
+							if (!scores.contains(boardEntry.getText())) {
+								boardEntry.remove();
+								board.getEntries().remove(boardEntry);
 							}
-							entry = new BoardEntry(board, text);
-							entry.setup().send(position);
+						}
+
+						for (int i = 0; i < scores.size(); i++) {
+							String text = scores.get(i);
+							int position = i + 1;
+
+							BoardEntry entry = board.getByPosition(i);
+							if (entry == null || !entry.getText().equals(text)) {
+								if (entry != null) {
+									entry.remove();
+								}
+								entry = new BoardEntry(board, text);
+								entry.setup().send(position);
+							}
+						}
+					} else {
+						for (BoardEntry entry : new ArrayList<>(board.getEntries())) {
+							entry.remove();
+							board.getEntries().remove(entry);
 						}
 					}
-
-				} else {
-					board.getEntries().forEach(BoardEntry::remove);
-					board.getEntries().clear();
 				}
 
 				this.adapter.onScoreboardCreate(player, scoreboard);
