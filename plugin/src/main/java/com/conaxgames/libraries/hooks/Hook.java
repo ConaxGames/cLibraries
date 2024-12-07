@@ -8,12 +8,12 @@ public abstract class Hook implements Listener {
     public String pluginFromAnnotation;
 
     /**
-     * Return of {@link Plugin} linked to this {@link Hook}.
+     * Return the {@link Plugin} linked to this {@link Hook}.
      */
     public abstract Plugin getPlugin();
 
     /**
-     * Return of {@link HookType} linked to this {@link Hook}.
+     * Return the {@link HookType} linked to this {@link Hook}.
      */
     public abstract HookType getHookType();
 
