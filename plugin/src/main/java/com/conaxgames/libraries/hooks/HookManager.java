@@ -15,8 +15,6 @@ public class HookManager implements Listener {
     public Set<Hook> hooks = new HashSet<>();
     public Set<Hook> disabledHooks = new HashSet<>();
 
-    public GamemodeType serverType = GamemodeType.UNKNOWN;
-
     public HookManager(LibraryPlugin plugin) {
         this.plugin = plugin;
 
@@ -31,38 +29,13 @@ public class HookManager implements Listener {
 
     @EventHandler
     public void onPluginEnable(LibraryPluginEnableEvent event) {
-        loadGamemodeTypeFromHooks();
-
-        if (serverType == GamemodeType.UNKNOWN) {
-            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                for (Hook disabled : disabledHooks) {
-                    if (plugin.isEnabled() && plugin.getName().contains(disabled.getPluginFromAnnotation())) {
-                        if (disabled.getHookType().getGamemode() != GamemodeType.UNKNOWN) {
-                            serverType = disabled.getHookType().getGamemode();
-
-                            LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager", Arrays.asList("Automatically determined the server is a " + serverType.getDisplay() + " server."
-                                    , "(This was determined through the " + plugin.getName() + " plugin being enabled.)"));
-                            break;
-                        }
-                    }
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            for (Hook disabled : disabledHooks) {
+                if (plugin.isEnabled() && plugin.getName().contains(disabled.getPluginFromAnnotation())) {
+                    hooks.add(disabled);
+                    disabledHooks.remove(disabled);
+                    break;
                 }
-            }
-        }
-    }
-
-    public void loadGamemodeTypeFromHooks() {
-        for (Hook hook : hooks) {
-            GamemodeType newServerType = hook.getHookType().getGamemode();
-            if (newServerType != null && newServerType != GamemodeType.UNKNOWN && newServerType != serverType) {
-                serverType = newServerType;
-                LibraryPlugin.getInstance().getLibraryLogger().toConsole(
-                        "Hook Manager",
-                        Arrays.asList(
-                                "Automatically determined the server is a " + serverType.getDisplay() + " server.",
-                                "(This was determined through the " + hook.getPlugin().getName() + " plugin being enabled.)"
-                        )
-                );
-                break;
             }
         }
     }
@@ -77,7 +50,7 @@ public class HookManager implements Listener {
             if (LibraryPlugin.getInstance().getSettings().debug) {
                 LibraryPlugin.getInstance().getLibraryLogger().toConsole("Hook Manager",
                         "Hooked into " + hook.getHookType() + " version " + hook.getPlugin().getDescription().getVersion() + "."
-                        + " (" + hook.getPlugin().getDescription().getDescription() + ")");
+                                + " (" + hook.getPlugin().getDescription().getDescription() + ")");
             }
         } catch (Exception e) {
             plugin.getPlugin().getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
@@ -97,9 +70,8 @@ public class HookManager implements Listener {
         return libraryPluginList;
     }
 
-
     public Hook getHookByPluginName(String pluginName) {
-       return getHooks().stream().filter(hook -> hook.getPluginFromAnnotation().equals(pluginName)).findFirst().orElse(null);
+        return getHooks().stream().filter(hook -> hook.getPluginFromAnnotation().equals(pluginName)).findFirst().orElse(null);
     }
 
     public Hook getHookByType(HookType type) {
@@ -120,9 +92,5 @@ public class HookManager implements Listener {
 
     public Set<Hook> getDisabledHooks() {
         return this.disabledHooks;
-    }
-
-    public GamemodeType getServerType() {
-        return this.serverType;
     }
 }
