@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>clibraries-plugin</artifactId>
-    <version>0.9</version>
+    <version>1.0.1</version>
     <name>cLibraries Plugin</name>
 
     <distributionManagement>
