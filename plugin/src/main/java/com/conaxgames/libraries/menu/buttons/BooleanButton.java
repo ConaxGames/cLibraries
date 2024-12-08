@@ -5,7 +5,6 @@ import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.Callback;
 import com.conaxgames.libraries.util.WoolUtil;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
