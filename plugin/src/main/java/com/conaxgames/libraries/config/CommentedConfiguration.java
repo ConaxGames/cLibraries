@@ -1,8 +1,8 @@
 package com.conaxgames.libraries.config;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.Pair;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -414,7 +414,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
         //Going through the sectionMap, which is in the correct order.
         for (Pair<String, Object> entry : sectionMap) {
             //Adding the entry into a new list with the correct value from the target section.
-            correctOrder.add(new Pair<>(entry.key, target.get(entry.key)));
+            correctOrder.add(new Pair<>(entry.getKey(), target.get(entry.getKey())));
         }
 
         /*The only way to change key-indexes is to add them one-by-one again, in the correct order.
@@ -425,7 +425,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
 
         //Adding the entries again in the correct order.
         for(Pair<String, Object> entry : correctOrder)
-            target.set(entry.key, entry.value);
+            target.set(entry.getKey(), entry.getValue());
     }
 
     /**
@@ -453,30 +453,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
     private static void clearConfiguration(ConfigurationSection section){
         for(String key : section.getKeys(false))
             section.set(key, null);
-    }
-
-    /**
-     * A class that is used as a way of representing a map's entry (which is not implemented).
-     */
-    private static class Pair<K, V>{
-
-        private final K key;
-        private final V value;
-
-        Pair(K key, V value){
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof Pair && key.equals(((Pair) obj).key) && value.equals(((Pair) obj).value);
-        }
-
-        @Override
-        public int hashCode() {
-            return key.hashCode();
-        }
     }
 
 }
