@@ -5,7 +5,7 @@
 Conax Libraries (cLibraries) is a development library for Bukkit plugins. It offers various utilities and extended APIs designed to streamline development and reduce boilerplate code.
 
 ## Useful Links
-- **ConaxGames Website:** [https://www.conaxgames.com](https://www.conaxgames.com)  
+- **ConaxGames Website:** [https://www.conaxgames.com](https://www.conaxgames.com)
 - **ConaxGames Discord:** [https://discord.gg/fYZt22SmTp](https://discord.gg/fYZt22SmTp)
 
 ## Implementation
@@ -15,9 +15,9 @@ To use cLibraries in your project, add the following dependency to your `pom.xml
 ```xml
 <dependency>
     <groupId>com.conaxgames</groupId>
-    <artifactId>clibraries-plugin</artifactId>
+    <artifactId>clibraries</artifactId>
     <version>LATEST</version>
-    <scope>compile</scope>
+    <scope>provided</scope>
 </dependency>
 ```
 
