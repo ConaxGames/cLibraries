@@ -9,7 +9,7 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,9 +19,10 @@ jobs:
           java-version: '21'
           distribution: 'zulu'
       - run: mvn --batch-mode --update-snapshots verify
-      - uses: actions/upload-artifact@v4
+      - uses: softprops/action-gh-release@v2
         with:
-          path: target/*.jar
+          files: target/*.jar
+          generate_release_notes: true
   publish:
     runs-on: ubuntu-latest
     permissions:
