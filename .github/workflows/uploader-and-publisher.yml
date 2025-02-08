@@ -2,8 +2,8 @@ name: Uploader and Publisher
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "*.*.*"
 
 jobs:
   upload:
