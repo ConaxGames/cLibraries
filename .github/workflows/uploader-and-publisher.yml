@@ -6,25 +6,10 @@ on:
       - "*.*.*"
 
 jobs:
-  upload:
+  publish-and-upload:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'zulu'
-      - run: mvn --batch-mode --update-snapshots verify
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: target/*.jar
-          generate_release_notes: true
-  publish:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +17,15 @@ jobs:
         with:
           java-version: '21'
           distribution: 'zulu'
-      - name: Publish package
-        run: mvn --batch-mode deploy
+      - uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: 'pom.xml'
+          find: '<version>dev</version>'
+          replace: '<version>${{ github.ref_name }}</version>'
+      - run: mvn --batch-mode --update-snapshots verify deploy
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: target/*.jar
+          generate_release_notes: true
