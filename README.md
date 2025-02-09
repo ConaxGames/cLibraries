@@ -26,28 +26,14 @@ To use cLibraries in your project, add the following dependency to your `pom.xml
 Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the [maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/) with relocation in your project's `pom.xml`:
 
 ```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-shade-plugin</artifactId>
-    <version>3.4.1</version>
-    <executions>
-        <execution>
-            <id>shade</id>
-            <phase>package</phase>
-            <goals>
-                <goal>shade</goal>
-            </goals>
-        </execution>
-    </executions>
-    <configuration>
-        <relocations>
-            <relocation>
-                <pattern>com.conaxgames.libraries</pattern>
-                <shadedPattern>com.conaxgames.{x}.clib</shadedPattern>
-            </relocation>
-        </relocations>
-    </configuration>
-</plugin>
+<configuration>
+    <relocations>
+        <relocation>
+            <pattern>com.conaxgames.libraries</pattern>
+            <shadedPattern>com.conaxgames.{x}.clib</shadedPattern>
+        </relocation>
+    </relocations>
+</configuration>
 ```
 
 ## Usage
