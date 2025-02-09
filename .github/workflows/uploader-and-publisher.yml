@@ -13,6 +13,8 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.base_ref }}
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -29,3 +31,12 @@ jobs:
         with:
           files: target/*.jar
           generate_release_notes: true
+      - uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: 'README.md'
+          find: '<version>.+</version>'
+          replace: '<version>${{ github.ref_name }}</version>'
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'docs: Updated to version `${{ github.ref_name }}`.'
+          file_pattern: 'README.md'
