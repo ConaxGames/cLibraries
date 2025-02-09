@@ -4,7 +4,7 @@
 
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>1.0.0</version>
+    <version>dev</version>
     <name>cLibraries</name>
 
     <properties>
