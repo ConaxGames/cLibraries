@@ -106,6 +106,6 @@ public class ButtonListener implements Listener {
             Menu.currentlyOpenedMenus.remove(player.getName());
         }
     }
-
+    //
 }
 
