@@ -6,9 +6,7 @@ import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.ItemFlagHelper;
 import com.cryptomorin.xseries.XMaterial;
 import com.google.common.base.Preconditions;
-import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_21_R2.entity.CraftHumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -23,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Menu {
 
-    private static Method openInventoryMethod;
     private final ConcurrentHashMap<Integer, Button> buttons = new ConcurrentHashMap<>();
     private boolean autoUpdate = false;
     private boolean updateAfterClick = true;
@@ -34,6 +31,7 @@ public abstract class Menu {
     private Menu previous;
     public static Map<String, Menu> currentlyOpenedMenus;
     public static Map<String, BukkitRunnable> checkTasks;
+    private final Map<String, Inventory> openInventories = new HashMap<>();
 
     private Inventory createInventory(Player player) {
         Map<Integer, Button> invButtons = this.getButtons(player);
@@ -81,19 +79,6 @@ public abstract class Menu {
         return inv;
     }
 
-    private static Method getOpenInventoryMethod() {
-        if (openInventoryMethod == null) {
-            try {
-                openInventoryMethod = CraftHumanEntity.class.getDeclaredMethod("openCustomInventory", Inventory.class, EntityPlayer.class, Integer.TYPE);
-                openInventoryMethod.setAccessible(true);
-            }
-            catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return openInventoryMethod;
-    }
-
     public Menu() {
     }
 
@@ -122,38 +107,42 @@ public abstract class Menu {
 
     private void open(Player player) {
         Inventory inv = this.createInventory(player);
-
-        try {
-            //Menu.getOpenInventoryMethod().invoke((Object)player, new Object[]{inv, ep, 0});
-            player.openInventory(inv);
-            this.update(player);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        openInventories.put(player.getName(), inv);
+        player.openInventory(inv);
+        this.update(player, inv);
     }
 
     public void buttonUpdate(Player player) {
-        player.getOpenInventory().getTopInventory().setContents(this.createInventory(player).getContents());
+        Inventory inv = openInventories.get(player.getName());
+        if (inv != null) {
+            inv.setContents(this.createInventory(player).getContents());
+        }
     }
 
-    private void update(final Player player) {
+    private void update(final Player player, final Inventory inv) {
         Menu.cancelCheck(player);
         currentlyOpenedMenus.put(player.getName(), this);
         this.onOpen(player);
-        BukkitRunnable runnable = new BukkitRunnable(){
+
+        BukkitRunnable runnable = new BukkitRunnable() {
+            @Override
             public void run() {
                 if (!player.isOnline()) {
                     Menu.cancelCheck(player);
                     currentlyOpenedMenus.remove(player.getName());
+                    return;
                 }
+
                 if (Menu.this.isAutoUpdate()) {
-                    player.getOpenInventory().getTopInventory().setContents(Menu.this.createInventory(player).getContents());
+                    inv.setContents(Menu.this.createInventory(player).getContents());
                 }
             }
         };
+
         runnable.runTaskTimer(LibraryPlugin.getInstance().getPlugin(), 10L, 20L);
         checkTasks.put(player.getName(), runnable);
     }
+
 
     public static void cancelCheck(Player player) {
         if (checkTasks.containsKey(player.getName())) {
@@ -184,6 +173,7 @@ public abstract class Menu {
     }
 
     public void onClose(Player player) {
+        openInventories.remove(player.getName());
     }
 
     public ConcurrentHashMap<Integer, Button> getButtons() {
