@@ -15,12 +15,11 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
-        <module name="cLibraries-Parent" />
+        <module name="cLibraries" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cLib-Jedis" target="1.8" />
-      <module name="cLibraries" target="1.8" />
       <module name="clibraries-jedis" target="1.8" />
       <module name="cLibraries-Jedis" target="1.8" />
       <module name="clibraries-nms-v1_12_R1" target="1.8" />
@@ -40,8 +39,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="cLibraries" options="-parameters" />
-      <module name="cLibraries-Parent" options="" />
+      <module name="cLibraries" options="" />
       <module name="cLibraries-Plugin" options="-parameters" />
       <module name="clibraries-jedis" options="-parameters" />
       <module name="clibraries-nms-v1_12_R1" options="-parameters" />
