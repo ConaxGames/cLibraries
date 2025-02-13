@@ -5,7 +5,33 @@
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
     <version>dev</version>
+
     <name>cLibraries</name>
+    <description>A streamlined API tailored for PaperMC, providing powerful utilities and extensions to accelerate server development and fuel innovation.</description>
+    <url>https://github.com/ConaxGames/cLibraries</url>
+
+    <developers>
+        <developer>
+            <id>conaxgames</id>
+            <name>ConaxGames</name>
+            <email>admin@conaxgames.com</email>
+            <organization>ConaxGames</organization>
+            <organizationUrl>https://github.com/ConaxGames</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:github.com/ConaxGames/cLibraries.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ConaxGames/cLibraries.git</developerConnection>
+        <url>https://github.com/ConaxGames/cLibraries/tree/main</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/ConaxGames/cLibraries/blob/main/LICENSE</url>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -87,6 +113,7 @@
 
     <build>
         <finalName>cLibraries</finalName>
+
         <resources>
             <resource>
                 <targetPath>.</targetPath>
@@ -126,8 +153,41 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -142,6 +202,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -207,6 +268,30 @@
                     </execution>
                 </executions>
 
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.6</version>
+                <configuration>
+                    <bestPractices>true</bestPractices>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <signer>bc</signer>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
