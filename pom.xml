@@ -213,9 +213,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>ConaxGames - GitHub Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/ConaxGames/cLibraries</url>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
