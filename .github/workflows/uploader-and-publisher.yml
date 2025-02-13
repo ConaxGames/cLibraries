@@ -19,6 +19,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'zulu'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
       - uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: 'pom.xml'
@@ -26,7 +29,8 @@ jobs:
           replace: '<version>${{ github.ref_name }}</version>'
       - run: mvn --batch-mode --update-snapshots verify deploy
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
       - uses: softprops/action-gh-release@v2
         with:
           files: target/*.jar
