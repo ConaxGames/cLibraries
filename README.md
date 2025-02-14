@@ -15,7 +15,7 @@ To use cLibraries in your project, add the following dependency to your `pom.xml
 <dependency>
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <scope>compile</scope>
 </dependency>
 ```
