@@ -9,8 +9,12 @@ Conax Libraries (cLibraries) is a development library for Bukkit plugins. It off
 
 ## Implementation
 
-To use cLibraries in your project, add the following dependency to your `pom.xml`:
+To use cLibraries in your project, select your preferred build automation tool from the dropdown (_Maven_ or _Gradle_) to view the setup instructions.
 
+<details>
+    <summary>Maven</summary>
+
+Add the following lines to your `pom.xml` inside of `dependencies` block:
 ```xml
 <dependency>
     <groupId>com.conaxgames</groupId>
@@ -20,9 +24,7 @@ To use cLibraries in your project, add the following dependency to your `pom.xml
 </dependency>
 ```
 
-### Shading cLibraries
-
-Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the [maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/) with relocation in your project's `pom.xml`:
+Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the _[maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/)_ with relocation in your `pom.xml`:
 
 ```xml
 <configuration>
@@ -34,6 +36,22 @@ Because cLibraries must be shaded into your plugin to avoid conflicts, you shoul
     </relocations>
 </configuration>
 ```
+</details>
+
+<details>
+    <summary>Gradle</summary>
+
+Add the following lines to your `build.gradle` inside of `dependencies` block:
+```groovy
+compileOnly group: 'com.conaxgames', name: 'clibraries', version: '1.0.4'
+```
+
+Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the _[Shadow Plugin](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)_ with relocation in your `build.gradle`:
+
+```groovy
+relocate 'com.conaxgames.libraries', 'com.conaxgames.{x}.clib'
+```
+</details>
 
 ## Usage
 
