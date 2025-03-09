@@ -99,18 +99,12 @@ public abstract class Module {
      * @return true if this hook meets all the requirements to register
      */
     public boolean canRegister() {
-        String requiredPlugin = getRequiredPlugin();
-
-        if (requiredPlugin == null) {
+        if (getRequiredPlugin() == null || Bukkit.getPluginManager().isPluginEnabled(getRequiredPlugin())) {
             return true;
         }
-
-        if (Bukkit.getPluginManager().getPlugin(requiredPlugin) == null) {
-            library.getLibraryLogger().toConsole("ModuleManager",
-                    "Required plugin " + requiredPlugin + " is missing. Module " + getIdentifier() + " cannot be registered.");
-            return false;
-        }
-        return true;
+        library.getLibraryLogger().toConsole("ModuleManager",
+                "Required plugin " + getRequiredPlugin() + " is missing. Module " + getIdentifier() + " cannot be registered.");
+        return false;
     }
 
     public String getString(String path, String def) {
