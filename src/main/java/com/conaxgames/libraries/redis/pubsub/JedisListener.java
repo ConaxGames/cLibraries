@@ -1,17 +1,21 @@
 package com.conaxgames.libraries.redis.pubsub;
 
 import com.conaxgames.libraries.redis.JedisCredentials;
+import com.conaxgames.libraries.redis.JedisConnection;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import redis.clients.jedis.Jedis;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class JedisListener {
 
     private final JedisCredentials jedisSettings;
     private final String channel;
     private final Object parameter;
+    private final AtomicBoolean isRunning = new AtomicBoolean(true);
+    private Thread listenerThread;
 
     /**
      * Creates an instance with {@link JedisCredentials} and the targeted channel to listen to.
@@ -22,12 +26,7 @@ public abstract class JedisListener {
     public JedisListener(JedisCredentials jedisSettings, String channel, Object parameter) {
         this.jedisSettings = jedisSettings;
         this.channel = channel;
-        if (parameter == null) {
-            this.parameter = new JsonObject();
-        } else {
-            this.parameter = parameter;
-        }
-
+        this.parameter = parameter != null ? parameter : new JsonObject();
         this.listen();
     }
 
@@ -49,23 +48,33 @@ public abstract class JedisListener {
      * Starts listening to the channel.
      */
     private void listen() {
-        new Thread(() -> {
-            while (true) {
+        listenerThread = new Thread(() -> {
+            while (isRunning.get()) {
                 Jedis jedis = null;
                 try {
-                    jedis = JedisListener.this.jedisSettings.getJedisPool().getResource();
+                    jedis = this.jedisSettings.getJedisPool().getResource();
+                    List<String> messages = jedis.blpop(0, this.channel);
 
-                    try {
-                        List<String> messages = jedis.blpop(0, JedisListener.this.channel);
-
+                    if (messages != null && messages.size() >= 2) {
                         if (this.parameter instanceof JsonObject) {
-                            this.respond(messages.get(0), new JsonParser().parse(messages.get(1)).getAsJsonObject());
+                            try {
+                                this.respond(messages.get(0), new JsonParser().parse(messages.get(1)).getAsJsonObject());
+                            } catch (Exception e) {
+                                JedisConnection.getInstance().toConsole("JedisListener: Error parsing JSON message: " + e.getMessage());
+                            }
                         } else {
                             this.respond(messages.get(0), messages.get(1));
                         }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    if (isRunning.get()) {
+                        JedisConnection.getInstance().toConsole("JedisListener: Error processing message: " + e.getMessage());
+                        try {
+                            Thread.sleep(1000); // Wait before retrying
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
                     }
                 } finally {
                     if (jedis != null) {
@@ -73,6 +82,20 @@ public abstract class JedisListener {
                     }
                 }
             }
-        }).start();
+        });
+        listenerThread.setName("JedisListener-" + channel);
+        listenerThread.start();
+    }
+
+    public void shutdown() {
+        isRunning.set(false);
+        if (listenerThread != null) {
+            listenerThread.interrupt();
+            try {
+                listenerThread.join(5000); // Wait up to 5 seconds for the thread to finish
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
