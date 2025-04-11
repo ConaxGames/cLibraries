@@ -39,6 +39,9 @@ public class JedisSubscriber<K> {
 
     private JedisSubscriptionHandler<K> jedisSubscriptionHandler;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private volatile boolean isShutdown = false;
+
     /**
      * Requires the {@link JedisCredentials} and a channel to listen to.
      */
@@ -53,23 +56,25 @@ public class JedisSubscriber<K> {
         this.pubSub = new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
-                JedisSubscriptionGenerator<K> jedisSubscriptionGenerator = (JedisSubscriptionGenerator<K>) GENERATORS.get(typeParameter);
+                try {
+                    JedisSubscriptionGenerator<K> jedisSubscriptionGenerator = (JedisSubscriptionGenerator<K>) GENERATORS.get(typeParameter);
 
-                if (jedisSubscriptionGenerator != null) {
-                    K object = jedisSubscriptionGenerator.generateSubscription(message);
-                    if (object instanceof JsonObject) {
-                        // Use UniversalMessageTypeResolver with the relevant enums (e.g., MessageTypeEnum from lib)
-                        MessageTypeResolver resolver = new UniversalMessageTypeResolver(MessageTypeEnum.class);
-
-                        JedisSubscriber.this.jedisSubscriptionHandler.subscribe(
-                                object,
-                                new SubscribeObject().from((JsonObject) object, resolver)
-                        );
+                    if (jedisSubscriptionGenerator != null) {
+                        K object = jedisSubscriptionGenerator.generateSubscription(message);
+                        if (object instanceof JsonObject) {
+                            MessageTypeResolver resolver = new UniversalMessageTypeResolver(MessageTypeEnum.class);
+                            JedisSubscriber.this.jedisSubscriptionHandler.subscribe(
+                                    object,
+                                    new SubscribeObject().from((JsonObject) object, resolver)
+                            );
+                        } else {
+                            JedisConnection.getInstance().toConsole("JedisSubscriber: Received object is not of type JsonObject");
+                        }
                     } else {
-                        JedisConnection.getInstance().toConsole("JedisSubscriber: Received object is not of type JsonObject");
+                        JedisConnection.getInstance().toConsole("JedisSubscriber: Jedis GENERATOR Type was invalid");
                     }
-                } else {
-                    JedisConnection.getInstance().toConsole("JedisSubscriber: Jedis GENERATOR Type was invalid");
+                } catch (Exception e) {
+                    JedisConnection.getInstance().toConsole("JedisSubscriber: Error processing message: " + e.getMessage());
                 }
             }
         };
@@ -93,37 +98,46 @@ public class JedisSubscriber<K> {
      * Creates the thread for the {@link JedisPubSub} to be subscribed to on the channel which is targeted.
      */
     private void attemptConnect() {
+        if (isShutdown) return;
+        
         new Thread(() -> {
             try {
                 this.jedis.subscribe(this.pubSub, this.channel);
-                this.connection.toConsole("JedisSubscriber: Jedis is now reading on " + this.channel);
             } catch (Exception e) {
-                e.printStackTrace();
-                if (this.connection.isEnabled()) { // can't reconnect if plugin is disabled
-                    this.connection.toConsole("JedisSubscriber: Jedis channel (" + this.channel + ") has lost connection...");
-
-                    try {
-                        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-                        scheduler.scheduleAtFixedRate(() -> {
-                            JedisConnection jedisConnection = JedisConnection.getInstance();
-                            jedisConnection.toConsole("JedisSubscriber: Attempting to reconnect JedisSubscriber (" + channel + ")");
-
-                            this.closeConnection();
-                            this.attemptConnect();
-
-                            if (jedis != null && pubSub.isSubscribed()) {
-                                jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
-                                scheduler.shutdown();
-                            } else {
-                                jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") will attempt a reconnect in 15 seconds...");
-                            }
-                        }, 10, 10, TimeUnit.SECONDS);
-                    } catch (IllegalArgumentException exception) {
-                        this.connection.toConsole("Unable to define thread pool, can't start jedis-reconnect task...");
-                    }
+                this.connection.toConsole("JedisSubscriber: Connection failed for (" + this.channel + "): " + e.getMessage());
+                if (!isShutdown) {
+                    scheduleReconnect();
                 }
             }
         }).start();
+    }
+
+    private void scheduleReconnect() {
+        if (isShutdown) return;
+        
+        try {
+            scheduler.scheduleAtFixedRate(() -> {
+                if (isShutdown) {
+                    scheduler.shutdown();
+                    return;
+                }
+
+                JedisConnection jedisConnection = JedisConnection.getInstance();
+                jedisConnection.toConsole("JedisSubscriber: Attempting to reconnect JedisSubscriber (" + channel + ")");
+
+                this.closeConnection();
+                this.attemptConnect();
+
+                if (jedis != null && pubSub.isSubscribed()) {
+                    jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
+                    scheduler.shutdown();
+                } else {
+                    jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") will attempt a reconnect in 10 seconds...");
+                }
+            }, 10, 10, TimeUnit.SECONDS);
+        } catch (IllegalArgumentException exception) {
+            this.connection.toConsole("Unable to define thread pool, can't start jedis-reconnect task...");
+        }
     }
 
     /**
@@ -141,6 +155,20 @@ public class JedisSubscriber<K> {
         } catch (Exception e) {
             boolean pubSubConnected = (pubSub != null && pubSub.isSubscribed());
             this.connection.toConsole("JedisSubscriber: Unable to close connection for (" + this.channel + ")... is it still connected? " + pubSubConnected);
+        }
+    }
+
+    public void shutdown() {
+        isShutdown = true;
+        closeConnection();
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
