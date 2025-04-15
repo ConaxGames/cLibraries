@@ -2,36 +2,56 @@ package com.conaxgames.libraries.menu.pagination;
 
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
+import com.conaxgames.libraries.menu.buttons.BackButton;
 import com.conaxgames.libraries.menu.pagination.buttons.JumpToPageButton;
+import com.conaxgames.libraries.util.CC;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class ViewAllPagesMenu extends Menu {
 
-    PaginatedMenu menu;
+    private final PaginatedMenu menu;
+    private static final int ROWS = 6;
+    private static final int COLS = 9;
+    private static final int BACK_BUTTON_SLOT = 49;
 
-    public PaginatedMenu getMenu() {
-        return this.menu;
+    @ConstructorProperties(value={"menu"})
+    public ViewAllPagesMenu(PaginatedMenu menu) {
+        this.menu = menu;
+        setPlaceholder(true);
     }
 
     @Override
     public String getTitle(Player player) {
-        return this.menu.getPrePaginatedTitle(player);
+        return CC.GREEN + "View All Pages - " + this.menu.getPrePaginatedTitle(player);
     }
 
     @Override
     public Map<Integer, Button> getButtons(Player player) {
-        HashMap<Integer, Button> buttons = new HashMap<>();
-
-        //buttons.put(size(getButtons()) - 1, new BackButton(this.menu));
-
+        Map<Integer, Button> buttons = new HashMap<>();
+        
+        buttons.put(BACK_BUTTON_SLOT, new BackButton(this.menu));
+        int totalPages = this.menu.getPages(player);
+        int currentPage = this.menu.getPage();
+        
         int index = 0;
-        for (int pageNumber = 1; pageNumber <= this.menu.getPages(player); ++pageNumber) {
-            buttons.put(index++, new JumpToPageButton(pageNumber, this.menu));
+        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            if (index == BACK_BUTTON_SLOT) {
+                index++;
+            }
+            
+            JumpToPageButton button = new JumpToPageButton(pageNumber, this.menu);
+            if (pageNumber == currentPage) {
+                button.setGlowing(true);
+            }
+            buttons.put(index++, button);
         }
+        
         return buttons;
     }
 
@@ -39,16 +59,10 @@ public class ViewAllPagesMenu extends Menu {
     public boolean isAutoUpdate() {
         return true;
     }
-
-    @ConstructorProperties(value={"menu"})
-    public ViewAllPagesMenu(PaginatedMenu menu) {
-        this.menu = menu;
+    
+    @Override
+    public int size(Map<Integer, Button> buttons) {
+        return ROWS * COLS;
     }
-
-//    @Override
-//    public int size(Map<Integer, Button> buttons) {
-//        return 54;
-//        // this fixes the issue, bredda tell me where 45 is coming from
-//    }
 }
 
