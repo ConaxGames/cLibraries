@@ -103,7 +103,7 @@ public final class ItemUtil {
 
 	public static ItemStack hideEnchants(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
-		XItemFlag.decorationOnly(meta);
+		XItemFlag.HIDE_ENCHANTS.set(meta);
 		item.setItemMeta(meta);
 		return item;
 	}

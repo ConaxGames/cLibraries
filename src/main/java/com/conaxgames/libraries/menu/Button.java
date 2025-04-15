@@ -244,12 +244,8 @@ public abstract class Button {
             skullMeta.setOwner(skullOwner(player));
         }
 
-        if (hideAttributes(player)) {
+        if (hideAttributes(player) || hideEnchants(player)) {
             XItemFlag.decorationOnly(meta);
-        }
-
-        if (hideEnchants(player)) {
-            XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
         if (shinyItem(player)) {
