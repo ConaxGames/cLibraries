@@ -1,14 +1,13 @@
 package com.conaxgames.libraries.menu;
 
-import com.conaxgames.libraries.util.ItemFlagHelper;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XSound;
+import com.cryptomorin.xseries.XItemFlag;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -246,17 +245,16 @@ public abstract class Button {
         }
 
         if (hideAttributes(player)) {
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_DESTROYS,
-                    ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON, ItemFlagHelper.getHideTooltipFlag());
+            XItemFlag.decorationOnly(meta);
         }
 
         if (hideEnchants(player)) {
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
         if (shinyItem(player)) {
             meta.addEnchant(XEnchantment.UNBREAKING.getEnchant(), 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
         buttonItem.setItemMeta(meta);

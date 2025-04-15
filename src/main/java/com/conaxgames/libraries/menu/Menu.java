@@ -388,11 +388,7 @@ public abstract class Menu {
     private void applyItemFlags(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            XItemFlag.HIDE_ATTRIBUTES.set(meta);
-            XItemFlag.HIDE_DESTROYS.set(meta);
-            XItemFlag.HIDE_PLACED_ON.set(meta);
-            XItemFlag.HIDE_UNBREAKABLE.set(meta);
-            XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
+            XItemFlag.decorationOnly(meta);
             item.setItemMeta(meta);
         }
     }
