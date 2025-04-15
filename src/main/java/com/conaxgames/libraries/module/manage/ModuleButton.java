@@ -1,15 +1,14 @@
 package com.conaxgames.libraries.module.manage;
 
-import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class ModuleButton extends Button {
 
     @Override
     public Material getMaterial(Player var1) {
-        return (this.enabled ? Material.LIME_DYE : Material.RED_DYE);
+        return (this.enabled ? XMaterial.GREEN_DYE.get() : XMaterial.RED_DYE.get());
     }
 
     @Override
