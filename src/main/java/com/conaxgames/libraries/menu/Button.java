@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.menu;
 
 import com.cryptomorin.xseries.XEnchantment;
+import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import com.cryptomorin.xseries.XItemFlag;
 import com.google.common.base.Joiner;
@@ -227,7 +228,7 @@ public abstract class Button {
     public ItemStack getButtonItem(Player player) {
         Material material = this.getMaterial(player);
         if (material == null) {
-            material = Material.BEDROCK;
+            material = XMaterial.BEDROCK.get();
         }
 
         ItemStack buttonItem = new ItemStack(material, this.getAmount(player), (short)this.getDamageValue(player));

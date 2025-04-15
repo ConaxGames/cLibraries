@@ -7,13 +7,13 @@ import com.conaxgames.libraries.commands.impl.LibraryCommands;
 import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.EnchantmentProcessor;
 import com.conaxgames.libraries.util.PotionProcessor;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,13 +48,17 @@ public class CommandRegistry {
 
         commandManager.getCommandContexts().registerContext(ItemStack.class, c -> {
             String argument = c.popFirstArg();
-
-            Material material = Material.getMaterial(argument);
-            if (material != null) {
-                return new ItemStack(material);
-            } else {
-                throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
+            try {
+                XMaterial material = XMaterial.valueOf(argument);
+                Material parsedMaterial = material.get();
+                if (parsedMaterial != null) {
+                    return new ItemStack(parsedMaterial);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(e);
             }
+
+            throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
         });
 
         commandManager.getCommandContexts().registerContext(Enchantment.class, c -> {
@@ -106,7 +110,7 @@ public class CommandRegistry {
 
         commandManager.getCommandCompletions().registerAsyncCompletion("materials", c -> {
             List<String> values = new ArrayList<>();
-            for (Material material : Material.values()) {
+            for (XMaterial material : XMaterial.values()) {
                 values.add(material.name());
             }
             return values;

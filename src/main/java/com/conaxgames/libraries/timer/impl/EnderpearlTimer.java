@@ -3,6 +3,7 @@ package com.conaxgames.libraries.timer.impl;
 import com.conaxgames.libraries.message.TimeUtil;
 import com.conaxgames.libraries.timer.PlayerTimer;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
@@ -43,7 +44,7 @@ public class EnderpearlTimer extends PlayerTimer implements Listener {
 		}
 		Player player = event.getPlayer();
 
-		if (event.getItem().getType() == Material.ENDER_PEARL) {
+		if (event.getItem().getType() == XMaterial.ENDER_PEARL.get()) {
 			long cooldown = this.getRemaining(player);
 			if (cooldown > 0) {
 				event.setCancelled(true);
@@ -79,7 +80,7 @@ public class EnderpearlTimer extends PlayerTimer implements Listener {
 
 		event.getTo().setX((double) event.getTo().getBlockX() + 0.5D);
 		event.getTo().setZ((double) event.getTo().getBlockZ() + 0.5D);
-		if (event.getTo().getBlock().getType() != Material.AIR) {
+		if (event.getTo().getBlock().getType() != XMaterial.AIR.get()) {
 			event.getTo().setY(event.getTo().getY() - (event.getTo().getY() - event.getTo().getBlockY()));
 		}
 	}

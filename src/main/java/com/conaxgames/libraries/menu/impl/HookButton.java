@@ -3,6 +3,7 @@ package com.conaxgames.libraries.menu.impl;
 import com.conaxgames.libraries.hooks.Hook;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -48,6 +49,6 @@ public class HookButton extends Button {
 
     @Override
     public Material getMaterial(Player var1) {
-        return Material.BOOK;
+        return XMaterial.BOOK.get();
     }
 }
