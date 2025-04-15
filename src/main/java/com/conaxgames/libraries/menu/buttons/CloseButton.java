@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu.buttons;
 
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.util.CC;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -22,7 +23,7 @@ public class CloseButton extends Button {
 
     @Override
     public Material getMaterial(Player var1) {
-        return Material.BARRIER;
+        return XMaterial.BARRIER.get();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class ConfigButtonData {
     }
 
     public ItemBuilderUtil getItemBuilder(Player player) {
-        ItemBuilderUtil builder = new ItemBuilderUtil(this.material.parseMaterial());
+        ItemBuilderUtil builder = new ItemBuilderUtil(this.material.get());
         builder.setName(CC.translate(this.name));
         builder.setDurability((short) this.materialData);
 

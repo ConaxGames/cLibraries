@@ -37,7 +37,7 @@ public final class MenuBackButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return XMaterial.RED_BED.parseMaterial();
+        return XMaterial.RED_BED.get();
     }
 
     @Override

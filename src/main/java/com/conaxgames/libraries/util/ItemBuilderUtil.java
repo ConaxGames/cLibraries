@@ -198,7 +198,7 @@ public class ItemBuilderUtil {
 
     @Deprecated
     public ItemBuilderUtil setWoolColor(DyeColor color) {
-        if (!is.getType().equals(XMaterial.WHITE_WOOL.parseMaterial())) {
+        if (!is.getType().equals(XMaterial.WHITE_WOOL.get())) {
             return this;
         }
         this.is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5") ? color.getWoolData() : color.getDyeData());

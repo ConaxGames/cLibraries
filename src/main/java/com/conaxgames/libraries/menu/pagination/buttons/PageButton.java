@@ -62,7 +62,7 @@ public class PageButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return this.mod > 0 ? XMaterial.GREEN_DYE.parseMaterial() : XMaterial.RED_DYE.parseMaterial();
+        return this.mod > 0 ? XMaterial.GREEN_DYE.get() : XMaterial.RED_DYE.get();
     }
 
 }
