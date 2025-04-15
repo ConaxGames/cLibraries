@@ -1,8 +1,10 @@
-package com.conaxgames.libraries.menu;
+package com.conaxgames.libraries.menu.listener;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
 import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
+import com.conaxgames.libraries.menu.Button;
+import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.util.TaskUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
