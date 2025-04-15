@@ -386,6 +386,7 @@ public abstract class Menu {
      * @param item The item to apply flags to
      */
     private void applyItemFlags(ItemStack item) {
+        if (item == null) return;
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             XItemFlag.decorationOnly(meta);
