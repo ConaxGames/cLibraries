@@ -7,11 +7,23 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 public abstract class PaginatedMenu extends Menu {
     private int page = 1;
+    private Set<Integer> reservedRows = new HashSet<>(); // Set of specific rows to reserve
+
+    public void setReservedRows(int... rows) {
+        this.reservedRows.clear();
+        for (int row : rows) {
+            if (row >= 0 && row < 6) { // Valid rows are 0-5 (6 rows total)
+                this.reservedRows.add(row);
+            }
+        }
+    }
 
     @Override
     public String getTitle(Player player) {
@@ -62,7 +74,24 @@ public abstract class PaginatedMenu extends Menu {
         for (Map.Entry<Integer, Button> entry : this.getAllPagesButtons(player).entrySet()) {
             int ind = entry.getKey();
             if (ind < minIndex || ind >= maxIndex) continue;
-            buttons.put(ind -= (int)((double)this.getMaxItemsPerPage(player) * (double)(this.page - 1)) - 9, entry.getValue());
+            
+            // Calculate the target slot, skipping reserved rows
+            int targetSlot = ind - (int)((double)this.getMaxItemsPerPage(player) * (double)(this.page - 1));
+            int currentRow = targetSlot / 9;
+            int currentCol = targetSlot % 9;
+            
+            // Count how many reserved rows we need to skip before this slot
+            int skippedRows = 0;
+            for (int reservedRow : this.reservedRows) {
+                if (reservedRow < currentRow) {
+                    skippedRows++;
+                }
+            }
+            
+            // Adjust the slot by skipping reserved rows
+            targetSlot = (currentRow - skippedRows) * 9 + currentCol;
+            
+            buttons.put(targetSlot, entry.getValue());
         }
 
         Map<Integer, Button> global = this.getGlobalButtons(player);
@@ -76,7 +105,7 @@ public abstract class PaginatedMenu extends Menu {
     }
 
     public int getMaxItemsPerPage(Player player) {
-        return 18;
+        return 54 - (this.reservedRows.size() * 9); // Adjust max items based on number of reserved rows
     }
 
     public Map<Integer, Button> getGlobalButtons(Player player) {
@@ -89,6 +118,5 @@ public abstract class PaginatedMenu extends Menu {
 
     public abstract int previousPageSlot(Player var1);
     public abstract int nextPageSlot(Player var1);
-
 }
 
