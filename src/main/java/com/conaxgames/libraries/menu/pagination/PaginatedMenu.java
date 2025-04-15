@@ -3,11 +3,13 @@ package com.conaxgames.libraries.menu.pagination;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.menu.pagination.buttons.PageButton;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public abstract class PaginatedMenu extends Menu {
     private int page = 1;
 
@@ -88,8 +90,5 @@ public abstract class PaginatedMenu extends Menu {
     public abstract int previousPageSlot(Player var1);
     public abstract int nextPageSlot(Player var1);
 
-    public int getPage() {
-        return this.page;
-    }
 }
 
