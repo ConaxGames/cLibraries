@@ -67,7 +67,7 @@ public abstract class Menu {
      * Whether item attributes (enchantments, durability, etc.) should be hidden.
      * When true, all items will have their attributes hidden using XSeries item flags.
      */
-    private boolean hideItemAttributes = true;
+    private boolean hideItemAttributes = false;
     
     /**
      * Whether inventory click events should be cancelled.
