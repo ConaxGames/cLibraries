@@ -8,6 +8,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * A utility class for handling chat colors and formatting in Minecraft.
+ * This class provides a comprehensive set of color codes and formatting options,
+ * along with methods to translate color codes in text.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Basic color codes (e.g., RED, BLUE, GREEN)</li>
+ *   <li>Formatting codes (BOLD, ITALIC, UNDERLINE, etc.)</li>
+ *   <li>Combined formatting (e.g., B_RED for bold red)</li>
+ *   <li>Hex color support (using &#RRGGBB format)</li>
+ *   <li>Theme colors (PRIMARY, SECONDARY, TERTIARY)</li>
+ * </ul>
+ * 
+ * <p>Usage Examples:
+ * <pre>
+ * // Basic color usage
+ * String message = CC.RED + "Error: " + CC.GRAY + "Something went wrong";
+ * 
+ * // Formatting
+ * String title = CC.BOLD + CC.YELLOW + "Welcome!";
+ * 
+ * // Combined formatting
+ * String warning = CC.B_RED + "Warning!";
+ * 
+ * // Hex colors
+ * String hexText = CC.translate("&#FF0000Red Text");
+ * 
+ * // Theme colors
+ * String themed = CC.PRIMARY + "Main " + CC.SECONDARY + "Secondary " + CC.TERTIARY + "Tertiary";
+ * </pre>
+ * </p>
+ */
 public final class CC {
 
 	public static final String U = ChatColor.UNDERLINE.toString();
@@ -106,11 +139,30 @@ public final class CC {
 	public static String B_SECONDARY = SECONDARY + B;
 	public static String B_TERTIARY = TERTIARY + B;
 
+	/**
+	 * Translates color codes in a string, including hex colors.
+	 * Supports both standard Minecraft color codes (&) and hex colors (&#RRGGBB).
+	 *
+	 * @param string The text to translate
+	 * @return The translated text with all color codes applied
+	 * 
+	 * @example
+	 * <pre>
+	 * String colored = CC.translate("&cRed &6Gold &#FF0000Hex Red");
+	 * </pre>
+	 */
 	public static String translate(String string) {
-		String translatedHex = translateHex(string); // Your version-agnostic method
+		String translatedHex = translateHex(string);
 		return ChatColor.translateAlternateColorCodes('&', translatedHex);
 	}
 
+	/**
+	 * Translates hex color codes in the format &#RRGGBB to their corresponding color codes.
+	 * This is a private helper method used by the public translate method.
+	 *
+	 * @param message The text containing hex color codes
+	 * @return The text with hex colors translated
+	 */
 	private static String translateHex(String message) {
 		// Handle hexadecimal color codes in the format &#RRGGBB
 		Pattern hexPattern = Pattern.compile("&#[A-Fa-f0-9]{6}");
@@ -125,10 +177,33 @@ public final class CC {
 		return message; // Your default implementation (1.8 NMS behavior)
 	}
 
+	/**
+	 * Translates color codes in a list of strings.
+	 *
+	 * @param text List of strings to translate
+	 * @return List of translated strings
+	 * 
+	 * @example
+	 * <pre>
+	 * List<String> messages = Arrays.asList("&cRed", "&6Gold", "&aGreen");
+	 * List<String> colored = CC.translate(messages);
+	 * </pre>
+	 */
 	public static List<String> translate(List<String> text) {
 		return text.stream().map(CC::translate).collect(Collectors.toList());
 	}
 
+	/**
+	 * Translates color codes in multiple strings.
+	 *
+	 * @param text Variable number of strings to translate
+	 * @return List of translated strings
+	 * 
+	 * @example
+	 * <pre>
+	 * List<String> colored = CC.translate("&cRed", "&6Gold", "&aGreen");
+	 * </pre>
+	 */
 	public static List<String> translate(String... text) {
 		return translate(Arrays.asList(text));
 	}
