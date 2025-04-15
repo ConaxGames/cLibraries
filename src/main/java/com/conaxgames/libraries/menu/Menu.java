@@ -6,6 +6,8 @@ import com.conaxgames.libraries.menu.listener.ButtonListener;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.ItemFlagHelper;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XItemStack;
+import com.cryptomorin.xseries.XItemFlag;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +67,19 @@ public abstract class Menu {
             if (buttonEntry.getKey() > size) continue;
 
             try {
-                inv.setItem(buttonEntry.getKey(), buttonEntry.getValue().getButtonItem(player));
+                ItemStack item = buttonEntry.getValue().getButtonItem(player);
+                if (isHideItemAttributes()) {
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta != null) {
+                        XItemFlag.HIDE_ATTRIBUTES.set(meta);
+                        XItemFlag.HIDE_DESTROYS.set(meta);
+                        XItemFlag.HIDE_PLACED_ON.set(meta);
+                        XItemFlag.HIDE_UNBREAKABLE.set(meta);
+                        XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
+                        item.setItemMeta(meta);
+                    }
+                }
+                inv.setItem(buttonEntry.getKey(), item);
             } catch (ArrayIndexOutOfBoundsException e) {
                 LibraryPlugin.getInstance().getLibraryLogger().toConsole(
                         "Menu",
@@ -76,28 +90,23 @@ public abstract class Menu {
         }
 
         if (this.isPlaceholder()) {
-            // Fills gray stained glass in all empty slots (good for panel menus)
             Button placeholder = Button.placeholder(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), (byte) 7, CC.DARK_GRAY + "");
             for (int index = 0; index < size; ++index) {
                 if (invButtons.get(index) != null) continue;
                 this.buttons.put(index, placeholder);
-                inv.setItem(index, placeholder.getButtonItem(player));
-            }
-        }
-
-        if (isHideItemAttributes()) {
-            for (ItemStack item : inv.getContents()) {
-                if (item != null) {
-                    ItemMeta itemMeta = item.getItemMeta();
-                    if (itemMeta != null) {
-                        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                        itemMeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-                        itemMeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-                        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-                        itemMeta.addItemFlags(ItemFlagHelper.getHideTooltipFlag());
-                        item.setItemMeta(itemMeta);
+                ItemStack item = placeholder.getButtonItem(player);
+                if (isHideItemAttributes()) {
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta != null) {
+                        XItemFlag.HIDE_ATTRIBUTES.set(meta);
+                        XItemFlag.HIDE_DESTROYS.set(meta);
+                        XItemFlag.HIDE_PLACED_ON.set(meta);
+                        XItemFlag.HIDE_UNBREAKABLE.set(meta);
+                        XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
+                        item.setItemMeta(meta);
                     }
                 }
+                inv.setItem(index, item);
             }
         }
 
