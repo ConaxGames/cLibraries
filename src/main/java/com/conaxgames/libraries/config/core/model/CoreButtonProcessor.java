@@ -5,10 +5,12 @@ import com.conaxgames.libraries.config.core.CoreMenu;
 import com.conaxgames.libraries.hooks.HookType;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.Formatter;
+import com.cryptomorin.xseries.XItemStack;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -153,8 +155,17 @@ public class CoreButtonProcessor {
 
                 case "EMPTY_INVENTORY": {
                     if (type.equalsIgnoreCase("EMPTY_INVENTORY")) {
-                        if (!player.getInventory().isEmpty())
+                        boolean isEmpty = true;
+                        ItemStack[] contents = XItemStack.getStorageContents(player.getInventory());
+                        for (ItemStack item : contents) {
+                            if (XItemStack.notEmpty(item)) {
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+                        if (!isEmpty) {
                             denial.set(new CoreProcessorDenial(CC.RED + "You need an empty inventory to use this..."));
+                        }
                     }
                     break;
                 }
