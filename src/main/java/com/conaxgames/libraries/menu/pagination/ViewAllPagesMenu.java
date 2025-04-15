@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu.pagination;
 
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
+import com.conaxgames.libraries.menu.pagination.buttons.JumpToPageButton;
 import org.bukkit.entity.Player;
 
 import java.beans.ConstructorProperties;
