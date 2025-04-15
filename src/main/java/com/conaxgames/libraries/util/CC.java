@@ -9,36 +9,26 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * A utility class for handling chat colors and formatting in Minecraft.
- * This class provides a comprehensive set of color codes and formatting options,
- * along with methods to translate color codes in text.
+ * Utility class for Minecraft chat color and formatting operations.
+ * Provides static access to color codes, formatting options, and color translation methods.
  * 
- * <p>Features:
+ * <p>Technical Details:
  * <ul>
- *   <li>Basic color codes (e.g., RED, BLUE, GREEN)</li>
- *   <li>Formatting codes (BOLD, ITALIC, UNDERLINE, etc.)</li>
- *   <li>Combined formatting (e.g., B_RED for bold red)</li>
- *   <li>Hex color support (using &#RRGGBB format)</li>
- *   <li>Theme colors (PRIMARY, SECONDARY, TERTIARY)</li>
+ *   <li>Implements Bukkit's ChatColor system with additional formatting combinations</li>
+ *   <li>Supports hex color codes via &#RRGGBB format using BungeeCord's ChatColor API</li>
+ *   <li>Provides theme-based color constants (PRIMARY, SECONDARY, TERTIARY)</li>
+ *   <li>Includes combined formatting constants (e.g., B_RED, I_BLUE)</li>
+ *   <li>Thread-safe implementation with immutable constants</li>
  * </ul>
+ * </p>
  * 
- * <p>Usage Examples:
- * <pre>
- * // Basic color usage
- * String message = CC.RED + "Error: " + CC.GRAY + "Something went wrong";
- * 
- * // Formatting
- * String title = CC.BOLD + CC.YELLOW + "Welcome!";
- * 
- * // Combined formatting
- * String warning = CC.B_RED + "Warning!";
- * 
- * // Hex colors
- * String hexText = CC.translate("&#FF0000Red Text");
- * 
- * // Theme colors
- * String themed = CC.PRIMARY + "Main " + CC.SECONDARY + "Secondary " + CC.TERTIARY + "Tertiary";
- * </pre>
+ * <p>Implementation Notes:
+ * <ul>
+ *   <li>All color constants are pre-computed ChatColor.toString() values</li>
+ *   <li>Hex color translation uses regex pattern matching</li>
+ *   <li>List translation operations utilize Java 8+ Stream API</li>
+ *   <li>Color code translation supports both '&' and hex '&#' formats</li>
+ * </ul>
  * </p>
  */
 public final class CC {
@@ -145,11 +135,6 @@ public final class CC {
 	 *
 	 * @param string The text to translate
 	 * @return The translated text with all color codes applied
-	 * 
-	 * @example
-	 * <pre>
-	 * String colored = CC.translate("&cRed &6Gold &#FF0000Hex Red");
-	 * </pre>
 	 */
 	public static String translate(String string) {
 		String translatedHex = translateHex(string);
@@ -164,17 +149,15 @@ public final class CC {
 	 * @return The text with hex colors translated
 	 */
 	private static String translateHex(String message) {
-		// Handle hexadecimal color codes in the format &#RRGGBB
 		Pattern hexPattern = Pattern.compile("&#[A-Fa-f0-9]{6}");
 
-		// Handle hexadecimal color codes
 		Matcher hexMatcher = hexPattern.matcher(message);
 		while (hexMatcher.find()) {
-			String hexColor = hexMatcher.group().substring(2); // Remove "&#"
+			String hexColor = hexMatcher.group().substring(2);
 			message = message.replace(hexMatcher.group(), net.md_5.bungee.api.ChatColor.of("#" + hexColor).toString());
 		}
 
-		return message; // Your default implementation (1.8 NMS behavior)
+		return message;
 	}
 
 	/**
@@ -182,12 +165,6 @@ public final class CC {
 	 *
 	 * @param text List of strings to translate
 	 * @return List of translated strings
-	 * 
-	 * @example
-	 * <pre>
-	 * List<String> messages = Arrays.asList("&cRed", "&6Gold", "&aGreen");
-	 * List<String> colored = CC.translate(messages);
-	 * </pre>
 	 */
 	public static List<String> translate(List<String> text) {
 		return text.stream().map(CC::translate).collect(Collectors.toList());
@@ -198,11 +175,6 @@ public final class CC {
 	 *
 	 * @param text Variable number of strings to translate
 	 * @return List of translated strings
-	 * 
-	 * @example
-	 * <pre>
-	 * List<String> colored = CC.translate("&cRed", "&6Gold", "&aGreen");
-	 * </pre>
 	 */
 	public static List<String> translate(String... text) {
 		return translate(Arrays.asList(text));
