@@ -1,7 +1,8 @@
-package com.conaxgames.libraries.menu.pagination;
+package com.conaxgames.libraries.menu.pagination.buttons;
 
 import com.conaxgames.libraries.event.impl.menu.MenuButtonJumpToEvent;
 import com.conaxgames.libraries.menu.Button;
+import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
 import com.conaxgames.libraries.util.CC;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
