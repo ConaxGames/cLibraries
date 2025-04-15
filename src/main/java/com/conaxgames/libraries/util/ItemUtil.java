@@ -4,6 +4,7 @@ import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.message.ItemNameUtil;
 import com.conaxgames.libraries.message.TimeUtil;
 import com.cryptomorin.xseries.XItemFlag;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -41,7 +42,7 @@ public final class ItemUtil {
 	}
 
 	public static ItemStack createPotion(String name, PotionType type, int level, int duration) {
-		ItemStack itemStack = new ItemStack(Material.POTION);
+		ItemStack itemStack = new ItemStack(XMaterial.POTION.get());
 		PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
 
 		if (name != null) {

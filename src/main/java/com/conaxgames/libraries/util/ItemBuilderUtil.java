@@ -262,7 +262,7 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setSkin(String texture) {
-        if (is.getType() == Material.PLAYER_HEAD) {
+        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
             final SkullMeta meta = (SkullMeta) is.getItemMeta();
             if (meta != null) {
                 GameProfile profile = new GameProfile(UUID.randomUUID(), null);
