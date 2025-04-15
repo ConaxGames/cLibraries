@@ -69,15 +69,7 @@ public abstract class Menu {
             try {
                 ItemStack item = buttonEntry.getValue().getButtonItem(player);
                 if (isHideItemAttributes()) {
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta != null) {
-                        XItemFlag.HIDE_ATTRIBUTES.set(meta);
-                        XItemFlag.HIDE_DESTROYS.set(meta);
-                        XItemFlag.HIDE_PLACED_ON.set(meta);
-                        XItemFlag.HIDE_UNBREAKABLE.set(meta);
-                        XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
-                        item.setItemMeta(meta);
-                    }
+                    applyItemFlags(item);
                 }
                 inv.setItem(buttonEntry.getKey(), item);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -96,21 +88,29 @@ public abstract class Menu {
                 this.buttons.put(index, placeholder);
                 ItemStack item = placeholder.getButtonItem(player);
                 if (isHideItemAttributes()) {
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta != null) {
-                        XItemFlag.HIDE_ATTRIBUTES.set(meta);
-                        XItemFlag.HIDE_DESTROYS.set(meta);
-                        XItemFlag.HIDE_PLACED_ON.set(meta);
-                        XItemFlag.HIDE_UNBREAKABLE.set(meta);
-                        XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
-                        item.setItemMeta(meta);
-                    }
+                    applyItemFlags(item);
                 }
                 inv.setItem(index, item);
             }
         }
 
         return inv;
+    }
+
+    /**
+     * Applies all item flags to hide attributes and tooltips
+     * @param item The item to apply flags to
+     */
+    private void applyItemFlags(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            XItemFlag.HIDE_ATTRIBUTES.set(meta);
+            XItemFlag.HIDE_DESTROYS.set(meta);
+            XItemFlag.HIDE_PLACED_ON.set(meta);
+            XItemFlag.HIDE_UNBREAKABLE.set(meta);
+            XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
+            item.setItemMeta(meta);
+        }
     }
 
     /**
