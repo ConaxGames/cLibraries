@@ -51,7 +51,7 @@ public class BooleanButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return WoolUtil.convertChatColorToXClay(this.confirm ? ChatColor.GREEN : ChatColor.RED).parseMaterial();
+        return WoolUtil.convertChatColorToXClay(this.confirm ? ChatColor.GREEN : ChatColor.RED).get();
     }
 
     @ConstructorProperties(value={"confirm", "callback"})

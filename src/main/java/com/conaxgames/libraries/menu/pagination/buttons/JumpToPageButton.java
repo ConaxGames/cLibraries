@@ -56,7 +56,7 @@ public class JumpToPageButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return this.glowing ? XMaterial.WRITABLE_BOOK.parseMaterial() : XMaterial.BOOK.parseMaterial();
+        return this.glowing ? XMaterial.WRITABLE_BOOK.get() : XMaterial.BOOK.get();
     }
 
     @Override

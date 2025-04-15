@@ -56,7 +56,7 @@ public final class BooleanTraitButton<T> extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return XMaterial.INK_SAC.parseMaterial();
+        return XMaterial.INK_SAC.get();
     }
 
     @Override

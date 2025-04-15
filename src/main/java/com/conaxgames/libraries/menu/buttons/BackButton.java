@@ -32,7 +32,7 @@ public class BackButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return XMaterial.RED_BED.parseMaterial();
+        return XMaterial.RED_BED.get();
     }
 
     @Override

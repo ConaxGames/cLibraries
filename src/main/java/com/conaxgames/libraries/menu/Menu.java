@@ -164,7 +164,7 @@ public abstract class Menu {
         }
 
         if (this.isPlaceholder()) {
-            Button placeholder = Button.placeholder(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial(), (byte) 7, CC.DARK_GRAY + "");
+            Button placeholder = Button.placeholder(XMaterial.GRAY_STAINED_GLASS_PANE.get(), (byte) 7, CC.DARK_GRAY + "");
             for (int index = 0; index < size; ++index) {
                 if (invButtons.get(index) != null) continue;
                 this.buttons.put(index, placeholder);
