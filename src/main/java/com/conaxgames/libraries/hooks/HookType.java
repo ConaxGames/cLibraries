@@ -15,7 +15,6 @@ public enum HookType {
 
     /* CONAX */
     CSUITE,
-    CADDONS,
     CMIGRATION,
     ANTICRASH,
     ARENAPVP,
