@@ -22,7 +22,7 @@ public class BackButton extends Button {
 
     @Override
     public String getName(Player player) {
-        return CC.GREEN + "Back";
+        return CC.RED + "Back";
     }
 
     @Override
