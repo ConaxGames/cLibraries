@@ -250,7 +250,7 @@ public abstract class Button {
         }
 
         if (shinyItem(player)) {
-            meta.addEnchant(XEnchantment.UNBREAKING.getEnchant(), 1, true);
+            meta.addEnchant(XEnchantment.UNBREAKING.get(), 1, true);
             XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
