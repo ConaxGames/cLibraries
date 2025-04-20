@@ -1,17 +1,15 @@
 package com.conaxgames.libraries.util;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import static org.bukkit.Bukkit.getLogger;
 
 public class VersioningChecker {
 
+    @Getter
     private static final VersioningChecker instance = new VersioningChecker();
 
     private VersioningChecker() {}
-
-    public static VersioningChecker getInstance() {
-        return instance;
-    }
 
     public boolean isServerVersionBefore(String targetVersion) {
         return compareVersions(Bukkit.getBukkitVersion().split("-")[0], targetVersion) < 0;
