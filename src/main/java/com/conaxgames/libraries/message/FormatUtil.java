@@ -31,7 +31,7 @@ public enum FormatUtil {;
     }
 
     public static List<String> wordWrap(String s) {
-        return wordWrap(s, 24, 24);
+        return wordWrap(s, 32, 32);
     }
 
     public static List<String> wordWrap(String s, int lineSize) {
