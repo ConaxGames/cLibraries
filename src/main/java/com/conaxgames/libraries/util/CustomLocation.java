@@ -77,7 +77,11 @@ public class CustomLocation {
 
 			if (split.length >= 6) {
 				customLocation.setWorld(split[5]);
+			} else {
+				throw new IllegalArgumentException("World must be provided in the location string");
 			}
+		} else {
+			throw new IllegalArgumentException("World must be provided in the location string");
 		}
 		return customLocation;
 	}
