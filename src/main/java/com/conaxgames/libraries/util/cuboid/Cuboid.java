@@ -29,6 +29,9 @@ public class Cuboid implements Iterable<Location> {
      * @param l2 the other corner
      */
     public Cuboid(Location l1, Location l2) {
+        if (l1 == null || l2 == null || l1.getWorld() == null || l2.getWorld() == null) {
+            throw new IllegalArgumentException("Cuboid corners must have non-null worlds");
+        }
         this(l1.getWorld().getName(),
                 l1.getBlockX(), l1.getBlockY(), l1.getBlockZ(),
                 l2.getBlockX(), l2.getBlockY(), l2.getBlockZ());
