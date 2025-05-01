@@ -21,7 +21,6 @@ public class ConfirmMenu extends Menu {
         this.title = title;
         this.details = details;
         this.response = response;
-        setPlaceholder(true);
     }
 
     @Override

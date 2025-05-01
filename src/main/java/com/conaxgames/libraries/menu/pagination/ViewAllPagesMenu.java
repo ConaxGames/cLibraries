@@ -23,7 +23,6 @@ public class ViewAllPagesMenu extends Menu {
     @ConstructorProperties(value={"menu"})
     public ViewAllPagesMenu(PaginatedMenu menu) {
         this.menu = menu;
-        setPlaceholder(true);
     }
 
     @Override
