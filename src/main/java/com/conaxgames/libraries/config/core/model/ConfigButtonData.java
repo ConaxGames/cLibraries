@@ -8,6 +8,7 @@ import com.conaxgames.libraries.util.ItemBuilderUtil;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
@@ -27,12 +28,9 @@ public class ConfigButtonData {
     public final boolean shiny;
     public final List<String> lore;
 
+    @Setter
     public String skull64 = null;
 
-
-    public void setSkull64(String skull) {
-        this.skull64 = skull;
-    }
 
     public ItemBuilderUtil getItemBuilder(Player player) {
         ItemBuilderUtil builder = new ItemBuilderUtil(this.material.get());
