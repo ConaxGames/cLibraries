@@ -32,9 +32,14 @@ public class Cuboid implements Iterable<Location> {
         if (l1 == null || l2 == null || l1.getWorld() == null || l2.getWorld() == null) {
             throw new IllegalArgumentException("Cuboid corners must have non-null worlds");
         }
-        this(l1.getWorld().getName(),
-                l1.getBlockX(), l1.getBlockY(), l1.getBlockZ(),
-                l2.getBlockX(), l2.getBlockY(), l2.getBlockZ());
+        
+        this.worldName = l1.getWorld().getName();
+        this.x1 = Math.min(l1.getBlockX(), l2.getBlockX());
+        this.x2 = Math.max(l1.getBlockX(), l2.getBlockX());
+        this.y1 = Math.min(l1.getBlockY(), l2.getBlockY());
+        this.y2 = Math.max(l1.getBlockY(), l2.getBlockY());
+        this.z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());
+        this.z2 = Math.max(l1.getBlockZ(), l2.getBlockZ());
     }
 
     /**
