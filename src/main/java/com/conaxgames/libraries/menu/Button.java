@@ -180,7 +180,7 @@ public abstract class Button {
      * @return true to hide enchants, false to show them
      */
     public boolean hideEnchants(Player player) {
-        return false;
+        return true;
     }
 
     /**
@@ -189,7 +189,7 @@ public abstract class Button {
      * @return true to hide attributes, false to show them
      */
     public boolean hideAttributes(Player player) {
-        return false;
+        return true;
     }
 
     /**
@@ -246,7 +246,10 @@ public abstract class Button {
         }
 
         if (hideAttributes(player) || hideEnchants(player)) {
-            XItemFlag.decorationOnly(meta);
+            XItemFlag.HIDE_ATTRIBUTES.set(meta);
+            XItemFlag.HIDE_ATTRIBUTE_MODIFIERS.set(meta);
+            XItemFlag.HIDE_ADDITIONAL_TOOLTIP.set(meta);
+            XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
         if (shinyItem(player)) {

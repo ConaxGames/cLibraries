@@ -54,7 +54,6 @@ public final class ItemUtil {
 				CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
 
 		meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-		XItemFlag.decorationOnly(meta);
 		itemStack.setItemMeta(meta);
 		return itemStack;
 	}

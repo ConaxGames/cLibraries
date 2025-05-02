@@ -389,7 +389,6 @@ public abstract class Menu {
         if (item == null) return;
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            XItemFlag.decorationOnly(meta);
             item.setItemMeta(meta);
         }
     }
