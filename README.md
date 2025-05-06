@@ -1,20 +1,29 @@
 # cLibraries
 
-**Overview**  
-Conax Libraries (cLibraries) is a development library for Bukkit plugins. It offers various utilities and extended APIs designed to streamline development and reduce boilerplate code.
+## Overview
+cLibraries is a comprehensive development framework for Bukkit/PaperMC plugins that provides a robust set of utilities, APIs, and abstractions to accelerate Minecraft server plugin development. This library is designed to reduce boilerplate code, streamline common development tasks, and provide consistent patterns for plugin architecture.
 
-## Useful Links
-- **ConaxGames Website:** [https://www.conaxgames.com](https://www.conaxgames.com)
-- **ConaxGames Discord:** [https://discord.gg/fYZt22SmTp](https://discord.gg/fYZt22SmTp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java: 1.8+](https://img.shields.io/badge/Java-1.8%2B-blue.svg)](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
+[![Paper: Support](https://img.shields.io/badge/Paper-Support-green.svg)](https://papermc.io/)
 
-## Implementation
+## Features
 
-To use cLibraries in your project, select your preferred build automation tool from the dropdown (_Maven_ or _Gradle_) to view the setup instructions.
+- **Module System**: A flexible module architecture allowing for modular plugin design
+- **Command Framework**: Integration with ACF (Aikar's Command Framework) for powerful command registration
+- **Scoreboard API**: Simple yet powerful scoreboard management system
+- **Plugin Hooks**: Easy integration with other plugins through an extensible hooks system
+- **Redis Integration**: Built-in Redis connectivity for cross-server communication
+- **Menu/GUI Framework**: Streamlined inventory menu creation utilities
+- **Configuration Framework**: Simplified YAML configuration management
+- **Utility Classes**: Extensive collection of utility methods for common Minecraft plugin development tasks
+- **Event Framework**: Enhanced event management systems
+- **Timers & Countdowns**: Utilities for creating and managing in-game timers
 
-<details>
-    <summary>Maven</summary>
+## Installation
 
-Add the following lines to your `pom.xml` inside of `dependencies` block:
+### Maven
+
 ```xml
 <dependency>
     <groupId>com.conaxgames</groupId>
@@ -24,59 +33,181 @@ Add the following lines to your `pom.xml` inside of `dependencies` block:
 </dependency>
 ```
 
-Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the _[maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/)_ with relocation in your `pom.xml`:
+Since cLibraries must be shaded into your plugin to avoid conflicts, configure the Maven Shade Plugin with relocation:
 
 ```xml
-<configuration>
-    <relocations>
-        <relocation>
-            <pattern>com.conaxgames.libraries</pattern>
-            <shadedPattern>com.conaxgames.{x}.clib</shadedPattern>
-        </relocation>
-    </relocations>
-</configuration>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.4.1</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+            <configuration>
+                <relocations>
+                    <relocation>
+                        <pattern>com.conaxgames.libraries</pattern>
+                        <shadedPattern>com.yourpackage.libs.clib</shadedPattern>
+                    </relocation>
+                </relocations>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
 ```
-</details>
 
-<details>
-    <summary>Gradle</summary>
+### Gradle
 
-Add the following lines to your `build.gradle` inside of `dependencies` block:
 ```groovy
-compileOnly group: 'com.conaxgames', name: 'clibraries', version: '1.1.3'
-```
-
-Because cLibraries must be shaded into your plugin to avoid conflicts, you should configure the _[Shadow Plugin](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)_ with relocation in your `build.gradle`:
-
-```groovy
-relocate 'com.conaxgames.libraries', 'com.conaxgames.{x}.clib'
-```
-</details>
-
-## Usage
-
-### Initialization (onEnable)
-
-Inside your plugin’s `onEnable` method, initialize the library by creating a new `LibraryPlugin` instance and invoking `onEnable()`:
-
-```java
-@Override
-public void onEnable() {
-    library = new LibraryPlugin().onEnable(this);
-    // Your plugin-specific setup code...
+dependencies {
+    implementation 'com.conaxgames:clibraries:1.1.3'
 }
 ```
 
-### Shutdown (onDisable)
+Configure the Shadow plugin with relocation:
 
-In your plugin’s `onDisable` method, gracefully shut down the library:
-
-```java
-@Override
-public void onDisable() {
-    library.onDisable();
-    // Your plugin-specific teardown code...
+```groovy
+shadowJar {
+    relocate 'com.conaxgames.libraries', 'com.yourpackage.libs.clib'
 }
 ```
 
----
+## Integration
+
+### Initialization
+
+```java
+public class YourPlugin extends JavaPlugin {
+    
+    private LibraryPlugin libraryPlugin;
+    
+    @Override
+    public void onEnable() {
+        // Initialize cLibraries
+        this.libraryPlugin = new LibraryPlugin().onEnable(
+            this,                  // Your plugin instance
+            "YourDebugPrefix",     // Debug prefix
+            "YourDebugSecondary",  // Secondary debug info
+            "module",              // Module command alias
+            "yourplugin.modules"   // Module command permission
+        );
+        
+        // Your plugin initialization code
+    }
+    
+    @Override
+    public void onDisable() {
+        // Properly shutdown cLibraries
+        this.libraryPlugin.onDisable();
+        
+        // Your plugin shutdown code
+    }
+}
+```
+
+### Configuration
+
+The library supports a settings.yml file that can be used to configure various aspects of the library's functionality.
+
+```java
+// Access settings
+Settings settings = libraryPlugin.getSettings();
+```
+
+### Custom Scoreboard Implementation
+
+```java
+public class YourScoreboardAdapter extends BoardAdapter {
+    
+    @Override
+    public String getTitle(Player player) {
+        return "Your Server";
+    }
+    
+    @Override
+    public List<String> getLines(Player player) {
+        List<String> lines = new ArrayList<>();
+        lines.add("&aPlayer: &f" + player.getName());
+        lines.add("&aOnline: &f" + Bukkit.getOnlinePlayers().size());
+        // Add more lines
+        return lines;
+    }
+    
+    @Override
+    public long getInterval() {
+        return 2L; // Update interval in ticks
+    }
+}
+
+// Register your scoreboard adapter
+YourScoreboardAdapter adapter = new YourScoreboardAdapter();
+BoardManager boardManager = new BoardManager(libraryPlugin, adapter);
+libraryPlugin.setBoardManager(boardManager);
+```
+
+## Advanced Usage
+
+### Module Registration
+
+```java
+// Create a module
+public class YourModule extends Module {
+    
+    public YourModule() {
+        super("module-id", "Module Name", "Module description");
+    }
+    
+    @Override
+    public void onEnable() {
+        // Module initialization
+    }
+    
+    @Override
+    public void onDisable() {
+        // Module cleanup
+    }
+}
+
+// Register the module
+libraryPlugin.getModuleManager().registerModule(new YourModule());
+```
+
+### Command Registration
+
+```java
+// Create commands using ACF
+@CommandAlias("yourcommand")
+public class YourCommands extends BaseCommand {
+    
+    @Default
+    public void onCommand(Player player) {
+        player.sendMessage("Your command was executed!");
+    }
+    
+    @Subcommand("reload")
+    @CommandPermission("yourplugin.reload")
+    public void onReload(CommandSender sender) {
+        // Reload logic
+        sender.sendMessage("Reloaded configuration!");
+    }
+}
+
+// Register commands
+libraryPlugin.getCommandRegistry().registerCommand(new YourCommands());
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Links
+- [Issue Tracker](https://github.com/ConaxGames/cLibraries/issues)
+- [ConaxGames Website](https://www.conaxgames.com)
+- [ConaxGames Discord](https://discord.gg/fYZt22SmTp)
