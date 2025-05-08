@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
  */
 public final class CC {
 
+	// Hex color pattern for efficient reuse
+	private static final Pattern HEX_PATTERN = Pattern.compile("&#[A-Fa-f0-9]{6}");
+
 	public static final String U = ChatColor.UNDERLINE.toString();
 	public static final String BLUE = ChatColor.BLUE.toString();
 	public static final String AQUA = ChatColor.AQUA.toString();
@@ -149,9 +152,7 @@ public final class CC {
 	 * @return The text with hex colors translated
 	 */
 	private static String translateHex(String message) {
-		Pattern hexPattern = Pattern.compile("&#[A-Fa-f0-9]{6}");
-
-		Matcher hexMatcher = hexPattern.matcher(message);
+		Matcher hexMatcher = HEX_PATTERN.matcher(message);
 		while (hexMatcher.find()) {
 			String hexColor = hexMatcher.group().substring(2);
 			message = message.replace(hexMatcher.group(), net.md_5.bungee.api.ChatColor.of("#" + hexColor).toString());
