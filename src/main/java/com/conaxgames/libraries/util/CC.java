@@ -8,32 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for Minecraft chat color and formatting operations.
- * Provides static access to color codes, formatting options, and color translation methods.
- * 
- * <p>Technical Details:
- * <ul>
- *   <li>Implements Bukkit's ChatColor system with additional formatting combinations</li>
- *   <li>Supports hex color codes via &#RRGGBB format using BungeeCord's ChatColor API</li>
- *   <li>Provides theme-based color constants (PRIMARY, SECONDARY, TERTIARY)</li>
- *   <li>Includes combined formatting constants (e.g., B_RED, I_BLUE)</li>
- *   <li>Thread-safe implementation with immutable constants</li>
- * </ul>
- * </p>
- * 
- * <p>Implementation Notes:
- * <ul>
- *   <li>All color constants are pre-computed ChatColor.toString() values</li>
- *   <li>Hex color translation uses regex pattern matching</li>
- *   <li>List translation operations utilize Java 8+ Stream API</li>
- *   <li>Color code translation supports both '&' and hex '&#' formats</li>
- * </ul>
- * </p>
- */
 public final class CC {
 
-	// Hex color pattern for efficient reuse
 	private static final Pattern HEX_PATTERN = Pattern.compile("&#[A-Fa-f0-9]{6}");
 
 	public static final String U = ChatColor.UNDERLINE.toString();
