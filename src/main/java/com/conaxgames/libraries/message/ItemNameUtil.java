@@ -3,6 +3,7 @@ package com.conaxgames.libraries.message;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
+import org.apache.commons.lang.WordUtils;
 
 import java.util.Map;
 
@@ -629,35 +630,40 @@ public class ItemNameUtil {
 //    }
 
     private static final Map<String,String> potionmap = ImmutableMap.<String,String>builder()
-            .put("1", "Speed")
-            .put("2", "Slowness")
-            .put("3", "Haste")
-            .put("4", "Mining Fatigue")
-            .put("5", "Strength")
-            .put("6", "Instant Health")
-            .put("7", "Instant Damage")
-            .put("8", "Jump Boost")
-            .put("9", "Nausea")
-            .put("10", "Regeneration")
-            .put("11", "Resistance")
-            .put("12", "Fire Resistance")
-            .put("13", "Water Breathing")
-            .put("14", "Invisibility")
-            .put("15", "Blindness")
-            .put("16", "Night Vision")
-            .put("17", "Hunger")
-            .put("18", "Weakness")
-            .put("19", "Poison")
-            .put("20", "Wither")
-            .put("21", "Health Boost")
-            .put("22", "Absorption")
-            .put("23", "Saturation")
+            .put("speed", "Speed")
+            .put("slowness", "Slowness")
+            .put("haste", "Haste")
+            .put("mining_fatigue", "Mining Fatigue")
+            .put("strength", "Strength")
+            .put("instant_health", "Instant Health")
+            .put("instant_damage", "Instant Damage")
+            .put("jump_boost", "Jump Boost")
+            .put("nausea", "Nausea")
+            .put("regeneration", "Regeneration")
+            .put("resistance", "Resistance")
+            .put("fire_resistance", "Fire Resistance")
+            .put("water_breathing", "Water Breathing")
+            .put("invisibility", "Invisibility")
+            .put("blindness", "Blindness")
+            .put("night_vision", "Night Vision")
+            .put("hunger", "Hunger")
+            .put("weakness", "Weakness")
+            .put("poison", "Poison")
+            .put("wither", "Wither")
+            .put("health_boost", "Health Boost")
+            .put("absorption", "Absorption")
+            .put("saturation", "Saturation")
             .build();
 
     public static String potionLookup(PotionEffectType potion) {
         String result;
-        String key = Integer.toString(potion.getId());
+        String key = potion.getName().toLowerCase();
         result = potionmap.get(key);
+        
+        if (result == null) {
+            result = WordUtils.capitalizeFully(potion.getName().replace("_", " "));
+        }
+        
         return result;
     }
 
