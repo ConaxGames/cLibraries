@@ -78,13 +78,16 @@ public class CustomLocation {
 			float pitch = 0.0f;
 			String world = "world";
 
-			if (split.length >= 5) {
+			if (split.length >= 4 && !split[3].contains(".")) {
+				world = split[3];
+			}
+			else if (split.length >= 5) {
 				yaw = Float.parseFloat(split[3]);
 				pitch = Float.parseFloat(split[4]);
-			}
 
-			if (split.length >= 6) {
-				world = split[5];
+				if (split.length >= 6) {
+					world = split[5];
+				}
 			}
 
 			return new CustomLocation(world, x, y, z, yaw, pitch);
