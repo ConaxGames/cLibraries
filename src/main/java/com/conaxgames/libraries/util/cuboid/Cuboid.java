@@ -85,6 +85,9 @@ public class Cuboid implements Iterable<Location> {
      */
     public Cuboid(Map<String, Object> map) {
         this.worldName = (String) map.get("worldName");
+        if (Bukkit.getWorld(this.worldName) == null) {
+            throw new IllegalArgumentException("World '" + this.worldName + "' is not loaded");
+        }
         this.x1 = (int) map.get("x1");
         this.x2 = (int) map.get("x2");
         this.y1 = (int) map.get("y1");
