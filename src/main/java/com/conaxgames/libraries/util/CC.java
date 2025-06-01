@@ -157,4 +157,18 @@ public final class CC {
 		return translate(Arrays.asList(text));
 	}
 
+	/**
+	 * Strips all color codes from a string, including hex colors.
+	 *
+	 * @param input The text to strip colors from
+	 * @return The text with all color codes removed
+	 */
+	public static String stripAllColor(String input) {
+		if (input == null) return null;
+		input = input.replaceAll("(?i)&#[0-9a-f]{6}", "");
+		input = input.replaceAll("(?i)§x(§[0-9a-f]){6}", "");
+		input = input.replaceAll("(?i)[&§][0-9a-fk-or]", "");
+		return ChatColor.stripColor(input);
+	}
+
 }
