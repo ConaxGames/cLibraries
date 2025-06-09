@@ -42,7 +42,12 @@ public class ConfigButtonData {
             if (LibraryPlugin.getInstance().getHookManager().isHooked(HookType.PLACEHOLDERAPI)) {
                 translated = PlaceholderAPI.setPlaceholders(player, translated);
             }
-            builder.addLoreLineList(FormatUtil.wordWrap(CC.translate(translated)));
+            // If the line starts with whitespace, preserve it by not using wordWrap
+            if (s.startsWith(" ") || s.startsWith("\t")) {
+                builder.addLoreLine(CC.translate(translated));
+            } else {
+                builder.addLoreLineList(FormatUtil.wordWrap(CC.translate(translated)));
+            }
         });
 
         if (this.getMaterial().equals(XMaterial.PLAYER_HEAD) && this.skull64 != null) {
