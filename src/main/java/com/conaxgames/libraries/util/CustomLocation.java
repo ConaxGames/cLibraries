@@ -116,9 +116,9 @@ public class CustomLocation {
 	}
 
 	public Location toBukkitLocation() {
-		World bukkitWorld = toBukkitWorld();
+		World bukkitWorld = Bukkit.getServer().getWorld(this.world);
 		if (bukkitWorld == null) {
-			throw new IllegalStateException("World '" + world + "' is not loaded");
+			return null;
 		}
 		return new Location(bukkitWorld, this.x, this.y, this.z, this.yaw, this.pitch);
 	}
