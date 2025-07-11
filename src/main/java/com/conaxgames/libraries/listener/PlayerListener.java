@@ -2,15 +2,14 @@ package com.conaxgames.libraries.listener;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.board.Board;
+import com.conaxgames.libraries.board.BoardEntry;
 import com.conaxgames.libraries.event.impl.FakeDeathEvent;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -32,7 +31,7 @@ public class PlayerListener implements Listener {
     public void onPlayerKick(PlayerKickEvent event) {
         Player player = event.getPlayer();
         if (library.getBoardManager() != null) {
-            library.getBoardManager().getPlayerBoards().remove(player.getUniqueId());
+            cleanupPlayerBoard(player);
         }
     }
 
@@ -40,6 +39,19 @@ public class PlayerListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         if (library.getBoardManager() != null) {
+            cleanupPlayerBoard(player);
+        }
+    }
+
+    private void cleanupPlayerBoard(Player player) {
+        Board board = library.getBoardManager().getPlayerBoards().get(player.getUniqueId());
+        if (board != null) {
+            // Clean up all board entries first
+            if (!board.getEntries().isEmpty()) {
+                board.getEntries().forEach(BoardEntry::remove);
+                board.getEntries().clear();
+            }
+            // Remove board from map
             library.getBoardManager().getPlayerBoards().remove(player.getUniqueId());
         }
     }

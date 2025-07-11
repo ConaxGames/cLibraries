@@ -114,13 +114,14 @@ public class LibraryPlugin {
      * 
      * @param boardManager The board manager instance
      */
-    public void setBoardManager(BoardManager boardManager) {
-        this.boardManager = boardManager;
-        long interval = this.boardManager.getAdapter().getInterval();
-        this.plugin.getServer().getScheduler().runTaskTimerAsynchronously(
-            this.plugin, this.boardManager, 0L, interval
-        );
-    }
+    	public void setBoardManager(BoardManager boardManager) {
+		this.boardManager = boardManager;
+		long interval = this.boardManager.getAdapter().getInterval();
+		// Run synchronously to avoid thread safety issues with scoreboard modifications
+		this.plugin.getServer().getScheduler().runTaskTimer(
+			this.plugin, this.boardManager, 0L, interval
+		);
+	}
 
     // Private helper methods
 

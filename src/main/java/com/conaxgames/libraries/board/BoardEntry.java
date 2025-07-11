@@ -34,8 +34,24 @@ public class BoardEntry {
 		Scoreboard scoreboard = this.board.getScoreboard();
 
 		String teamName = this.key;
+		// Team names must be 16 characters or less and cannot contain certain characters
 		if (teamName.length() > 16) {
 			teamName = teamName.substring(0, 16);
+		}
+		// Remove invalid characters for team names
+		teamName = teamName.replaceAll("[^a-zA-Z0-9_.-]", "");
+		
+		// Ensure team name is not empty after filtering
+		if (teamName.isEmpty()) {
+			teamName = "board_" + System.currentTimeMillis() % 10000;
+		}
+
+		// Ensure unique team name by adding counter if needed
+		String originalTeamName = teamName;
+		int counter = 1;
+		while (scoreboard.getTeam(teamName) != null && !scoreboard.getTeam(teamName).getEntries().contains(this.key)) {
+			teamName = originalTeamName.substring(0, Math.min(originalTeamName.length(), 14)) + counter;
+			counter++;
 		}
 
 		if (scoreboard.getTeam(teamName) != null) {
@@ -59,9 +75,21 @@ public class BoardEntry {
 		Objective objective = board.getObjective();
 		String preSplit = CC.translate(text);
 		String[] split = this.splitText(preSplit);
-		this.team.setPrefix(split[0]);
-		this.team.setSuffix(split[1]);
-		this.team.addEntry(ChatColor.translateAlternateColorCodes('&', "&a"));
+		
+		// Validate prefix and suffix lengths to prevent protocol errors
+		String prefix = split[0];
+		String suffix = split[1];
+		
+		// Modern Minecraft has stricter limits - ensure we don't exceed them
+		if (prefix.length() > 64) {
+			prefix = prefix.substring(0, 64);
+		}
+		if (suffix.length() > 64) {
+			suffix = suffix.substring(0, 64);
+		}
+		
+		this.team.setPrefix(prefix);
+		this.team.setSuffix(suffix);
 
 		Score score = objective.getScore(this.key);
 		score.setScore(position);
@@ -72,6 +100,23 @@ public class BoardEntry {
 	public void remove() {
 		this.board.getKeys().remove(this.key);
 		this.board.getScoreboard().resetScores(this.key);
+		
+		// Remove entry from team and unregister empty teams
+		if (this.team != null) {
+			try {
+				// Check if the team still contains this entry before removing
+				if (this.team.getEntries().contains(this.key)) {
+					this.team.removeEntry(this.key);
+				}
+				// Only unregister if team is empty and still registered
+				if (this.team.getEntries().isEmpty() && this.board.getScoreboard().getTeam(this.team.getName()) != null) {
+					this.team.unregister();
+				}
+			} catch (IllegalStateException e) {
+				// Team might have been already removed or player not on team
+				// This is expected behavior in some edge cases
+			}
+		}
 	}
 
     public Board getBoard() {
