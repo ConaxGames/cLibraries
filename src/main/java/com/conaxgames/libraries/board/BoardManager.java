@@ -24,6 +24,9 @@ public class BoardManager implements Runnable {
 	public void run() {
 		this.adapter.preLoop();
 		for (Player player : LibraryPlugin.getInstance().getPlugin().getServer().getOnlinePlayers()) {
+			if (player == null || !player.isOnline()) {
+				continue;
+			}
 			Board board = this.playerBoards.get(player.getUniqueId());
 			if (board == null) {
 				continue;
@@ -58,20 +61,31 @@ public class BoardManager implements Runnable {
 						int position = i + 1;
 
 						for (BoardEntry boardEntry : new LinkedList<>(board.getEntries())) {
-							Score score = objective.getScore(boardEntry.getKey());
+							try {
+								Score score = objective.getScore(boardEntry.getKey());
 
-							if (score != null && boardEntry.getText().equals(text)) {
-								if (score.getScore() == position) {
-									continue forILoop;
+								if (score != null && boardEntry.getText().equals(text)) {
+									if (score.getScore() == position) {
+										continue forILoop;
+									}
 								}
+							} catch (Exception e) {
+								// Score might be invalid or player disconnected
+								continue;
 							}
 						}
 
 						Iterator<BoardEntry> iter = board.getEntries().iterator();
 						while (iter.hasNext()) {
 							BoardEntry boardEntry = iter.next();
-							int entryPosition = scoreboard.getObjective(DisplaySlot.SIDEBAR).getScore(boardEntry.getKey()).getScore();
-							if (entryPosition > scores.size()) {
+							try {
+								int entryPosition = scoreboard.getObjective(DisplaySlot.SIDEBAR).getScore(boardEntry.getKey()).getScore();
+								if (entryPosition > scores.size()) {
+									boardEntry.remove();
+									iter.remove();
+								}
+							} catch (Exception e) {
+								// Score might be invalid, remove the entry
 								boardEntry.remove();
 								iter.remove();
 							}
@@ -90,7 +104,7 @@ public class BoardManager implements Runnable {
 							iter = board.getEntries().iterator();
 							while (iter.hasNext()) {
 								BoardEntry boardEntry = iter.next();
-								if (!scores.contains(boardEntry.getText()) || Collections.frequency(board.getBoardEntriesFormatted(), boardEntry.getText()) > 1) {
+								if (!scores.contains(boardEntry.getText())) {
 									boardEntry.remove();
 									iter.remove();
 								}
