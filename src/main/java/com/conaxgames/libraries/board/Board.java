@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Board {
 
@@ -23,20 +21,11 @@ public class Board {
 	private Set<String> keys = new HashSet<>();
 	private Scoreboard scoreboard;
 	private Objective objective;
-	
-	// Performance optimizations
-	private static final AtomicInteger keyCounter = new AtomicInteger(0);
-	private static final ChatColor[] COLOR_ARRAY = ChatColor.values();
-	private static final ConcurrentHashMap<String, String> keyCache = new ConcurrentHashMap<>();
-	private static final int MAX_KEYS = 1000;
-	
-	// Memory management
-	private long lastCleanup = System.currentTimeMillis();
-	private static final long CLEANUP_INTERVAL = 300000; // 5 minutes
 
 	public Board(Player player, BoardAdapter adapter) {
 		this.adapter = adapter;
 		this.player = player;
+
 		this.init();
 	}
 
@@ -50,64 +39,46 @@ public class Board {
 
 		this.objective = this.scoreboard.registerNewObjective("Default", "dummy");
 		this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
 		this.objective.setDisplayName(this.adapter.getTitle(player));
 	}
 
 	public String getNewKey(BoardEntry entry) {
-		// Check cache first
-		String cacheKey = entry.getText().hashCode() + "";
-		String cachedKey = keyCache.get(cacheKey);
-		if (cachedKey != null && !keys.contains(cachedKey)) {
-			keys.add(cachedKey);
-			return cachedKey;
-		}
-		
-		// Generate new key
-		int counter = keyCounter.getAndIncrement();
-		int colorIndex = counter % COLOR_ARRAY.length;
-		ChatColor color = COLOR_ARRAY[colorIndex];
-		
-		String colorText = color + "" + ChatColor.WHITE;
+		for (ChatColor color : ChatColor.values()) {
+			String colorText = color + "" + ChatColor.WHITE;
 
-		if (entry.getText().length() > 16) {
-			String sub = entry.getText().substring(0, 16);
-			colorText = colorText + ChatColor.getLastColors(sub);
+			if (entry.getText().length() > 16) {
+				String sub = entry.getText().substring(0, 16);
+				colorText = colorText + ChatColor.getLastColors(sub);
+			}
+
+			if (!keys.contains(colorText)) {
+				keys.add(colorText);
+				return colorText;
+			}
 		}
 
-		// Ensure uniqueness by adding counter if needed
-		String baseKey = colorText;
-		int suffix = 0;
-		while (keys.contains(colorText)) {
-			colorText = baseKey + suffix;
-			suffix++;
-		}
-		
-		keys.add(colorText);
-		
-		// Cache the key for future use
-		keyCache.put(cacheKey, colorText);
-		
-		// Clean up cache if it gets too large
-		if (keyCache.size() > MAX_KEYS) {
-			keyCache.clear();
-		}
-		
-		return colorText;
+		throw new IndexOutOfBoundsException("No more keys available!");
 	}
 
 	public List<String> getBoardEntriesFormatted() {
-		List<String> toReturn = new ArrayList<>(entries.size());
-		for (BoardEntry entry : entries) {
+		List<String> toReturn = new ArrayList<>();
+
+		for (BoardEntry entry : new ArrayList<>(entries)) {
 			toReturn.add(entry.getText());
 		}
+
 		return toReturn;
 	}
 
 	public BoardEntry getByPosition(int position) {
-		if (position < 0 || position >= entries.size()) {
-			return null;
+		for (int i = 0; i < this.entries.size(); i++) {
+			if (i == position) {
+				return this.entries.get(i);
+			}
 		}
-		return this.entries.get(position);
+
+		return null;
 	}
 
 	public BoardTimer getCooldown(String id) {
@@ -116,32 +87,13 @@ public class Board {
 				return cooldown;
 			}
 		}
+
 		return null;
 	}
 
 	public Set<BoardTimer> getTimers() {
 		this.timers.removeIf(cooldown -> System.currentTimeMillis() >= cooldown.getEnd());
 		return this.timers;
-	}
-	
-	// Memory cleanup
-	public void cleanup() {
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - lastCleanup > CLEANUP_INTERVAL) {
-			// Remove unused keys
-			Set<String> usedKeys = new HashSet<>();
-			for (BoardEntry entry : entries) {
-				usedKeys.add(entry.getKey());
-			}
-			keys.retainAll(usedKeys);
-			
-			// Clear old cache entries
-			if (keyCache.size() > MAX_KEYS / 2) {
-				keyCache.clear();
-			}
-			
-			lastCleanup = currentTime;
-		}
 	}
 
 	public BoardAdapter getAdapter() {

@@ -9,117 +9,113 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @Accessors(chain = true)
 public class BoardEntry {
 
 	private final Board board;
+
 	private final String originalText;
+
 	private Team team;
+
 	private String text;
 	private String key;
-	
-	// Static counter for unique team names
-	private static final AtomicInteger teamCounter = new AtomicInteger(0);
 
 	public BoardEntry(Board board, String text) {
 		this.board = board;
 		this.text = text;
 		this.originalText = text;
 		this.key = board.getNewKey(this);
+
 		this.setup();
 	}
 
 	public BoardEntry setup() {
 		Scoreboard scoreboard = this.board.getScoreboard();
+
+		String teamName = this.key;
+		// Team names must be 16 characters or less and cannot contain certain characters
+		if (teamName.length() > 16) {
+			teamName = teamName.substring(0, 16);
+		}
+		// Remove invalid characters for team names
+		teamName = teamName.replaceAll("[^a-zA-Z0-9_.-]", "");
 		
-		// Generate unique team name efficiently
-		String teamName = generateUniqueTeamName();
-		
-		// Get or create team
-		Team existingTeam = scoreboard.getTeam(teamName);
-		if (existingTeam != null) {
-			this.team = existingTeam;
+		// Ensure team name is not empty after filtering
+		if (teamName.isEmpty()) {
+			teamName = "board_" + System.currentTimeMillis() % 10000;
+		}
+
+		// Ensure unique team name by adding counter if needed
+		String originalTeamName = teamName;
+		int counter = 1;
+		while (scoreboard.getTeam(teamName) != null && !scoreboard.getTeam(teamName).getEntries().contains(this.key)) {
+			teamName = originalTeamName.substring(0, Math.min(originalTeamName.length(), 14)) + counter;
+			counter++;
+		}
+
+		if (scoreboard.getTeam(teamName) != null) {
+			this.team = scoreboard.getTeam(teamName);
 		} else {
 			this.team = scoreboard.registerNewTeam(teamName);
 		}
 
-		// Add entry to team if not already present
-		if (!this.team.getEntries().contains(this.key)) {
+		if (!(this.team.getEntries().contains(this.key))) {
 			this.team.addEntry(this.key);
 		}
 
-		// Add to board entries if not already present
-		if (!this.board.getEntries().contains(this)) {
+		if (!(this.board.getEntries().contains(this))) {
 			this.board.getEntries().add(this);
 		}
 
 		return this;
 	}
-	
-	private String generateUniqueTeamName() {
-		// Use atomic counter for guaranteed uniqueness
-		int counter = teamCounter.getAndIncrement();
-		return "board_" + (counter % 10000);
-	}
 
 	public BoardEntry send(int position) {
-		try {
-			Objective objective = board.getObjective();
-			String preSplit = CC.translate(text);
-			String[] split = this.splitText(preSplit);
-			
-			// Validate and limit prefix/suffix lengths
-			String prefix = validateLength(split[0], 64);
-			String suffix = validateLength(split[1], 64);
-			
-			this.team.setPrefix(prefix);
-			this.team.setSuffix(suffix);
-
-			Score score = objective.getScore(this.key);
-			score.setScore(position);
-		} catch (Exception e) {
-			// Log error but don't crash
-			board.getPlayer().getServer().getLogger().warning(
-				"Error updating scoreboard entry for " + board.getPlayer().getName() + ": " + e.getMessage()
-			);
+		Objective objective = board.getObjective();
+		String preSplit = CC.translate(text);
+		String[] split = this.splitText(preSplit);
+		
+		// Validate prefix and suffix lengths to prevent protocol errors
+		String prefix = split[0];
+		String suffix = split[1];
+		
+		// Modern Minecraft has stricter limits - ensure we don't exceed them
+		if (prefix.length() > 64) {
+			prefix = prefix.substring(0, 64);
 		}
+		if (suffix.length() > 64) {
+			suffix = suffix.substring(0, 64);
+		}
+		
+		this.team.setPrefix(prefix);
+		this.team.setSuffix(suffix);
+
+		Score score = objective.getScore(this.key);
+		score.setScore(position);
 
 		return this;
 	}
-	
-	private String validateLength(String input, int maxLength) {
-		if (input == null) return "";
-		return input.length() > maxLength ? input.substring(0, maxLength) : input;
-	}
 
 	public void remove() {
-		try {
-			this.board.getKeys().remove(this.key);
-			this.board.getScoreboard().resetScores(this.key);
-			
-			// Clean up team
-			if (this.team != null) {
-				try {
-					if (this.team.getEntries().contains(this.key)) {
-						this.team.removeEntry(this.key);
-					}
-					
-					// Only unregister if team is empty and still registered
-					if (this.team.getEntries().isEmpty() && 
-						this.board.getScoreboard().getTeam(this.team.getName()) != null) {
-						this.team.unregister();
-					}
-				} catch (IllegalStateException e) {
-					// Team might have been already removed - this is expected in some cases
+		this.board.getKeys().remove(this.key);
+		this.board.getScoreboard().resetScores(this.key);
+		
+		// Remove entry from team and unregister empty teams
+		if (this.team != null) {
+			try {
+				// Check if the team still contains this entry before removing
+				if (this.team.getEntries().contains(this.key)) {
+					this.team.removeEntry(this.key);
 				}
+				// Only unregister if team is empty and still registered
+				if (this.team.getEntries().isEmpty() && this.board.getScoreboard().getTeam(this.team.getName()) != null) {
+					this.team.unregister();
+				}
+			} catch (IllegalStateException e) {
+				// Team might have been already removed or player not on team
+				// This is expected behavior in some edge cases
 			}
-		} catch (Exception e) {
-			// Log error but don't crash
-			board.getPlayer().getServer().getLogger().warning(
-				"Error removing scoreboard entry for " + board.getPlayer().getName() + ": " + e.getMessage()
-			);
 		}
 	}
 
@@ -148,7 +144,7 @@ public class BoardEntry {
         return this;
     }
 
-	public String[] splitText(String input) {
+	public String[] splitText(String input) { // allows up-to 32 chars length on under 1.16 server version
 		final int inputLength = input.length();
 		if (inputLength > 16) {
 			String prefix = input.substring(0, 16);
@@ -162,7 +158,6 @@ public class BoardEntry {
 				suffix = ChatColor.getLastColors(prefix) + input.substring(16);
 			}
 
-			// Apply version-specific length limits
 			if (VersioningChecker.getInstance().isServerVersionBefore("1.16.5")) {
 				if (suffix.length() > 16) {
 					suffix = suffix.substring(0, 16);
