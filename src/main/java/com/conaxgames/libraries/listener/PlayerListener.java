@@ -22,6 +22,12 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        
+        // Skip board creation for players with cElement metadata
+        if (player.hasMetadata("cElement")) {
+            return;
+        }
+        
         if (library.getBoardManager() != null) {
             library.getBoardManager().getPlayerBoards().put(player.getUniqueId(), new Board(player, library.getBoardManager().getAdapter()));
         }
