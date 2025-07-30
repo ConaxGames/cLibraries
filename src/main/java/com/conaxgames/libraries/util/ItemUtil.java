@@ -3,7 +3,6 @@ package com.conaxgames.libraries.util;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.message.ItemNameUtil;
 import com.conaxgames.libraries.message.TimeUtil;
-import com.cryptomorin.xseries.XItemFlag;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -54,7 +53,6 @@ public final class ItemUtil {
 				CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
 
 		meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-		XItemFlag.decorationOnly(meta);
 		itemStack.setItemMeta(meta);
 		return itemStack;
 	}
@@ -102,12 +100,7 @@ public final class ItemUtil {
 		return item;
 	}
 
-	public static ItemStack hideEnchants(ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
-		XItemFlag.HIDE_ENCHANTS.set(meta);
-		item.setItemMeta(meta);
-		return item;
-	}
+
 
 	public static ItemStack renameItem(ItemStack item, String name) {
 		ItemMeta meta = item.getItemMeta();
