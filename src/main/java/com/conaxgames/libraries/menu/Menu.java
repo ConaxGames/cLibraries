@@ -5,7 +5,6 @@ import com.conaxgames.libraries.event.impl.menu.MenuOpenEvent;
 import com.conaxgames.libraries.menu.listener.ButtonListener;
 import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
-import com.cryptomorin.xseries.XItemFlag;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,11 +62,7 @@ public abstract class Menu {
      */
     private boolean placeholder = false;
     
-    /**
-     * Whether item attributes (enchantments, durability, etc.) should be hidden.
-     * When true, all items will have their attributes hidden using XSeries item flags.
-     */
-    private boolean hideItemAttributes = false;
+
     
     /**
      * Whether inventory click events should be cancelled.
@@ -150,9 +145,6 @@ public abstract class Menu {
 
             try {
                 ItemStack item = buttonEntry.getValue().getButtonItem(player);
-                if (isHideItemAttributes()) {
-                    applyItemFlags(item);
-                }
                 inv.setItem(buttonEntry.getKey(), item);
             } catch (ArrayIndexOutOfBoundsException e) {
                 LibraryPlugin.getInstance().getLibraryLogger().toConsole(
@@ -169,9 +161,6 @@ public abstract class Menu {
                 if (invButtons.get(index) != null) continue;
                 this.buttons.put(index, placeholder);
                 ItemStack item = placeholder.getButtonItem(player);
-                if (isHideItemAttributes()) {
-                    applyItemFlags(item);
-                }
                 inv.setItem(index, item);
             }
         }
@@ -379,18 +368,5 @@ public abstract class Menu {
         return (int) Math.max(27, (Math.min(Math.ceil(listSize / 7.0) + 2, 6) * 9));
     }
 
-    /**
-     * Applies all item flags to hide attributes and tooltips.
-     * This method uses XSeries to apply item flags in a version-compatible way.
-     * 
-     * @param item The item to apply flags to
-     */
-    private void applyItemFlags(ItemStack item) {
-        if (item == null) return;
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            XItemFlag.decorationOnly(meta);
-            item.setItemMeta(meta);
-        }
-    }
+
 }

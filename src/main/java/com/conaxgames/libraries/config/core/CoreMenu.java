@@ -75,7 +75,7 @@ public class CoreMenu {
                 int size = menuSection.getInt(name + ".size");
                 String back = (menuSection.contains(name + ".back") ? menuSection.getString(name + ".back") : null);
                 boolean fillGlass = menuSection.getBoolean(name + ".settings.fillGlass", false);
-                boolean hideItemAttributes = menuSection.getBoolean(name + ".settings.hideItemAttributes", true);
+
                 boolean updateOnClick = menuSection.getBoolean(name + ".settings.updateOnClick", true);
                 boolean autoUpdate = menuSection.getBoolean(name + ".settings.autoUpdate", false);
 
@@ -108,7 +108,7 @@ public class CoreMenu {
                     });
                 }
 
-                ConfigMenuData coreMenu = new ConfigMenuData(name, title, size, fillGlass, hideItemAttributes, updateOnClick, autoUpdate, back, btns);
+                ConfigMenuData coreMenu = new ConfigMenuData(name, title, size, fillGlass, updateOnClick, autoUpdate, back, btns);
                 this.menus.add(coreMenu);
             });
         }
@@ -177,7 +177,6 @@ public class CoreMenu {
             this.data = data;
 
             setPlaceholder(data.isFillGlass()); // glass
-            setHideItemAttributes(data.isHideItemAttributes());
             setUpdateAfterClick(data.isUpdateOnClick());
             setAutoUpdate(data.isAutoUpdate());
         }

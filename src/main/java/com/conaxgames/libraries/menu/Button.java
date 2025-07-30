@@ -3,7 +3,6 @@ package com.conaxgames.libraries.menu;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import com.cryptomorin.xseries.XItemFlag;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
@@ -26,7 +25,7 @@ import java.util.List;
  *     <li>Custom lore/description</li>
  *     <li>Custom material and data value</li>
  *     <li>Click handlers</li>
- *     <li>Visual effects (enchant glint, hidden attributes)</li>
+ *     <li>Visual effects (enchant glint)</li>
  *     <li>Player skull support</li>
  * </ul>
  */
@@ -174,23 +173,7 @@ public abstract class Button {
         return true;
     }
 
-    /**
-     * Determines if enchantment glints should be hidden.
-     * @param player The player viewing the button
-     * @return true to hide enchants, false to show them
-     */
-    public boolean hideEnchants(Player player) {
-        return false;
-    }
 
-    /**
-     * Determines if item attributes should be hidden.
-     * @param player The player viewing the button
-     * @return true to hide attributes, false to show them
-     */
-    public boolean hideAttributes(Player player) {
-        return false;
-    }
 
     /**
      * Determines if the button should have an enchantment glint.
@@ -245,13 +228,8 @@ public abstract class Button {
             skullMeta.setOwner(skullOwner(player));
         }
 
-        if (hideAttributes(player) || hideEnchants(player)) {
-            XItemFlag.decorationOnly(meta);
-        }
-
         if (shinyItem(player)) {
             meta.addEnchant(XEnchantment.UNBREAKING.get(), 1, true);
-            XItemFlag.HIDE_ENCHANTS.set(meta);
         }
 
         buttonItem.setItemMeta(meta);

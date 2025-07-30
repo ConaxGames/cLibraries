@@ -13,7 +13,7 @@ public class ConfigMenuData {
     public final String title;
     public final int size;
     public final boolean fillGlass;
-    public final boolean hideItemAttributes;
+
     public final boolean updateOnClick;
     public final boolean autoUpdate;
 

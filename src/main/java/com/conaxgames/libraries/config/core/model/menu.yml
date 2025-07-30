@@ -7,7 +7,7 @@ menus:
     size: 27
     settings:
       fillGlass: true
-      hideItemAttributes: true
+      
       updateOnClick: true
       autoUpdate: false
     buttons:
