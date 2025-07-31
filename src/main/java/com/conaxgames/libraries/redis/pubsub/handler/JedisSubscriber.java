@@ -32,7 +32,7 @@ public class JedisSubscriber<K> {
     private final JedisConnection connection;
     private final Class<K> typeParameter;
     private final JedisCredentials jedisSettings;
-    private final Jedis jedis;
+    private volatile Jedis jedis;
 
     @Getter
     private JedisPubSub pubSub;
@@ -79,18 +79,38 @@ public class JedisSubscriber<K> {
             }
         };
 
-        this.jedis = new Jedis(this.jedisSettings.getAddress(), this.jedisSettings.getPort());
-        this.authenticate();
+        this.createNewConnection();
         this.attemptConnect();
     }
 
     /**
-     * Checks the {@link JedisCredentials} if there is a password, and if there is it will authenticate with the password
-     * that is given.
+     * Creates a new Jedis connection and authenticates if password is provided.
      */
-    private void authenticate() {
-        if (this.jedisSettings.hasPassword()) {
-            this.jedis.auth(this.jedisSettings.getPassword());
+    private void createNewConnection() {
+        try {
+            // Close existing connection if it exists
+            if (this.jedis != null) {
+                try {
+                    this.jedis.close();
+                } catch (Exception e) {
+                    // Ignore close errors
+                }
+            }
+            
+            // Create new connection
+            this.jedis = new Jedis(this.jedisSettings.getAddress(), this.jedisSettings.getPort());
+            
+            // Authenticate if password is provided
+            if (this.jedisSettings.hasPassword()) {
+                this.jedis.auth(this.jedisSettings.getPassword());
+            }
+            
+            // Test the connection
+            this.jedis.ping();
+            
+        } catch (Exception e) {
+            this.connection.toConsole("JedisSubscriber: Failed to create new connection: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -102,6 +122,15 @@ public class JedisSubscriber<K> {
         
         new Thread(() -> {
             try {
+                // Ensure we have a valid connection before subscribing
+                if (jedis == null || !jedis.isConnected()) {
+                    throw new IllegalStateException("Jedis connection is null or not connected");
+                }
+                
+                // Test connection with ping before subscribing
+                jedis.ping();
+                
+                // Subscribe to the channel
                 this.jedis.subscribe(this.pubSub, this.channel);
             } catch (Exception e) {
                 this.connection.toConsole("JedisSubscriber: Connection failed for (" + this.channel + "): " + e.getMessage());
@@ -125,8 +154,13 @@ public class JedisSubscriber<K> {
                 JedisConnection jedisConnection = JedisConnection.getInstance();
                 jedisConnection.toConsole("JedisSubscriber: Attempting to reconnect JedisSubscriber (" + channel + ")");
 
-                this.closeConnection();
-                this.attemptConnect();
+                try {
+                    this.closeConnection();
+                    this.createNewConnection(); // Create new connection with authentication
+                    this.attemptConnect();
+                } catch (Exception e) {
+                    jedisConnection.toConsole("JedisSubscriber: Failed to reconnect (" + channel + "): " + e.getMessage());
+                }
 
                 if (jedis != null && pubSub.isSubscribed()) {
                     jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
