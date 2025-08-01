@@ -103,13 +103,25 @@ public class JedisSubscriber<K> {
             // Authenticate if password is provided
             if (this.jedisSettings.hasPassword()) {
                 this.jedis.auth(this.jedisSettings.getPassword());
+                // Verify authentication worked by testing a command
+                this.jedis.ping();
+                this.connection.toConsole("JedisSubscriber: Authentication successful for (" + this.channel + ")");
+            } else {
+                // Test the connection even without password
+                this.jedis.ping();
             }
             
-            // Test the connection
-            this.jedis.ping();
-            
         } catch (Exception e) {
-            this.connection.toConsole("JedisSubscriber: Failed to create new connection: " + e.getMessage());
+            this.connection.toConsole("JedisSubscriber: Failed to create new connection for (" + this.channel + "): " + e.getMessage());
+            // Clean up failed connection
+            if (this.jedis != null) {
+                try {
+                    this.jedis.close();
+                } catch (Exception cleanupError) {
+                    // Ignore cleanup errors
+                }
+                this.jedis = null;
+            }
             throw e;
         }
     }
@@ -127,8 +139,23 @@ public class JedisSubscriber<K> {
                     throw new IllegalStateException("Jedis connection is null or not connected");
                 }
                 
-                // Test connection with ping before subscribing
+                // Test connection and authentication with ping before subscribing
                 jedis.ping();
+                
+                // Additional authentication verification if password is required
+                if (this.jedisSettings.hasPassword()) {
+                    // Try a simple operation to verify authentication is still valid
+                    try {
+                        jedis.clientId(); // This requires authentication to work
+                    } catch (Exception authTest) {
+                        // Re-authenticate if the test fails
+                        this.connection.toConsole("JedisSubscriber: Re-authenticating connection for (" + this.channel + ")");
+                        jedis.auth(this.jedisSettings.getPassword());
+                        jedis.ping(); // Verify auth worked
+                    }
+                }
+                
+                this.connection.toConsole("JedisSubscriber: Subscribing to channel (" + this.channel + ")");
                 
                 // Subscribe to the channel
                 this.jedis.subscribe(this.pubSub, this.channel);
@@ -157,17 +184,40 @@ public class JedisSubscriber<K> {
                 try {
                     this.closeConnection();
                     this.createNewConnection(); // Create new connection with authentication
-                    this.attemptConnect();
+                    
+                    // Wait a moment for the connection to be fully established
+                    Thread.sleep(1000);
+                    
+                    // Verify connection is still valid before attempting to connect
+                    if (jedis != null && jedis.isConnected()) {
+                        // Test authentication again before subscribing
+                        if (this.jedisSettings.hasPassword()) {
+                            try {
+                                jedis.auth(this.jedisSettings.getPassword());
+                                jedis.ping();
+                            } catch (Exception authError) {
+                                jedisConnection.toConsole("JedisSubscriber: Authentication failed during reconnect for (" + channel + "): " + authError.getMessage());
+                                return; // Skip this reconnect attempt
+                            }
+                        }
+                        
+                        this.attemptConnect();
+                        
+                        // Give the connection attempt time to complete
+                        Thread.sleep(2000);
+                        
+                        // Check if connection succeeded
+                        if (jedis != null && pubSub.isSubscribed()) {
+                            jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
+                            scheduler.shutdown();
+                            return;
+                        }
+                    }
                 } catch (Exception e) {
                     jedisConnection.toConsole("JedisSubscriber: Failed to reconnect (" + channel + "): " + e.getMessage());
                 }
 
-                if (jedis != null && pubSub.isSubscribed()) {
-                    jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");
-                    scheduler.shutdown();
-                } else {
-                    jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") will attempt a reconnect in 10 seconds...");
-                }
+                jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") will attempt a reconnect in 10 seconds...");
             }, 10, 10, TimeUnit.SECONDS);
         } catch (IllegalArgumentException exception) {
             this.connection.toConsole("Unable to define thread pool, can't start jedis-reconnect task...");
