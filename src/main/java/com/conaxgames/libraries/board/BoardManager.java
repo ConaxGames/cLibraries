@@ -27,6 +27,10 @@ public class BoardManager implements Runnable {
 			if (player == null || !player.isOnline()) {
 				continue;
 			}
+			// Skip players with cElement metadata - they shouldn't have boards
+			if (player.hasMetadata("cElement")) {
+				continue;
+			}
 			Board board = this.playerBoards.get(player.getUniqueId());
 			if (board == null) {
 				continue;
