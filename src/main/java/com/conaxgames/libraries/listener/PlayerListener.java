@@ -23,6 +23,10 @@ public class PlayerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (library.getBoardManager() != null) {
+            // Check if player has cElement metadata - if they do, don't give them a board
+            if (player.hasMetadata("cElement")) {
+                return;
+            }
             library.getBoardManager().getPlayerBoards().put(player.getUniqueId(), new Board(player, library.getBoardManager().getAdapter()));
         }
     }
