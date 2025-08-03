@@ -8,8 +8,10 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Board {
@@ -43,28 +45,40 @@ public class Board {
 		this.objective.setDisplayName(this.adapter.getTitle(player));
 	}
 
-	public String getNewKey(BoardEntry entry) {
-		for (ChatColor color : ChatColor.values()) {
-			String colorText = color + "" + ChatColor.WHITE;
-
-			if (entry.getText().length() > 16) {
-				String sub = entry.getText().substring(0, 16);
-				colorText = colorText + ChatColor.getLastColors(sub);
-			}
-
-			if (!keys.contains(colorText)) {
-				keys.add(colorText);
-				return colorText;
-			}
+	// Pre-computed key pool for performance
+	private static final String[] AVAILABLE_KEYS;
+	static {
+		ChatColor[] colors = ChatColor.values();
+		AVAILABLE_KEYS = new String[colors.length];
+		for (int i = 0; i < colors.length; i++) {
+			AVAILABLE_KEYS[i] = colors[i] + "" + ChatColor.WHITE;
 		}
-
-		throw new IndexOutOfBoundsException("No more keys available!");
+	}
+	
+	private int keyIndex = 0;
+	
+	public String getNewKey(BoardEntry entry) {
+		// Use pre-computed keys for much better performance
+		if (keyIndex >= AVAILABLE_KEYS.length) {
+			throw new IndexOutOfBoundsException("No more keys available!");
+		}
+		
+		String colorText = AVAILABLE_KEYS[keyIndex++];
+		
+		if (entry.getText().length() > 16) {
+			String sub = entry.getText().substring(0, 16);
+			colorText = colorText + ChatColor.getLastColors(sub);
+		}
+		
+		keys.add(colorText);
+		return colorText;
 	}
 
 	public List<String> getBoardEntriesFormatted() {
-		List<String> toReturn = new ArrayList<>();
+		// Avoid unnecessary ArrayList creation
+		List<String> toReturn = new ArrayList<>(entries.size());
 
-		for (BoardEntry entry : new ArrayList<>(entries)) {
+		for (BoardEntry entry : entries) {
 			toReturn.add(entry.getText());
 		}
 
@@ -72,27 +86,51 @@ public class Board {
 	}
 
 	public BoardEntry getByPosition(int position) {
-		for (int i = 0; i < this.entries.size(); i++) {
-			if (i == position) {
-				return this.entries.get(i);
-			}
+		// Direct array access instead of linear search - major performance boost
+		if (position >= 0 && position < this.entries.size()) {
+			return this.entries.get(position);
 		}
-
 		return null;
 	}
 
+	// Cache for timer lookups to avoid linear search
+	private final Map<String, BoardTimer> timerCache = new HashMap<>();
+	
 	public BoardTimer getCooldown(String id) {
-		for (BoardTimer cooldown : getTimers()) {
-			if (cooldown.getId().equals(id)) {
-				return cooldown;
+		// Check cache first for O(1) lookup
+		BoardTimer cached = timerCache.get(id);
+		if (cached != null && cached.getEnd() > System.currentTimeMillis()) {
+			return cached;
+		}
+		
+		// Remove expired timer from cache
+		if (cached != null) {
+			timerCache.remove(id);
+		}
+		
+		// Search in active timers
+		for (BoardTimer timer : timers) {
+			if (timer.getId().equals(id) && timer.getEnd() > System.currentTimeMillis()) {
+				timerCache.put(id, timer);
+				return timer;
 			}
 		}
 
 		return null;
 	}
 
+	private long lastTimerCleanup = 0;
+	private static final long TIMER_CLEANUP_INTERVAL = 5000; // 5 seconds
+	
 	public Set<BoardTimer> getTimers() {
-		this.timers.removeIf(cooldown -> System.currentTimeMillis() >= cooldown.getEnd());
+		// Only clean up expired timers periodically to reduce CPU usage
+		long now = System.currentTimeMillis();
+		if (now - lastTimerCleanup > TIMER_CLEANUP_INTERVAL) {
+			this.timers.removeIf(cooldown -> now >= cooldown.getEnd());
+			this.lastTimerCleanup = now;
+			// Also clean timer cache
+			timerCache.entrySet().removeIf(entry -> now >= entry.getValue().getEnd());
+		}
 		return this.timers;
 	}
 
@@ -118,5 +156,17 @@ public class Board {
 
 	public Objective getObjective() {
 		return this.objective;
+	}
+	
+	/**
+	 * Efficiently clear all board entries
+	 */
+	public void clearAllEntries() {
+		for (BoardEntry entry : entries) {
+			entry.remove();
+		}
+		entries.clear();
+		keys.clear();
+		keyIndex = 0; // Reset key index for reuse
 	}
 }
