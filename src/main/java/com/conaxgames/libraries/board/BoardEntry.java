@@ -9,17 +9,21 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.util.regex.Pattern;
+
 @Accessors(chain = true)
 public class BoardEntry {
 
+	// Pre-compiled regex pattern for better performance
+	private static final Pattern INVALID_TEAM_CHARS = Pattern.compile("[^a-zA-Z0-9_.-]");
+	
 	private final Board board;
-
 	private final String originalText;
-
 	private Team team;
-
 	private String text;
 	private String key;
+	private String cachedTranslatedText;
+	private String[] cachedSplitText;
 
 	public BoardEntry(Board board, String text) {
 		this.board = board;
@@ -31,41 +35,44 @@ public class BoardEntry {
 	}
 
 	public BoardEntry setup() {
-		Scoreboard scoreboard = this.board.getScoreboard();
+		// Only setup team if not already done or if text changed
+		if (this.team == null) {
+			Scoreboard scoreboard = this.board.getScoreboard();
 
-		String teamName = this.key;
-		// Team names must be 16 characters or less and cannot contain certain characters
-		if (teamName.length() > 16) {
-			teamName = teamName.substring(0, 16);
-		}
-		// Remove invalid characters for team names
-		teamName = teamName.replaceAll("[^a-zA-Z0-9_.-]", "");
-		
-		// Ensure team name is not empty after filtering
-		if (teamName.isEmpty()) {
-			teamName = "board_" + System.currentTimeMillis() % 10000;
-		}
+			String teamName = this.key;
+			// Team names must be 16 characters or less and cannot contain certain characters
+			if (teamName.length() > 16) {
+				teamName = teamName.substring(0, 16);
+			}
+			// Remove invalid characters for team names using pre-compiled pattern
+			teamName = INVALID_TEAM_CHARS.matcher(teamName).replaceAll("");
+			
+			// Ensure team name is not empty after filtering
+			if (teamName.isEmpty()) {
+				teamName = "board_" + (System.currentTimeMillis() % 10000);
+			}
 
-		// Ensure unique team name by adding counter if needed
-		String originalTeamName = teamName;
-		int counter = 1;
-		while (scoreboard.getTeam(teamName) != null && !scoreboard.getTeam(teamName).getEntries().contains(this.key)) {
-			teamName = originalTeamName.substring(0, Math.min(originalTeamName.length(), 14)) + counter;
-			counter++;
-		}
+			// Ensure unique team name by adding counter if needed
+			String originalTeamName = teamName;
+			int counter = 1;
+			while (scoreboard.getTeam(teamName) != null && !scoreboard.getTeam(teamName).getEntries().contains(this.key)) {
+				teamName = originalTeamName.substring(0, Math.min(originalTeamName.length(), 14)) + counter;
+				counter++;
+			}
 
-		if (scoreboard.getTeam(teamName) != null) {
-			this.team = scoreboard.getTeam(teamName);
-		} else {
-			this.team = scoreboard.registerNewTeam(teamName);
-		}
+			if (scoreboard.getTeam(teamName) != null) {
+				this.team = scoreboard.getTeam(teamName);
+			} else {
+				this.team = scoreboard.registerNewTeam(teamName);
+			}
 
-		if (!(this.team.getEntries().contains(this.key))) {
-			this.team.addEntry(this.key);
-		}
+			if (!this.team.getEntries().contains(this.key)) {
+				this.team.addEntry(this.key);
+			}
 
-		if (!(this.board.getEntries().contains(this))) {
-			this.board.getEntries().add(this);
+			if (!this.board.getEntries().contains(this)) {
+				this.board.getEntries().add(this);
+			}
 		}
 
 		return this;
@@ -73,8 +80,15 @@ public class BoardEntry {
 
 	public BoardEntry send(int position) {
 		Objective objective = board.getObjective();
-		String preSplit = CC.translate(text);
-		String[] split = this.splitText(preSplit);
+		
+		// Cache translated text to avoid repeated CC.translate calls
+		if (cachedTranslatedText == null) {
+			cachedTranslatedText = CC.translate(text);
+			cachedSplitText = this.splitText(cachedTranslatedText);
+		}
+		
+		// Use cached split text
+		String[] split = cachedSplitText;
 		
 		// Validate prefix and suffix lengths to prevent protocol errors
 		String prefix = split[0];
@@ -140,7 +154,13 @@ public class BoardEntry {
     }
 
     public BoardEntry setText(String text) {
-        this.text = text;
+        // Only update if text actually changed
+        if (!this.text.equals(text)) {
+            this.text = text;
+            // Clear caches when text changes
+            this.cachedTranslatedText = null;
+            this.cachedSplitText = null;
+        }
         return this;
     }
 

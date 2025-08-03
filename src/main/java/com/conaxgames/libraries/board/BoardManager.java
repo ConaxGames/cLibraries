@@ -23,113 +23,90 @@ public class BoardManager implements Runnable {
 	@Override
 	public void run() {
 		this.adapter.preLoop();
-		for (Player player : LibraryPlugin.getInstance().getPlugin().getServer().getOnlinePlayers()) {
+		
+		// Only process players who actually have boards - major performance boost
+		for (Map.Entry<UUID, Board> entry : this.playerBoards.entrySet()) {
+			UUID playerUUID = entry.getKey();
+			Board board = entry.getValue();
+			
+			Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(playerUUID);
 			if (player == null || !player.isOnline()) {
 				continue;
 			}
+			
 			// Skip players with cElement metadata - they shouldn't have boards
 			if (player.hasMetadata("cElement")) {
 				continue;
 			}
-			Board board = this.playerBoards.get(player.getUniqueId());
-			if (board == null) {
-				continue;
-			}
+			
 			try {
 				Scoreboard scoreboard = board.getScoreboard();
+				Objective objective = board.getObjective();
 
 				List<String> scores = this.adapter.getScoreboard(player, board);
 
-				if (scores != null) {
-					Collections.reverse(scores);
-
-					Objective objective = board.getObjective();
-
-					if (!objective.getDisplayName().equals(this.adapter.getTitle(player))) {
-						objective.setDisplayName(this.adapter.getTitle(player));
-					}
-
-					if (scores.isEmpty()) {
-						Iterator<BoardEntry> iter = board.getEntries().iterator();
-						while (iter.hasNext()) {
-							BoardEntry boardEntry = iter.next();
-							boardEntry.remove();
-							iter.remove();
-						}
-						continue;
-					}
-
-					forILoop:
-					for (int i = 0; i < scores.size(); i++) {
-						String text = scores.get(i);
-						int position = i + 1;
-
-						for (BoardEntry boardEntry : new LinkedList<>(board.getEntries())) {
-							try {
-								Score score = objective.getScore(boardEntry.getKey());
-
-								if (score != null && boardEntry.getText().equals(text)) {
-									if (score.getScore() == position) {
-										continue forILoop;
-									}
-								}
-							} catch (Exception e) {
-								// Score might be invalid or player disconnected
-								continue;
-							}
-						}
-
-						Iterator<BoardEntry> iter = board.getEntries().iterator();
-						while (iter.hasNext()) {
-							BoardEntry boardEntry = iter.next();
-							try {
-								int entryPosition = scoreboard.getObjective(DisplaySlot.SIDEBAR).getScore(boardEntry.getKey()).getScore();
-								if (entryPosition > scores.size()) {
-									boardEntry.remove();
-									iter.remove();
-								}
-							} catch (Exception e) {
-								// Score might be invalid, remove the entry
-								boardEntry.remove();
-								iter.remove();
-							}
-						}
-
-						int positionToSearch = position - 1;
-
-						BoardEntry entry = board.getByPosition(positionToSearch);
-						if (entry == null) {
-							entry = new BoardEntry(board, text).send(position);
-						}
-
-						entry.setText(text).setup().send(position);
-
-						if (board.getEntries().size() > scores.size()) {
-							iter = board.getEntries().iterator();
-							while (iter.hasNext()) {
-								BoardEntry boardEntry = iter.next();
-								if (!scores.contains(boardEntry.getText())) {
-									boardEntry.remove();
-									iter.remove();
-								}
-							}
-						}
-					}
-				} else {
+				if (scores == null || scores.isEmpty()) {
+					// Clear all entries if no scores
 					if (!board.getEntries().isEmpty()) {
-						board.getEntries().forEach(BoardEntry::remove);
-						board.getEntries().clear();
+						board.clearAllEntries();
 					}
+					continue;
+				}
+				
+				// Reverse scores for proper positioning
+				Collections.reverse(scores);
+				
+				// Update title if changed
+				String newTitle = this.adapter.getTitle(player);
+				if (!objective.getDisplayName().equals(newTitle)) {
+					objective.setDisplayName(newTitle);
 				}
 
-				this.adapter.onScoreboardCreate(player, scoreboard);
+				// Efficiently update entries
+				updateBoardEntries(board, scores, objective);
 
+				this.adapter.onScoreboardCreate(player, scoreboard);
 				player.setScoreboard(scoreboard);
 			} catch (Exception e) {
 				e.printStackTrace();
 				LibraryPlugin.getInstance().getPlugin().getLogger()
 						.severe("Something went wrong while updating " + player.getName() + "'s scoreboard " + board + " - " + board.getAdapter() + ")");
 			}
+		}
+	}
+	
+	private void updateBoardEntries(Board board, List<String> scores, Objective objective) {
+		List<BoardEntry> entries = board.getEntries();
+		int scoresSize = scores.size();
+		
+		// Remove excess entries efficiently
+		if (entries.size() > scoresSize) {
+			for (int i = entries.size() - 1; i >= scoresSize; i--) {
+				BoardEntry entry = entries.get(i);
+				entry.remove();
+				entries.remove(i);
+			}
+		}
+		
+		// Update or create entries
+		for (int i = 0; i < scoresSize; i++) {
+			String text = scores.get(i);
+			int position = i + 1;
+			
+			BoardEntry entry;
+			if (i < entries.size()) {
+				// Update existing entry
+				entry = entries.get(i);
+				if (!entry.getText().equals(text)) {
+					entry.setText(text).setup();
+				}
+			} else {
+				// Create new entry
+				entry = new BoardEntry(board, text);
+			}
+			
+			// Update position
+			entry.send(position);
 		}
 	}
 
