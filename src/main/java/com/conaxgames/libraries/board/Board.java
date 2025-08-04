@@ -45,7 +45,7 @@ public class Board {
 		this.objective.setDisplayName(this.adapter.getTitle(player));
 	}
 
-	// Pre-computed key pool for performance
+	// Pre-computed key pool for performance with proper recycling
 	private static final String[] AVAILABLE_KEYS;
 	static {
 		ChatColor[] colors = ChatColor.values();
@@ -55,23 +55,23 @@ public class Board {
 		}
 	}
 	
-	private int keyIndex = 0;
-	
 	public String getNewKey(BoardEntry entry) {
-		// Use pre-computed keys for much better performance
-		if (keyIndex >= AVAILABLE_KEYS.length) {
-			throw new IndexOutOfBoundsException("No more keys available!");
+		// Find first unused key from pre-computed pool
+		for (String baseKey : AVAILABLE_KEYS) {
+			String colorText = baseKey;
+			
+			if (entry.getText().length() > 16) {
+				String sub = entry.getText().substring(0, 16);
+				colorText = colorText + ChatColor.getLastColors(sub);
+			}
+			
+			if (!keys.contains(colorText)) {
+				keys.add(colorText);
+				return colorText;
+			}
 		}
 		
-		String colorText = AVAILABLE_KEYS[keyIndex++];
-		
-		if (entry.getText().length() > 16) {
-			String sub = entry.getText().substring(0, 16);
-			colorText = colorText + ChatColor.getLastColors(sub);
-		}
-		
-		keys.add(colorText);
-		return colorText;
+		throw new IndexOutOfBoundsException("No more keys available!");
 	}
 
 	public List<String> getBoardEntriesFormatted() {
@@ -166,7 +166,6 @@ public class Board {
 			entry.remove();
 		}
 		entries.clear();
-		keys.clear();
-		keyIndex = 0; // Reset key index for reuse
+		keys.clear(); // Keys will be recycled automatically
 	}
 }
