@@ -4,7 +4,7 @@
 
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>dev</version>
+    <version>1.1.5</version>
 
     <name>cLibraries</name>
     <description>A streamlined API tailored for PaperMC, providing powerful utilities and extensions to accelerate server development and fuel innovation.</description>
