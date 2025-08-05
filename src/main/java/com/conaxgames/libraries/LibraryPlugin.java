@@ -106,6 +106,12 @@ public class LibraryPlugin {
      */
     public LibraryPlugin onDisable() {
         this.moduleManager.disableAllModules();
+        
+        // Shutdown board manager async executors
+        if (this.boardManager != null) {
+            this.boardManager.shutdown();
+        }
+        
         return this;
     }
 

@@ -15,12 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Board {
 
 	private final BoardAdapter adapter;
 	private final Player player;
-	private List<BoardEntry> entries = new ArrayList<>();
+	private List<BoardEntry> entries = new CopyOnWriteArrayList<>();
 	private Set<BoardTimer> timers = new HashSet<>();
 	private Set<String> keys = new HashSet<>();
 	private Scoreboard scoreboard;
@@ -63,28 +64,37 @@ public class Board {
 	
 	// Performance optimization: Key reuse system
 	private final Map<String, Boolean> usedKeys = new ConcurrentHashMap<>();
-	private int keyIndex = 0;
+	private final java.util.concurrent.atomic.AtomicInteger keyIndex = new java.util.concurrent.atomic.AtomicInteger(0);
 	
 	public String getNewKey(BoardEntry entry) {
-		// Use round-robin approach for better key distribution
-		String key = AVAILABLE_KEYS[keyIndex % AVAILABLE_KEYS.length];
-		keyIndex++;
-		
-		// Ensure key is unique for this board with fallback
-		int attempts = 0;
-		while (keys.contains(key) && attempts < AVAILABLE_KEYS.length) {
-			key = AVAILABLE_KEYS[keyIndex % AVAILABLE_KEYS.length];
-			keyIndex++;
-			attempts++;
+		// Safety check for null entry
+		if (entry == null) {
+			return "board_" + System.currentTimeMillis() + "_" + (Math.random() * 1000);
 		}
 		
-		// If we've exhausted all keys, generate a unique one
-		if (attempts >= AVAILABLE_KEYS.length) {
-			key = "board_" + System.currentTimeMillis() + "_" + (Math.random() * 1000);
+		// Use atomic counter for thread safety and better performance
+		int currentIndex = keyIndex.getAndIncrement();
+		String key = AVAILABLE_KEYS[currentIndex % AVAILABLE_KEYS.length];
+		
+		// Fast path: if key is not used, return immediately
+		if (!keys.contains(key)) {
+			keys.add(key);
+			return key;
 		}
 		
-		keys.add(key);
-		return key;
+		// Fallback: find next available key efficiently
+		for (int i = 1; i < AVAILABLE_KEYS.length; i++) {
+			String candidateKey = AVAILABLE_KEYS[(currentIndex + i) % AVAILABLE_KEYS.length];
+			if (!keys.contains(candidateKey)) {
+				keys.add(candidateKey);
+				return candidateKey;
+			}
+		}
+		
+		// Last resort: generate unique key
+		String uniqueKey = "board_" + System.currentTimeMillis() + "_" + (Math.random() * 1000);
+		keys.add(uniqueKey);
+		return uniqueKey;
 	}
 	
 	/**
@@ -106,6 +116,10 @@ public class Board {
 	 * Return BoardEntry to pool for reuse
 	 */
 	public void returnToPool(BoardEntry entry) {
+		if (entry == null) {
+			return;
+		}
+		
 		synchronized (entryPool) {
 			if (entryPool.size() < MAX_POOL_SIZE) {
 				// Clean up the entry before pooling
@@ -116,6 +130,8 @@ public class Board {
 				entry.remove();
 			}
 		}
+		// Remove from entries list to prevent memory leaks - thread-safe without sync
+		entries.remove(entry);
 	}
 
 	public List<String> getBoardEntriesFormatted() {
