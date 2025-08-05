@@ -28,7 +28,7 @@ cLibraries is a comprehensive development framework for Bukkit/PaperMC plugins t
 <dependency>
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>v1.1.5</version>
+    <version>1.1.3</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -39,7 +39,7 @@ Since cLibraries must be shaded into your plugin to avoid conflicts, configure t
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-shade-plugin</artifactId>
-    <version>v1.1.5</version>
+    <version>3.4.1</version>
     <executions>
         <execution>
             <phase>package</phase>
