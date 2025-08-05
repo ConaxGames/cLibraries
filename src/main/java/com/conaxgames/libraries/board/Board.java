@@ -8,13 +8,11 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Board {
 
@@ -25,10 +23,6 @@ public class Board {
 	private Set<String> keys = new HashSet<>();
 	private Scoreboard scoreboard;
 	private Objective objective;
-	
-	// Performance optimization: Object pool for BoardEntry reuse
-	private final List<BoardEntry> entryPool = Collections.synchronizedList(new ArrayList<>());
-	private static final int MAX_POOL_SIZE = 50;
 
 	public Board(Player player, BoardAdapter adapter) {
 		this.adapter = adapter;
@@ -61,61 +55,23 @@ public class Board {
 		}
 	}
 	
-	// Performance optimization: Key reuse system
-	private final Map<String, Boolean> usedKeys = new ConcurrentHashMap<>();
-	private int keyIndex = 0;
-	
 	public String getNewKey(BoardEntry entry) {
-		// Use round-robin approach for better key distribution
-		String key = AVAILABLE_KEYS[keyIndex % AVAILABLE_KEYS.length];
-		keyIndex++;
-		
-		// Ensure key is unique for this board with fallback
-		int attempts = 0;
-		while (keys.contains(key) && attempts < AVAILABLE_KEYS.length) {
-			key = AVAILABLE_KEYS[keyIndex % AVAILABLE_KEYS.length];
-			keyIndex++;
-			attempts++;
-		}
-		
-		// If we've exhausted all keys, generate a unique one
-		if (attempts >= AVAILABLE_KEYS.length) {
-			key = "board_" + System.currentTimeMillis() + "_" + (Math.random() * 1000);
-		}
-		
-		keys.add(key);
-		return key;
-	}
-	
-	/**
-	 * Get a recycled BoardEntry from pool or create new one
-	 */
-	public BoardEntry getPooledEntry(String text) {
-		synchronized (entryPool) {
-			if (!entryPool.isEmpty()) {
-				BoardEntry entry = entryPool.remove(entryPool.size() - 1);
-				// Reset the entry state for reuse
-				entry.resetForReuse(text);
-				return entry;
+		// Find first unused key from pre-computed pool
+		for (String baseKey : AVAILABLE_KEYS) {
+			String colorText = baseKey;
+			
+			if (entry.getText().length() > 16) {
+				String sub = entry.getText().substring(0, 16);
+				colorText = colorText + ChatColor.getLastColors(sub);
+			}
+			
+			if (!keys.contains(colorText)) {
+				keys.add(colorText);
+				return colorText;
 			}
 		}
-		return new BoardEntry(this, text);
-	}
-	
-	/**
-	 * Return BoardEntry to pool for reuse
-	 */
-	public void returnToPool(BoardEntry entry) {
-		synchronized (entryPool) {
-			if (entryPool.size() < MAX_POOL_SIZE) {
-				// Clean up the entry before pooling
-				entry.cleanupForPool();
-				entryPool.add(entry);
-			} else {
-				// If pool is full, just remove the entry
-				entry.remove();
-			}
-		}
+		
+		throw new IndexOutOfBoundsException("No more keys available!");
 	}
 
 	public List<String> getBoardEntriesFormatted() {
@@ -206,9 +162,8 @@ public class Board {
 	 * Efficiently clear all board entries
 	 */
 	public void clearAllEntries() {
-		// Return entries to pool for reuse
 		for (BoardEntry entry : entries) {
-			returnToPool(entry);
+			entry.remove();
 		}
 		entries.clear();
 		keys.clear(); // Keys will be recycled automatically

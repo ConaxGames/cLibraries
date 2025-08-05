@@ -26,9 +26,6 @@ public class BoardTimer {
 	}
 
 	public String getFormattedString(TimerType format) {
-		if (format == null) {
-			format = TimerType.MINUTES; // Default fallback
-		}
 		if (format == TimerType.SECONDS) {
 			return SECONDS_FORMATTER.format(((this.end - System.currentTimeMillis()) / 1000.0f));
 		} else {
