@@ -28,9 +28,14 @@ public class BoardEntry {
 	private boolean needsTeamUpdate = true;
 
 	public BoardEntry(Board board, String text) {
+		// Safety check for null board
+		if (board == null) {
+			throw new IllegalArgumentException("Board cannot be null");
+		}
+		
 		this.board = board;
-		this.text = text;
-		this.originalText = text;
+		this.text = text != null ? text : "";
+		this.originalText = this.text;
 		this.key = board.getNewKey(this);
 
 		this.setup();
@@ -40,6 +45,16 @@ public class BoardEntry {
 		// Only setup team if not already done or if text changed
 		if (this.team == null) {
 			Scoreboard scoreboard = this.board.getScoreboard();
+			
+			// Safety check for null scoreboard
+			if (scoreboard == null) {
+				return this;
+			}
+			
+			// Safety check for null board
+			if (this.board == null) {
+				return this;
+			}
 
 			String teamName = this.key;
 			// Team names must be 16 characters or less and cannot contain certain characters
@@ -82,6 +97,16 @@ public class BoardEntry {
 	public BoardEntry sendOptimized(int position) {
 		Objective objective = board.getObjective();
 		
+		// Safety check for null objective
+		if (objective == null) {
+			return this;
+		}
+		
+		// Ensure team is set up before proceeding
+		if (this.team == null) {
+			this.setup();
+		}
+		
 		// Only update team if text changed or first time
 		if (needsTeamUpdate) {
 			updateTeamText();
@@ -104,6 +129,10 @@ public class BoardEntry {
 	public BoardEntry sendPositionOnly(int position) {
 		if (position != lastPosition) {
 			Objective objective = board.getObjective();
+			// Safety check for null objective
+			if (objective == null) {
+				return this;
+			}
 			Score score = objective.getScore(this.key);
 			score.setScore(position);
 			lastPosition = position;
@@ -115,6 +144,11 @@ public class BoardEntry {
 	 * Batch team text updates for better performance
 	 */
 	private void updateTeamText() {
+		// Safety check for null team
+		if (this.team == null) {
+			return;
+		}
+		
 		// Cache translated text to avoid repeated CC.translate calls
 		if (cachedTranslatedText == null) {
 			cachedTranslatedText = CC.translate(text);
@@ -136,8 +170,11 @@ public class BoardEntry {
 			suffix = suffix.substring(0, 64);
 		}
 		
-		// Batch team updates - only call if values actually changed
-		if (!prefix.equals(this.team.getPrefix()) || !suffix.equals(this.team.getSuffix())) {
+		// Performance optimization: Only update if values actually changed
+		String currentPrefix = this.team.getPrefix();
+		String currentSuffix = this.team.getSuffix();
+		
+		if (!prefix.equals(currentPrefix) || !suffix.equals(currentSuffix)) {
 			this.team.setPrefix(prefix);
 			this.team.setSuffix(suffix);
 		}
@@ -245,6 +282,11 @@ public class BoardEntry {
     }
 
     public BoardEntry setText(String text) {
+        // Safety check for null text
+        if (text == null) {
+            text = "";
+        }
+        
         // Only update if text actually changed
         if (!this.text.equals(text)) {
             this.text = text;
