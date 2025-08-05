@@ -29,11 +29,6 @@ jobs:
           include: 'pom.xml'
           find: '<version>dev</version>'
           replace: '<version>${{ github.ref_name }}</version>'
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'chore: bump version to ${{ github.ref_name }}'
-          file_pattern: 'pom.xml'
-          branch: main
       - run: mvn --batch-mode --update-snapshots verify deploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -59,3 +54,4 @@ jobs:
           commit_message: 'docs: Updated to version `${{ github.ref_name }}`.'
           file_pattern: 'README.md'
           branch: main
+          push_options: '--force'
