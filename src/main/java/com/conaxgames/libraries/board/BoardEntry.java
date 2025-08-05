@@ -24,6 +24,8 @@ public class BoardEntry {
 	private String key;
 	private String cachedTranslatedText;
 	private String[] cachedSplitText;
+	private int lastPosition = -1;
+	private boolean needsTeamUpdate = true;
 
 	public BoardEntry(Board board, String text) {
 		this.board = board;
@@ -69,18 +71,50 @@ public class BoardEntry {
 			if (!this.team.getEntries().contains(this.key)) {
 				this.team.addEntry(this.key);
 			}
-
-			if (!this.board.getEntries().contains(this)) {
-				this.board.getEntries().add(this);
-			}
 		}
 
 		return this;
 	}
 
-	public BoardEntry send(int position) {
+	/**
+	 * Optimized send method that batches team updates and reduces operations
+	 */
+	public BoardEntry sendOptimized(int position) {
 		Objective objective = board.getObjective();
 		
+		// Only update team if text changed or first time
+		if (needsTeamUpdate) {
+			updateTeamText();
+			needsTeamUpdate = false;
+		}
+		
+		// Only update score if position changed
+		if (position != lastPosition) {
+			Score score = objective.getScore(this.key);
+			score.setScore(position);
+			lastPosition = position;
+		}
+
+		return this;
+	}
+	
+	/**
+	 * Only update position without team text changes
+	 */
+	public BoardEntry sendPositionOnly(int position) {
+		if (position != lastPosition) {
+			Objective objective = board.getObjective();
+			Score score = objective.getScore(this.key);
+			score.setScore(position);
+			lastPosition = position;
+		}
+		return this;
+	}
+	
+	/**
+	 * Batch team text updates for better performance
+	 */
+	private void updateTeamText() {
 		// Cache translated text to avoid repeated CC.translate calls
 		if (cachedTranslatedText == null) {
 			cachedTranslatedText = CC.translate(text);
@@ -102,13 +136,18 @@ public class BoardEntry {
 			suffix = suffix.substring(0, 64);
 		}
 		
-		this.team.setPrefix(prefix);
-		this.team.setSuffix(suffix);
+		// Batch team updates - only call if values actually changed
+		if (!prefix.equals(this.team.getPrefix()) || !suffix.equals(this.team.getSuffix())) {
+			this.team.setPrefix(prefix);
+			this.team.setSuffix(suffix);
+		}
+	}
 
-		Score score = objective.getScore(this.key);
-		score.setScore(position);
-
-		return this;
+	/**
+	 * Legacy method for backward compatibility
+	 */
+	public BoardEntry send(int position) {
+		return sendOptimized(position);
 	}
 
 	public void remove() {
@@ -129,6 +168,58 @@ public class BoardEntry {
 			} catch (IllegalStateException e) {
 				// Team might have been already removed or player not on team
 				// This is expected behavior in some edge cases
+			}
+		}
+	}
+
+	/**
+	 * Reset this entry for reuse from the object pool
+	 */
+	public void resetForReuse(String newText) {
+		// Reset all state variables
+		this.text = newText;
+		this.cachedTranslatedText = null;
+		this.cachedSplitText = null;
+		this.lastPosition = -1;
+		this.needsTeamUpdate = true;
+		
+		// Generate new key for this entry
+		this.key = board.getNewKey(this);
+		
+		// Reset team state
+		this.team = null;
+		
+		// Setup the entry with new state
+		this.setup();
+	}
+	
+	/**
+	 * Clean up this entry before returning to pool
+	 */
+	public void cleanupForPool() {
+		// Remove from current board entries list
+		if (this.board.getEntries().contains(this)) {
+			this.board.getEntries().remove(this);
+		}
+		
+		// Remove key from board keys set
+		this.board.getKeys().remove(this.key);
+		
+		// Reset scores but don't unregister team (keep for reuse)
+		this.board.getScoreboard().resetScores(this.key);
+		
+		// Remove entry from team and properly unregister empty teams to prevent conflicts
+		if (this.team != null) {
+			try {
+				if (this.team.getEntries().contains(this.key)) {
+					this.team.removeEntry(this.key);
+				}
+				// Unregister empty teams to prevent name conflicts and memory leaks
+				if (this.team.getEntries().isEmpty() && this.board.getScoreboard().getTeam(this.team.getName()) != null) {
+					this.team.unregister();
+				}
+			} catch (IllegalStateException e) {
+				// Team might have been already removed
 			}
 		}
 	}
@@ -160,6 +251,7 @@ public class BoardEntry {
             // Clear caches when text changes
             this.cachedTranslatedText = null;
             this.cachedSplitText = null;
+            this.needsTeamUpdate = true;
         }
         return this;
     }
