@@ -105,6 +105,11 @@ public class LibraryPlugin {
      * @return This LibraryPlugin instance for chaining
      */
     public LibraryPlugin onDisable() {
+        // Shutdown board manager if it exists
+        if (this.boardManager != null) {
+            this.boardManager.shutdown();
+        }
+        
         this.moduleManager.disableAllModules();
         return this;
     }
