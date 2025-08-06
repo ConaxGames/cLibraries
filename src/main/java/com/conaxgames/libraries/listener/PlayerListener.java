@@ -25,6 +25,8 @@ public class PlayerListener implements Listener {
         if (library.getBoardManager() != null) {
             // Check if player has cElement metadata - if they do, don't give them a board
             if (player.hasMetadata("cElement")) {
+                // Ensure any existing board is cleaned up for zero CPU cost
+                library.getBoardManager().cleanupPlayerBoardIfCElement(player);
                 return;
             }
             library.getBoardManager().getPlayerBoards().put(player.getUniqueId(), new Board(player, library.getBoardManager().getAdapter()));
