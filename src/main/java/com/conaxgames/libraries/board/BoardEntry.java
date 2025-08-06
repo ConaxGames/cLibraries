@@ -146,11 +146,19 @@ public class BoardEntry {
             suffix = suffix.substring(0, MAX_SUFFIX_LENGTH);
         }
         
-        this.team.setPrefix(prefix);
-        this.team.setSuffix(suffix);
+        // Only update team prefix/suffix if they actually changed (reduces packet spam)
+        if (!prefix.equals(this.team.getPrefix())) {
+            this.team.setPrefix(prefix);
+        }
+        if (!suffix.equals(this.team.getSuffix())) {
+            this.team.setSuffix(suffix);
+        }
 
         Score score = objective.getScore(this.key);
-        score.setScore(position);
+        // Only update score if it changed
+        if (score.getScore() != position) {
+            score.setScore(position);
+        }
 
         return this;
     }
