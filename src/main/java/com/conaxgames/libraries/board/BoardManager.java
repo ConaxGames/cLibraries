@@ -24,6 +24,9 @@ public class BoardManager implements Runnable {
 	public void run() {
 		this.adapter.preLoop();
 		
+		// Clean up any boards for players with cElement metadata (zero CPU cost)
+		cleanupAllCElementBoards();
+		
 		// Only process players who actually have boards - major performance boost
 		for (Map.Entry<UUID, Board> entry : this.playerBoards.entrySet()) {
 			UUID playerUUID = entry.getKey();
@@ -107,6 +110,52 @@ public class BoardManager implements Runnable {
 			
 			// Update position
 			entry.send(position);
+		}
+	}
+
+
+	
+	/**
+	 * Clean up board for a specific player if they have cElement metadata
+	 * @param player The player to check and clean up
+	 */
+	public void cleanupPlayerBoardIfCElement(Player player) {
+		if (player.hasMetadata("cElement")) {
+			Board board = this.playerBoards.get(player.getUniqueId());
+			if (board != null) {
+				// Clean up board entries
+				if (!board.getEntries().isEmpty()) {
+					board.getEntries().forEach(BoardEntry::remove);
+					board.getEntries().clear();
+				}
+				// Remove from map to prevent future processing
+				this.playerBoards.remove(player.getUniqueId());
+			}
+		}
+	}
+	
+	/**
+	 * Clean up boards for all online players with cElement metadata
+	 * This can be called periodically to ensure zero CPU cost
+	 */
+	public void cleanupAllCElementBoards() {
+		// Use iterator to safely remove during iteration
+		Iterator<Map.Entry<UUID, Board>> iterator = this.playerBoards.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<UUID, Board> entry = iterator.next();
+			UUID playerUUID = entry.getKey();
+			Board board = entry.getValue();
+			
+			Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(playerUUID);
+			if (player != null && player.isOnline() && player.hasMetadata("cElement")) {
+				// Clean up board entries
+				if (!board.getEntries().isEmpty()) {
+					board.getEntries().forEach(BoardEntry::remove);
+					board.getEntries().clear();
+				}
+				// Remove from map to prevent future processing
+				iterator.remove();
+			}
 		}
 	}
 
