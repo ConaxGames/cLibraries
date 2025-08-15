@@ -102,10 +102,10 @@ public class CustomLocation {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		builder.append(String.format("%.6f, %.6f, %.6f", loc.getX(), loc.getY(), loc.getZ()));
+		builder.append(String.format("%.2f, %.2f, %.2f", loc.getX(), loc.getY(), loc.getZ()));
 
 		if (loc.getYaw() != 0.0f || loc.getPitch() != 0.0f) {
-			builder.append(String.format(", %.6f, %.6f", loc.getYaw(), loc.getPitch()));
+			builder.append(String.format(", %.2f, %.2f", loc.getYaw(), loc.getPitch()));
 		}
 
 		if (!loc.getWorld().equals("world")) {
