@@ -231,8 +231,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
                 boolean isIgnored = ignoredSections.stream().anyMatch(path::contains);
                 //Checking if the config contains the section.
                 boolean containsSection = contains(path);
-                //If the config doesn't contain the section, and it's not ignored - we will sync data.
-                if(!containsSection && !isIgnored) {
+                //If the config doesn't contain the section, or it's not ignored - we will sync data.
+                if(!containsSection || !isIgnored) {
                     //Syncing data and updating the changed variable.
                     changed = syncConfigurationSection(commentedConfig, section.getConfigurationSection(key), ignoredSections) || changed;
                 }
