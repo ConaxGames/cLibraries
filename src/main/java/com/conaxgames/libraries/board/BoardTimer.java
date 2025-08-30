@@ -1,7 +1,6 @@
 package com.conaxgames.libraries.board;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
-
 import java.text.DecimalFormat;
 
 /**
@@ -19,7 +18,6 @@ public class BoardTimer {
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
     // Instance fields
-    private final Board board;
     private final String id;
     private final double duration;
     private final long end;
@@ -27,19 +25,13 @@ public class BoardTimer {
     /**
      * Creates a new board timer with the specified parameters.
      * 
-     * @param board The board this timer belongs to (can be null)
      * @param id The unique identifier for this timer
      * @param duration The duration of the timer in seconds
      */
-    public BoardTimer(Board board, String id, double duration) {
-        this.board = board;
+    public BoardTimer(String id, double duration) {
         this.id = id;
         this.duration = duration;
         this.end = (long) (System.currentTimeMillis() + (duration * MILLISECONDS_PER_SECOND));
-
-        if (board != null) {
-            board.getTimers().add(this);
-        }
     }
 
     /**
@@ -51,19 +43,14 @@ public class BoardTimer {
     public String getFormattedString(TimerType format) {
         long remainingTime = this.end - System.currentTimeMillis();
         
+        if (remainingTime <= 0) {
+            return "0.0";
+        }
+        
         if (format == TimerType.SECONDS) {
             return SECONDS_FORMATTER.format(remainingTime / 1000.0f);
         } else {
             return DurationFormatUtils.formatDuration(remainingTime, MINUTES_SECONDS_FORMAT);
-        }
-    }
-
-    /**
-     * Cancels this timer by removing it from the board.
-     */
-    public void cancel() {
-        if (this.board != null) {
-            this.board.getTimers().remove(this);
         }
     }
 
@@ -87,10 +74,6 @@ public class BoardTimer {
     }
 
     // Getter methods
-    public Board getBoard() {
-        return this.board;
-    }
-
     public String getId() {
         return this.id;
     }

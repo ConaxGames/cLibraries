@@ -2,6 +2,7 @@ package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Objective;
@@ -28,16 +29,21 @@ public class BoardEntry {
     private static final int MAX_PREFIX_LENGTH = 64;
     private static final int MAX_SUFFIX_LENGTH = 64;
     private static final String TEAM_NAME_PREFIX = "board_";
-    private static final String TIME_SUFFIX = String.valueOf(System.currentTimeMillis() % 10000);
-    
+    private static int teamCounter = 0;
+
+    // Getter methods
     // Instance fields
+    @Getter
     private final Board board;
+    @Getter
     private final String originalText;
+    @Getter
     private final String key;
     
+    @Getter
     private Team team;
+    @Getter
     private String text;
-    private String cachedTranslatedText;
     private String[] cachedSplitText;
 
     /**
@@ -61,28 +67,12 @@ public class BoardEntry {
      * @return This board entry for method chaining
      */
     public BoardEntry setup() {
-        // Only setup team if not already done or if text changed
         if (this.team == null) {
             Scoreboard scoreboard = this.board.getScoreboard();
             String teamName = createValidTeamName();
             
-            // Ensure unique team name by adding counter if needed
-            String originalTeamName = teamName;
-            int counter = 1;
-            while (scoreboard.getTeam(teamName) != null && !scoreboard.getTeam(teamName).getEntries().contains(this.key)) {
-                teamName = originalTeamName.substring(0, Math.min(originalTeamName.length(), 14)) + counter;
-                counter++;
-            }
-
-            if (scoreboard.getTeam(teamName) != null) {
-                this.team = scoreboard.getTeam(teamName);
-            } else {
-                this.team = scoreboard.registerNewTeam(teamName);
-            }
-
-            if (!this.team.getEntries().contains(this.key)) {
-                this.team.addEntry(this.key);
-            }
+            this.team = scoreboard.registerNewTeam(teamName);
+            this.team.addEntry(this.key);
 
             if (!this.board.getEntries().contains(this)) {
                 this.board.getEntries().add(this);
@@ -105,12 +95,12 @@ public class BoardEntry {
             teamName = teamName.substring(0, MAX_TEAM_NAME_LENGTH);
         }
         
-        // Remove invalid characters for team names using pre-compiled pattern
+        // Remove invalid characters for team names
         teamName = INVALID_TEAM_CHARS.matcher(teamName).replaceAll("");
         
         // Ensure team name is not empty after filtering
         if (teamName.isEmpty()) {
-            teamName = TEAM_NAME_PREFIX + TIME_SUFFIX;
+            teamName = TEAM_NAME_PREFIX + (++teamCounter);
         }
         
         return teamName;
@@ -125,20 +115,13 @@ public class BoardEntry {
     public BoardEntry send(int position) {
         Objective objective = board.getObjective();
         
-        // Cache translated text to avoid repeated CC.translate calls
-        if (cachedTranslatedText == null) {
-            cachedTranslatedText = CC.translate(text);
-            cachedSplitText = this.splitText(cachedTranslatedText);
-        }
+        // Get split text (cached if available)
+        String[] split = getSplitText();
         
-        // Use cached split text
-        String[] split = cachedSplitText;
-        
-        // Validate prefix and suffix lengths to prevent protocol errors
+        // Validate prefix and suffix lengths
         String prefix = split[0];
         String suffix = split[1];
         
-        // Modern Minecraft has stricter limits - ensure we don't exceed them
         if (prefix.length() > MAX_PREFIX_LENGTH) {
             prefix = prefix.substring(0, MAX_PREFIX_LENGTH);
         }
@@ -146,7 +129,7 @@ public class BoardEntry {
             suffix = suffix.substring(0, MAX_SUFFIX_LENGTH);
         }
         
-        // Only update team prefix/suffix if they actually changed (reduces packet spam)
+        // Update team prefix/suffix if changed
         if (!prefix.equals(this.team.getPrefix())) {
             this.team.setPrefix(prefix);
         }
@@ -155,7 +138,6 @@ public class BoardEntry {
         }
 
         Score score = objective.getScore(this.key);
-        // Only update score if it changed
         if (score.getScore() != position) {
             score.setScore(position);
         }
@@ -167,25 +149,35 @@ public class BoardEntry {
      * Removes this entry from the scoreboard and cleans up associated resources.
      */
     public void remove() {
-        this.board.getKeys().remove(this.key);
+        this.board.getUsedKeys().remove(this.key);
         this.board.getScoreboard().resetScores(this.key);
         
-        // Remove entry from team and unregister empty teams
         if (this.team != null) {
             try {
-                // Check if the team still contains this entry before removing
                 if (this.team.getEntries().contains(this.key)) {
                     this.team.removeEntry(this.key);
                 }
-                // Only unregister if team is empty and still registered
-                if (this.team.getEntries().isEmpty() && this.board.getScoreboard().getTeam(this.team.getName()) != null) {
+                if (this.team.getEntries().isEmpty()) {
                     this.team.unregister();
                 }
             } catch (IllegalStateException e) {
-                // Team might have been already removed or player not on team
-                // This is expected behavior in some edge cases
+                // Team might have been already removed
             }
         }
+    }
+
+    /**
+     * Gets split text for display on the scoreboard.
+     * This method handles text longer than 16 characters by splitting it appropriately.
+     * 
+     * @return Array containing [prefix, suffix]
+     */
+    private String[] getSplitText() {
+        if (cachedSplitText == null) {
+            String translatedText = CC.translate(text);
+            cachedSplitText = splitText(translatedText);
+        }
+        return cachedSplitText;
     }
 
     /**
@@ -220,27 +212,6 @@ public class BoardEntry {
         }
     }
 
-    // Getter methods
-    public Board getBoard() {
-        return this.board;
-    }
-
-    public String getOriginalText() {
-        return this.originalText;
-    }
-
-    public Team getTeam() {
-        return this.team;
-    }
-
-    public String getText() {
-        return this.text;
-    }
-
-    public String getKey() {
-        return this.key;
-    }
-
     /**
      * Sets the text for this entry and clears the cache.
      * 
@@ -248,11 +219,8 @@ public class BoardEntry {
      * @return This board entry for method chaining
      */
     public BoardEntry setText(String text) {
-        // Only update if text actually changed
         if (!this.text.equals(text)) {
             this.text = text;
-            // Clear caches when text changes
-            this.cachedTranslatedText = null;
             this.cachedSplitText = null;
         }
         return this;
