@@ -4,6 +4,7 @@ import com.conaxgames.libraries.board.Board;
 import com.conaxgames.libraries.board.BoardAdapter;
 import com.conaxgames.libraries.board.BoardTimer;
 import com.conaxgames.libraries.util.CC;
+import com.google.common.base.Strings;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -24,7 +25,7 @@ public class SimpleBoardAdapter implements BoardAdapter {
         List<String> lines = new ArrayList<>();
         
         // Add some basic information
-        lines.add(CC.translate("&7&m" + "─".repeat(20)));
+        lines.add(CC.translate("&7&m" + Strings.repeat("─", 20)));
         lines.add(CC.translate("&b&lPlayer Info"));
         lines.add(CC.translate("&7Name: &f" + player.getName()));
         lines.add(CC.translate("&7Health: &c" + (int) player.getHealth() + "&7/&c" + (int) player.getMaxHealth()));
@@ -38,7 +39,7 @@ public class SimpleBoardAdapter implements BoardAdapter {
             lines.add(CC.translate("&7Timer: &e" + timer.getFormattedString(BoardTimer.TimerType.SECONDS)));
         }
         
-        lines.add(CC.translate("&7&m" + "─".repeat(20)));
+        lines.add(CC.translate("&7&m" + Strings.repeat("─", 20)));
         
         return lines;
     }
