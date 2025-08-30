@@ -62,8 +62,6 @@ public abstract class Menu {
      */
     private boolean placeholder = false;
     
-
-    
     /**
      * Whether inventory click events should be cancelled.
      * When false, players can take items from the menu.
@@ -90,10 +88,9 @@ public abstract class Menu {
     
     /**
      * Map of update tasks by player name.
-     * Used to manage automatic menu updates.
-     * Note: With the new scheduler abstraction, we store a boolean flag to indicate if a task is scheduled.
+     * Used to manage automatic menu updates with cancellable tasks.
      */
-    public static Map<String, Boolean> checkTasks;
+    public static Map<String, Object> checkTasks;
 
     /**
      * Map of open inventories by player name.
@@ -170,8 +167,7 @@ public abstract class Menu {
     }
 
     /**
-     * Opens the menu to the player with firstOpen set to true.
-     * This is a convenience method that calls {@link #openMenu(Player, boolean)}.
+     * Opens the menu for a player with proper thread safety.
      * 
      * @param player The player to open the menu for
      */
@@ -180,13 +176,13 @@ public abstract class Menu {
     }
 
     /**
-     * Opens the menu to the player, optionally triggering the open event.
+     * Opens the menu for a player with proper thread safety.
      * 
      * @param player The player to open the menu for
-     * @param firstOpen Whether this is the first time the menu is being opened
+     * @param update Whether to update the menu after opening
      */
-    public void openMenu(Player player, boolean firstOpen) {
-        if (firstOpen) {
+    public void openMenu(Player player, boolean update) {
+        if (MenuOpenEvent.class.isAssignableFrom(this.getClass())) {
             MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
             // If the event is canceled, do not open
             if (openEvent.call()) {
@@ -195,9 +191,9 @@ public abstract class Menu {
         }
 
         if (Bukkit.isPrimaryThread()) {
-            open(player);
+            open(player, update);
         } else {
-            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player, update));
         }
     }
 
@@ -209,10 +205,24 @@ public abstract class Menu {
      * @param player The player to open the menu for
      */
     private void open(Player player) {
+        open(player, true);
+    }
+
+    /**
+     * Internal method to open the menu for a player.
+     * Creates the inventory, stores it in the openInventories map,
+     * opens it for the player, and optionally starts the update task.
+     * 
+     * @param player The player to open the menu for
+     * @param update Whether to start the update task
+     */
+    private void open(Player player, boolean update) {
         Inventory inv = this.createInventory(player);
         openInventories.put(player.getName(), inv);
         player.openInventory(inv);
-        this.update(player, inv);
+        if (update) {
+            this.update(player, inv);
+        }
     }
 
     /**
@@ -230,8 +240,7 @@ public abstract class Menu {
 
     /**
      * Performs automatic updates if the menu is configured to update automatically.
-     * This method cancels any existing update task, stores the menu in the currentlyOpenedMenus map,
-     * calls the onOpen method, and starts a new update task if autoUpdate is enabled.
+     * Uses cancellable tasks for proper task management.
      * 
      * @param player The player whose menu should be updated
      * @param inv The inventory to update
@@ -241,38 +250,38 @@ public abstract class Menu {
         currentlyOpenedMenus.put(player.getName(), this);
         this.onOpen(player);
 
-        // Note: Using the new scheduler abstraction - task cancellation handled differently
-        // We'll use a state-based approach since the new scheduler doesn't return BukkitTask
         String playerName = player.getName();
-        checkTasks.put(playerName, true); // Mark that a task is scheduled
         
-        LibraryPlugin.getInstance().getScheduler().runTaskTimer(LibraryPlugin.getInstance().getPlugin(), () -> {
-            if (!checkTasks.containsKey(playerName) || !checkTasks.get(playerName)) {
-                return;
-            }
-            
-            if (!player.isOnline()) {
-                cancelCheck(player);
-                currentlyOpenedMenus.remove(playerName);
-                return;
-            }
+        // Use cancellable task for better management
+        Scheduler.CancellableTask updateTask = LibraryPlugin.getInstance().getScheduler()
+            .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> {
+                if (!player.isOnline()) {
+                    cancelCheck(player);
+                    currentlyOpenedMenus.remove(playerName);
+                    return;
+                }
 
-            if (Menu.this.isAutoUpdate()) {
-                inv.setContents(Menu.this.createInventory(player).getContents());
-            }
-        }, 10L, 20L);
+                if (Menu.this.isAutoUpdate()) {
+                    inv.setContents(Menu.this.createInventory(player).getContents());
+                }
+            }, 10L, 20L);
+            
+        // Store the task for potential cancellation
+        checkTasks.put(playerName, updateTask);
     }
 
     /**
      * Cancels any active check task for this player.
-     * This is called when a player closes a menu or opens a new one.
-     * Note: With the new scheduler abstraction, we can't directly cancel tasks,
-     * but we can mark them as cancelled by setting the flag to false.
      * 
      * @param player The player whose check task should be cancelled
      */
     public static void cancelCheck(Player player) {
-        checkTasks.put(player.getName(), false);
+        String playerName = player.getName();
+        Object task = checkTasks.get(playerName);
+        if (task instanceof Scheduler.CancellableTask) {
+            ((Scheduler.CancellableTask) task).cancel();
+        }
+        checkTasks.remove(playerName);
     }
 
     /**

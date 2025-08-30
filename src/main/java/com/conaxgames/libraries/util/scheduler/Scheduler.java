@@ -27,10 +27,75 @@ public interface Scheduler {
     void scheduleSyncDelayedTask(Plugin plugin, Runnable runnable, long delay);
 
     /**
-     * Cancels all tasks for the specified plugin.
-     * Note: This is a best-effort operation and may not cancel all tasks immediately.
+     * Runs a task and returns a cancellable task instance.
      * 
-     * @param plugin The plugin whose tasks should be cancelled
+     * @param plugin The plugin instance
+     * @param runnable The task to run
+     * @return Cancellable task instance
      */
-    void cancelTasks(Plugin plugin);
+    CancellableTask runTaskCancellable(Plugin plugin, Runnable runnable);
+
+    /**
+     * Runs a delayed task and returns a cancellable task instance.
+     * 
+     * @param plugin The plugin instance
+     * @param runnable The task to run
+     * @param delay The delay in ticks
+     * @return Cancellable task instance
+     */
+    CancellableTask runTaskLaterCancellable(Plugin plugin, Runnable runnable, long delay);
+
+    /**
+     * Runs a repeating task and returns a cancellable task instance.
+     * 
+     * @param plugin The plugin instance
+     * @param runnable The task to run
+     * @param delay The initial delay in ticks
+     * @param period The period between executions in ticks
+     * @return Cancellable task instance
+     */
+    CancellableTask runTaskTimerCancellable(Plugin plugin, Runnable runnable, long delay, long period);
+
+    /**
+     * Runs a task and returns a cancellable task instance (uses library plugin).
+     * 
+     * @param runnable The task to run
+     * @return Cancellable task instance
+     */
+    CancellableTask runTaskCancellable(Runnable runnable);
+
+    /**
+     * Runs a delayed task and returns a cancellable task instance (uses library plugin).
+     * 
+     * @param runnable The task to run
+     * @param delay The delay in ticks
+     * @return Cancellable task instance
+     */
+    CancellableTask runTaskLaterCancellable(Runnable runnable, long delay);
+
+    /**
+     * Runs a repeating task and returns a cancellable task instance (uses library plugin).
+     * 
+     * @param runnable The task to run
+     * @param delay The initial delay in ticks
+     * @param period The period between executions in ticks
+     * @return Cancellable task instance
+     */
+    CancellableTask runTaskTimerCancellable(Runnable runnable, long delay, long period);
+
+    /**
+     * Interface for cancellable tasks that work across both Bukkit and Folia.
+     */
+    interface CancellableTask {
+        /**
+         * Cancels this task.
+         */
+        void cancel();
+        
+        /**
+         * Checks if this task is cancelled.
+         * @return true if cancelled, false otherwise
+         */
+        boolean isCancelled();
+    }
 }
