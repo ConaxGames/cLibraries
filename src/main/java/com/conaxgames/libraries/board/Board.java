@@ -9,14 +9,12 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents a scoreboard board for a specific player.
- * This class manages the scoreboard entries, timers, and provides utilities for board management.
+ * This class manages the scoreboard entries and provides utilities for board management.
  * 
  * @author ConaxGames
  * @since 1.0
@@ -26,12 +24,8 @@ public class Board {
     // Constants
     private static final String OBJECTIVE_NAME = "Default";
     private static final String OBJECTIVE_CRITERIA = "dummy";
-    private static final long TIMER_CLEANUP_INTERVAL = 5000L; // 5 seconds
-    private static final int MAX_TEXT_LENGTH = 16;
-    private static final int MAX_PREFIX_LENGTH = 64;
-    private static final int MAX_SUFFIX_LENGTH = 64;
 
-    // Pre-computed key pool for performance with proper recycling
+    // Pre-computed key pool for performance
     private static final String[] AVAILABLE_KEYS;
     static {
         ChatColor[] colors = ChatColor.values();
@@ -45,13 +39,11 @@ public class Board {
     private final BoardAdapter adapter;
     private final Player player;
     private final List<BoardEntry> entries = new ArrayList<>();
-    private final Set<BoardTimer> timers = new HashSet<>();
-    private final Set<String> keys = new HashSet<>();
-    private final Map<String, BoardTimer> timerCache = new HashMap<>();
+    private final Map<String, BoardTimer> timers = new HashMap<>();
+    private final Map<String, String> usedKeys = new HashMap<>();
     
     private Scoreboard scoreboard;
     private Objective objective;
-    private long lastTimerCleanup = 0;
 
     /**
      * Creates a new board for the specified player with the given adapter.
@@ -92,13 +84,13 @@ public class Board {
         for (String baseKey : AVAILABLE_KEYS) {
             String colorText = baseKey;
             
-            if (entry.getText().length() > MAX_TEXT_LENGTH) {
-                String sub = entry.getText().substring(0, MAX_TEXT_LENGTH);
+            if (entry.getText().length() > 16) {
+                String sub = entry.getText().substring(0, 16);
                 colorText = colorText + ChatColor.getLastColors(sub);
             }
             
-            if (!keys.contains(colorText)) {
-                keys.add(colorText);
+            if (!usedKeys.containsKey(colorText)) {
+                usedKeys.put(colorText, entry.getText());
                 return colorText;
             }
         }
@@ -139,44 +131,46 @@ public class Board {
      * @return The active timer, or null if not found or expired
      */
     public BoardTimer getTimer(String id) {
-        // Check cache first for O(1) lookup
-        BoardTimer cached = timerCache.get(id);
-        if (cached != null && cached.getEnd() > System.currentTimeMillis()) {
-            return cached;
+        BoardTimer timer = timers.get(id);
+        if (timer != null && !timer.isExpired()) {
+            return timer;
         }
         
-        // Remove expired timer from cache
-        if (cached != null) {
-            timerCache.remove(id);
+        // Remove expired timer
+        if (timer != null) {
+            timers.remove(id);
         }
         
-        // Search in active timers
-        for (BoardTimer timer : timers) {
-            if (timer.getId().equals(id) && timer.getEnd() > System.currentTimeMillis()) {
-                timerCache.put(id, timer);
-                return timer;
-            }
-        }
-
         return null;
     }
 
     /**
      * Gets all active timers for this board.
-     * This method also performs periodic cleanup of expired timers.
      * 
-     * @return Set of active timers
+     * @return Map of active timers
      */
-    public Set<BoardTimer> getTimers() {
-        // Only clean up expired timers periodically to reduce CPU usage
-        long now = System.currentTimeMillis();
-        if (now - lastTimerCleanup > TIMER_CLEANUP_INTERVAL) {
-            this.timers.removeIf(timer -> now >= timer.getEnd());
-            this.lastTimerCleanup = now;
-            // Also clean timer cache
-            timerCache.entrySet().removeIf(entry -> now >= entry.getValue().getEnd());
-        }
+    public Map<String, BoardTimer> getTimers() {
+        // Clean up expired timers
+        timers.entrySet().removeIf(entry -> entry.getValue().isExpired());
         return this.timers;
+    }
+
+    /**
+     * Adds a timer to this board.
+     * 
+     * @param timer The timer to add
+     */
+    public void addTimer(BoardTimer timer) {
+        timers.put(timer.getId(), timer);
+    }
+
+    /**
+     * Removes a timer from this board.
+     * 
+     * @param id The timer ID to remove
+     */
+    public void removeTimer(String id) {
+        timers.remove(id);
     }
 
     /**
@@ -187,7 +181,7 @@ public class Board {
             entry.remove();
         }
         entries.clear();
-        keys.clear(); // Keys will be recycled automatically
+        usedKeys.clear();
     }
 
     // Getter methods
@@ -203,8 +197,8 @@ public class Board {
         return this.entries;
     }
 
-    public Set<String> getKeys() {
-        return this.keys;
+    public Map<String, String> getUsedKeys() {
+        return this.usedKeys;
     }
 
     public Scoreboard getScoreboard() {

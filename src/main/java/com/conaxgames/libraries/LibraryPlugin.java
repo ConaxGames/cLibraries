@@ -93,10 +93,6 @@ public class LibraryPlugin {
      * @return This instance for chaining
      */
     public LibraryPlugin onDisable() {
-        if (this.boardManager != null) {
-            this.boardManager.shutdown();
-        }
-        
         this.moduleManager.disableAllModules();
         return this;
     }
