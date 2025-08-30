@@ -1,43 +1,25 @@
 package com.conaxgames.libraries.util.cuboid;
 
 /**
- * Represents directions that can be applied to certain faces and actions of a Cuboid
+ * Represents directions for cuboid operations.
  */
 public enum RegionDirection {
-
-    NORTH,
-    EASY,
-    SOUTH,
-    WEST,
-    UP,
-    DOWN,
-    HORIZONTAL,
-    VERTICAL,
-    BOTH,
-    UNKNOWN;
+    NORTH, EAST, SOUTH, WEST,
+    UP, DOWN,
+    HORIZONTAL, VERTICAL, BOTH;
 
     public RegionDirection opposite() {
         switch (this) {
-            case NORTH:
-                return SOUTH;
-            case EASY:
-                return WEST;
-            case SOUTH:
-                return NORTH;
-            case WEST:
-                return EASY;
-            case HORIZONTAL:
-                return VERTICAL;
-            case VERTICAL:
-                return HORIZONTAL;
-            case UP:
-                return DOWN;
-            case DOWN:
-                return UP;
-            case BOTH:
-                return BOTH;
-            default:
-                return UNKNOWN;
+            case NORTH: return SOUTH;
+            case EAST: return WEST;
+            case SOUTH: return NORTH;
+            case WEST: return EAST;
+            case UP: return DOWN;
+            case DOWN: return UP;
+            case HORIZONTAL: return VERTICAL;
+            case VERTICAL: return HORIZONTAL;
+            case BOTH: return BOTH;
+            default: return this;
         }
     }
 }
