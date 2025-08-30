@@ -84,13 +84,13 @@ public abstract class Menu {
      * Map of currently opened menus by player name.
      * Used to track which menu each player has open.
      */
-    public static Map<String, Menu> currentlyOpenedMenus;
+    public static Map<String, Menu> currentlyOpenedMenus = new ConcurrentHashMap<>();
     
     /**
      * Map of update tasks by player name.
      * Used to manage automatic menu updates with cancellable tasks.
      */
-    public static Map<String, Object> checkTasks;
+    public static Map<String, Scheduler.CancellableTask> checkTasks = new ConcurrentHashMap<>();
 
     /**
      * Map of open inventories by player name.
@@ -277,9 +277,9 @@ public abstract class Menu {
      */
     public static void cancelCheck(Player player) {
         String playerName = player.getName();
-        Object task = checkTasks.get(playerName);
-        if (task instanceof Scheduler.CancellableTask) {
-            ((Scheduler.CancellableTask) task).cancel();
+        Scheduler.CancellableTask task = checkTasks.get(playerName);
+        if (task != null) {
+            task.cancel();
         }
         checkTasks.remove(playerName);
     }
@@ -381,5 +381,18 @@ public abstract class Menu {
         return (int) Math.max(27, (Math.min(Math.ceil(listSize / 7.0) + 2, 6) * 9));
     }
 
+    /**
+     * Cleans up all active menu tasks.
+     * This should be called when the plugin is shutting down to prevent memory leaks.
+     */
+    public static void cleanupAllTasks() {
+        for (Scheduler.CancellableTask task : checkTasks.values()) {
+            if (task != null) {
+                task.cancel();
+            }
+        }
+        checkTasks.clear();
+        currentlyOpenedMenus.clear();
+    }
 
 }

@@ -94,6 +94,17 @@ public class LibraryPlugin {
      */
     public LibraryPlugin onDisable() {
         this.moduleManager.disableAllModules();
+        
+        // Clean up menu tasks to prevent memory leaks
+        try {
+            com.conaxgames.libraries.menu.Menu.cleanupAllTasks();
+        } catch (Exception e) {
+            // Log but don't fail shutdown
+            if (this.libraryLogger != null) {
+                this.libraryLogger.toConsole("cLibraries", "Error cleaning up menu tasks: " + e.getMessage());
+            }
+        }
+        
         return this;
     }
 
