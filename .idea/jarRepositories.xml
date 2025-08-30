@@ -32,6 +32,11 @@
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="papermc" />
+      <option name="name" value="papermc" />
+      <option name="url" value="https://repo.papermc.io/repository/maven-public/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="codemc-snapshots" />
       <option name="name" value="codemc-snapshots" />
       <option name="url" value="https://repo.codemc.io/repository/maven-snapshots/" />

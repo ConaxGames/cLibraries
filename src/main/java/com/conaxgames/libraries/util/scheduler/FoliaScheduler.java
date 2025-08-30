@@ -37,6 +37,21 @@ public class FoliaScheduler implements Scheduler {
     }
 
     @Override
+    public void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period) {
+        if (delay > 0) {
+            plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> {
+                runnable.run();
+                runTaskTimerAsynchronously(plugin, runnable, 0, period);
+            }, delay * 50, TimeUnit.MILLISECONDS);
+        } else {
+            plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> {
+                runnable.run();
+                runTaskTimerAsynchronously(plugin, runnable, 0, period);
+            }, period * 50, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
     public void runTaskTimer(Runnable runnable, long delay, long period) {
         plugin.getPlugin().getServer().getGlobalRegionScheduler().runAtFixedRate(plugin.getPlugin(), scheduledTask -> runnable.run(), (int) delay, (int) period);
     }
@@ -59,6 +74,21 @@ public class FoliaScheduler implements Scheduler {
     @Override
     public void runTaskLaterAsynchronously(Runnable runnable, long later) {
         plugin.getPlugin().getServer().getAsyncScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> runnable.run(), later * 50, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void runTaskTimerAsynchronously(Runnable runnable, long delay, long period) {
+        if (delay > 0) {
+            plugin.getPlugin().getServer().getAsyncScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> {
+                runnable.run();
+                runTaskTimerAsynchronously(runnable, 0, period);
+            }, delay * 50, TimeUnit.MILLISECONDS);
+        } else {
+            plugin.getPlugin().getServer().getAsyncScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> {
+                runnable.run();
+                runTaskTimerAsynchronously(runnable, 0, period);
+            }, period * 50, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override

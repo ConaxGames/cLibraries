@@ -123,6 +123,15 @@ public class LibraryPlugin {
 		this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
 	}
 
+    /**
+     * Gets the scheduler instance.
+     * 
+     * @return The scheduler instance
+     */
+    public Scheduler getScheduler() {
+        return this.scheduler;
+    }
+
     private void initializeSettings() {
         try {
             settings = new Settings();

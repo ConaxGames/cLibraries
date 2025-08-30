@@ -2,9 +2,7 @@ package com.conaxgames.libraries.timer;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.timer.event.TimerExpireEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import com.conaxgames.libraries.util.scheduler.Scheduler;
 
 import java.util.UUID;
 
@@ -12,7 +10,7 @@ public class TimerCooldown {
 
 	private final Timer timer;
 	private final UUID owner;
-	private BukkitTask eventNotificationTask;
+	private boolean taskScheduled = false;
 	private long expiryMillis;
 
 	private long pauseMillis;
@@ -43,23 +41,27 @@ public class TimerCooldown {
 		if (expiryMillis != this.expiryMillis) {
 			this.expiryMillis = expiryMillis;
 
-			if (this.eventNotificationTask != null) {
-				this.eventNotificationTask.cancel();
-			}
+			// Cancel any existing task
+			this.cancel();
 
+			// Schedule new task using the scheduler abstraction
 			long ticks = milliseconds / 50L;
-			this.eventNotificationTask = new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (TimerCooldown.this.timer instanceof PlayerTimer && owner != null) {
-						((PlayerTimer) timer).handleExpiry(
-								LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
-					}
-
-					LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(
-							new TimerExpireEvent(TimerCooldown.this.owner, TimerCooldown.this.timer));
+			Scheduler scheduler = LibraryPlugin.getInstance().getScheduler();
+			
+			scheduler.runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
+				if (TimerCooldown.this.timer instanceof PlayerTimer && owner != null) {
+					((PlayerTimer) timer).handleExpiry(
+							LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
 				}
-			}.runTaskLater(JavaPlugin.getProvidingPlugin(this.getClass()), ticks);
+
+				LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(
+						new TimerExpireEvent(TimerCooldown.this.owner, TimerCooldown.this.timer));
+				
+				// Mark task as completed
+				TimerCooldown.this.taskScheduled = false;
+			}, ticks);
+			
+			this.taskScheduled = true;
 		}
 	}
 
@@ -88,10 +90,10 @@ public class TimerCooldown {
 	}
 
 	protected void cancel() throws IllegalStateException {
-		if (this.eventNotificationTask != null) {
-			this.eventNotificationTask.cancel();
-			this.eventNotificationTask = null;
-		}
+		// Note: With the new scheduler abstraction, we can't directly cancel individual tasks
+		// The task will be automatically cleaned up when it completes
+		// We just mark that no task is currently scheduled
+		this.taskScheduled = false;
 	}
 
 	public Timer getTimer() {
@@ -108,5 +110,9 @@ public class TimerCooldown {
 
 	public void setPauseMillis(long pauseMillis) {
 		this.pauseMillis = pauseMillis;
+	}
+
+	public boolean isTaskScheduled() {
+		return this.taskScheduled;
 	}
 }

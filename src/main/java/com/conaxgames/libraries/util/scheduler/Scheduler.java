@@ -14,6 +14,8 @@ public interface Scheduler {
 
     void runTaskLaterAsynchronously(Plugin plugin, Runnable runnable, long later);
 
+    void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period);
+
     void runTaskTimer(Runnable runnable, long delay, long period);
 
     void runTask(Runnable runnable);
@@ -23,6 +25,8 @@ public interface Scheduler {
     void runTaskLater(Runnable runnable, long delay);
 
     void runTaskLaterAsynchronously(Runnable runnable, long later);
+
+    void runTaskTimerAsynchronously(Runnable runnable, long delay, long period);
 
     void scheduleSyncDelayedTask(Plugin plugin, Runnable runnable, long delay);
 }
