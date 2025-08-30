@@ -37,21 +37,6 @@ public class FoliaScheduler implements Scheduler {
     }
 
     @Override
-    public void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period) {
-        if (delay > 0) {
-            plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> {
-                runnable.run();
-                runTaskTimerAsynchronously(plugin, runnable, 0, period);
-            }, delay * 50, TimeUnit.MILLISECONDS);
-        } else {
-            plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> {
-                runnable.run();
-                runTaskTimerAsynchronously(plugin, runnable, 0, period);
-            }, period * 50, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    @Override
     public void runTaskTimer(Runnable runnable, long delay, long period) {
         plugin.getPlugin().getServer().getGlobalRegionScheduler().runAtFixedRate(plugin.getPlugin(), scheduledTask -> runnable.run(), (int) delay, (int) period);
     }
@@ -77,22 +62,15 @@ public class FoliaScheduler implements Scheduler {
     }
 
     @Override
-    public void runTaskTimerAsynchronously(Runnable runnable, long delay, long period) {
-        if (delay > 0) {
-            plugin.getPlugin().getServer().getAsyncScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> {
-                runnable.run();
-                runTaskTimerAsynchronously(runnable, 0, period);
-            }, delay * 50, TimeUnit.MILLISECONDS);
-        } else {
-            plugin.getPlugin().getServer().getAsyncScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> {
-                runnable.run();
-                runTaskTimerAsynchronously(runnable, 0, period);
-            }, period * 50, TimeUnit.MILLISECONDS);
-        }
+    public void scheduleSyncDelayedTask(Plugin plugin, Runnable runnable, long delay) {
+        plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> runnable.run(), delay);
     }
 
     @Override
-    public void scheduleSyncDelayedTask(Plugin plugin, Runnable runnable, long delay) {
-        plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> runnable.run(), delay);
+    public void cancelTasks(Plugin plugin) {
+        // Folia doesn't provide a direct way to cancel all tasks for a plugin.
+        // Tasks are automatically cleaned up when the plugin is disabled.
+        // This is a limitation of Folia's design - tasks are tied to the plugin lifecycle.
+        // Individual tasks can be cancelled by their ScheduledTask instances, but we don't track those here.
     }
 }

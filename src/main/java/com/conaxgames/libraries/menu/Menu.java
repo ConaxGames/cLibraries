@@ -91,9 +91,9 @@ public abstract class Menu {
     /**
      * Map of update tasks by player name.
      * Used to manage automatic menu updates.
-     * Note: With the new scheduler abstraction, we store null to indicate a task is scheduled.
+     * Note: With the new scheduler abstraction, we store a boolean flag to indicate if a task is scheduled.
      */
-    public static Map<String, Object> checkTasks;
+    public static Map<String, Boolean> checkTasks;
 
     /**
      * Map of open inventories by player name.
@@ -244,9 +244,13 @@ public abstract class Menu {
         // Note: Using the new scheduler abstraction - task cancellation handled differently
         // We'll use a state-based approach since the new scheduler doesn't return BukkitTask
         String playerName = player.getName();
-        checkTasks.put(playerName, null); // Mark that a task is scheduled
+        checkTasks.put(playerName, true); // Mark that a task is scheduled
         
         LibraryPlugin.getInstance().getScheduler().runTaskTimer(LibraryPlugin.getInstance().getPlugin(), () -> {
+            if (!checkTasks.containsKey(playerName) || !checkTasks.get(playerName)) {
+                return;
+            }
+            
             if (!player.isOnline()) {
                 cancelCheck(player);
                 currentlyOpenedMenus.remove(playerName);
@@ -263,12 +267,12 @@ public abstract class Menu {
      * Cancels any active check task for this player.
      * This is called when a player closes a menu or opens a new one.
      * Note: With the new scheduler abstraction, we can't directly cancel tasks,
-     * but we can mark them as cancelled by removing from the map.
+     * but we can mark them as cancelled by setting the flag to false.
      * 
      * @param player The player whose check task should be cancelled
      */
     public static void cancelCheck(Player player) {
-        checkTasks.remove(player.getName());
+        checkTasks.put(player.getName(), false);
     }
 
     /**
