@@ -21,21 +21,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Arrays;
 
 /**
- * Core library plugin class that manages the initialization and lifecycles
- * of all library components.
+ * Main library plugin class for cLibraries framework.
+ * Provides scheduling, commands, modules, timers, and hooks.
  */
 @Getter
 public class LibraryPlugin {
 
-    // Singleton instance
     private static LibraryPlugin instance;
-    
-    // Core properties
     private JavaPlugin plugin;
     private boolean setup;
     private Settings settings;
-    
-    // Managers
     private LibraryLogger libraryLogger;
     private TimerManager timerManager;
     private PaperCommandManager paperCommandManager;
@@ -46,10 +41,9 @@ public class LibraryPlugin {
     private Scheduler scheduler;
 
     /**
-     * Gets the singleton instance of the LibraryPlugin.
-     * 
-     * @return The LibraryPlugin instance
-     * @throws IllegalPluginAccessException if the library is not registered
+     * Gets the library instance.
+     * @return LibraryPlugin instance
+     * @throws IllegalPluginAccessException if not initialized
      */
     public static LibraryPlugin getInstance() {
         if (instance == null) {
@@ -59,15 +53,13 @@ public class LibraryPlugin {
     }
 
     /**
-     * Initializes the LibraryPlugin with the provided plugin instance and configuration.
-     * This should only be called once during plugin initialization.
-     *
-     * @param plugin The JavaPlugin instance
-     * @param debugPrimary The primary debug configuration
-     * @param debugSecondary The secondary debug configuration
-     * @param moduleCommandAlias The command alias for module commands
-     * @param moduleCommandPerm The permission for module commands
-     * @return This LibraryPlugin instance for chaining
+     * Initializes the library.
+     * @param plugin Main plugin instance
+     * @param debugPrimary Primary debug key
+     * @param debugSecondary Secondary debug key
+     * @param moduleCommandAlias Module command alias
+     * @param moduleCommandPerm Module command permission
+     * @return This instance for chaining
      */
     public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary, 
                                  String moduleCommandAlias, String moduleCommandPerm) {
@@ -97,12 +89,10 @@ public class LibraryPlugin {
     }
 
     /**
-     * Disables the plugin and all modules.
-     * 
-     * @return This LibraryPlugin instance for chaining
+     * Shuts down the library.
+     * @return This instance for chaining
      */
     public LibraryPlugin onDisable() {
-        // Shutdown board manager if it exists
         if (this.boardManager != null) {
             this.boardManager.shutdown();
         }
@@ -112,16 +102,14 @@ public class LibraryPlugin {
     }
 
     /**
-     * Sets the board manager and schedules its task.
-     * 
-     * @param boardManager The board manager instance
+     * Sets the board manager and starts its update task.
+     * @param boardManager Board manager instance
      */
-    	public void setBoardManager(BoardManager boardManager) {
-		this.boardManager = boardManager;
-		long interval = this.boardManager.getAdapter().getInterval();
-		// Use our scheduler abstraction to ensure compatibility with both Bukkit and Folia
-		this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
-	}
+    public void setBoardManager(BoardManager boardManager) {
+        this.boardManager = boardManager;
+        long interval = this.boardManager.getAdapter().getInterval();
+        this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
+    }
 
     private void initializeSettings() {
         try {
