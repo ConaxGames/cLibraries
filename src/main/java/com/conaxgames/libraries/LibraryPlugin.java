@@ -9,6 +9,9 @@ import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.timer.TimerManager;
+import com.conaxgames.libraries.util.scheduler.Scheduler;
+import com.conaxgames.libraries.util.scheduler.BukkitScheduler;
+import com.conaxgames.libraries.util.scheduler.FoliaScheduler;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -40,6 +43,7 @@ public class LibraryPlugin {
     private BoardManager boardManager;
     private HookManager hookManager;
     private ModuleManager moduleManager;
+    private Scheduler scheduler;
 
     /**
      * Gets the singleton instance of the LibraryPlugin.
@@ -67,35 +71,28 @@ public class LibraryPlugin {
      */
     public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary, 
                                  String moduleCommandAlias, String moduleCommandPerm) {
-        // Prevent multiple initialization
         if (this.setup) {
             logMultipleInitializationWarning();
             return this;
         }
 
-        // Set instance and plugin
         instance = this;
         this.plugin = plugin;
-
-        // Initialize settings
         initializeSettings();
         
-        // Initialize core components
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.paperCommandManager = new PaperCommandManager(this.plugin);
         this.commandRegistry = new CommandRegistry(this, paperCommandManager);
         this.hookManager = new HookManager(this);
         this.timerManager = new TimerManager();
         this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);
-
-        // Register event listeners
+        
+        initializeScheduler();
         registerEventListeners();
 
-        // Complete initialization
         new LibraryPluginEnableEvent().call();
         this.setup = true;
         logSuccessfulInitialization();
-        
         return this;
     }
 
@@ -122,13 +119,9 @@ public class LibraryPlugin {
     	public void setBoardManager(BoardManager boardManager) {
 		this.boardManager = boardManager;
 		long interval = this.boardManager.getAdapter().getInterval();
-		// Run synchronously to avoid thread safety issues with scoreboard modifications
-		this.plugin.getServer().getScheduler().runTaskTimer(
-			this.plugin, this.boardManager, 0L, interval
-		);
+		// Use our scheduler abstraction to ensure compatibility with both Bukkit and Folia
+		this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
 	}
-
-    // Private helper methods
 
     private void initializeSettings() {
         try {
@@ -137,6 +130,21 @@ public class LibraryPlugin {
             Bukkit.getLogger().info(" ");
             Bukkit.getLogger().info("cLibraries settings were unable to load!");
             Bukkit.getLogger().info(" ");
+        }
+    }
+
+    private void initializeScheduler() {
+        boolean foliaFound = false;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            foliaFound = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        
+        if (foliaFound) {
+            this.scheduler = new FoliaScheduler(this);
+        } else {
+            this.scheduler = new BukkitScheduler(this);
         }
     }
 
