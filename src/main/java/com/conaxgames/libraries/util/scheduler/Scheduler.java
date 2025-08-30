@@ -14,8 +14,6 @@ public interface Scheduler {
 
     void runTaskLaterAsynchronously(Plugin plugin, Runnable runnable, long later);
 
-    void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period);
-
     void runTaskTimer(Runnable runnable, long delay, long period);
 
     void runTask(Runnable runnable);
@@ -26,7 +24,13 @@ public interface Scheduler {
 
     void runTaskLaterAsynchronously(Runnable runnable, long later);
 
-    void runTaskTimerAsynchronously(Runnable runnable, long delay, long period);
-
     void scheduleSyncDelayedTask(Plugin plugin, Runnable runnable, long delay);
+
+    /**
+     * Cancels all tasks for the specified plugin.
+     * Note: This is a best-effort operation and may not cancel all tasks immediately.
+     * 
+     * @param plugin The plugin whose tasks should be cancelled
+     */
+    void cancelTasks(Plugin plugin);
 }
