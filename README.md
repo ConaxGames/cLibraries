@@ -120,33 +120,63 @@ Settings settings = libraryPlugin.getSettings();
 ### Custom Scoreboard Implementation
 
 ```java
-public class YourScoreboardAdapter extends BoardAdapter {
+public class YourScoreboardAdapter implements BoardAdapter {
     
     @Override
     public String getTitle(Player player) {
-        return "Your Server";
+        return CC.translate("&b&lYour Server");
     }
     
     @Override
-    public List<String> getLines(Player player) {
+    public List<String> getScoreboard(Player player, Board board) {
         List<String> lines = new ArrayList<>();
-        lines.add("&aPlayer: &f" + player.getName());
-        lines.add("&aOnline: &f" + Bukkit.getOnlinePlayers().size());
-        // Add more lines
+        lines.add(CC.translate("&7&m" + "─".repeat(20)));
+        lines.add(CC.translate("&aPlayer: &f" + player.getName()));
+        lines.add(CC.translate("&aOnline: &f" + Bukkit.getOnlinePlayers().size()));
+        lines.add(CC.translate("&aHealth: &c" + (int) player.getHealth()));
+        lines.add(CC.translate("&7&m" + "─".repeat(20)));
         return lines;
     }
     
     @Override
     public long getInterval() {
-        return 2L; // Update interval in ticks
+        return 20L; // Update every second
+    }
+    
+    @Override
+    public void onScoreboardCreate(Player player, Scoreboard board) {
+        // Optional: Called when scoreboard is created
+    }
+    
+    @Override
+    public void preLoop() {
+        // Optional: Called before updating all boards
     }
 }
 
 // Register your scoreboard adapter
-YourScoreboardAdapter adapter = new YourScoreboardAdapter();
-BoardManager boardManager = new BoardManager(libraryPlugin, adapter);
+BoardManager boardManager = new BoardManager(new YourScoreboardAdapter());
 libraryPlugin.setBoardManager(boardManager);
 ```
+More information in our example board: [SimpleBoardAdapter Example](src/main/java/com/conaxgames/libraries/board/example/SimpleBoardAdapter.java)
+
+
+#### Timer Support
+
+```java
+// Create a timer
+BoardTimer timer = new BoardTimer("myTimer", 60.0); // 60 seconds
+board.addTimer(timer);
+
+// Check timer in your adapter
+BoardTimer activeTimer = board.getTimer("myTimer");
+if (activeTimer != null && !activeTimer.isExpired()) {
+    String timeLeft = activeTimer.getFormattedString(BoardTimer.TimerType.SECONDS);
+    // Use timeLeft in your scoreboard
+}
+```
+
+**See also:** [SimpleBoardAdapter Example](src/main/java/com/conaxgames/libraries/board/example/SimpleBoardAdapter.java) - Complete example implementation
 
 ## Advanced Usage
 
