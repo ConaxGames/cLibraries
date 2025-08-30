@@ -10,7 +10,7 @@ public class TimerCooldown {
 
 	private final Timer timer;
 	private final UUID owner;
-	private boolean taskScheduled = false;
+	private Scheduler.CancellableTask scheduledTask = null;
 	private long expiryMillis;
 
 	private long pauseMillis;
@@ -44,11 +44,11 @@ public class TimerCooldown {
 			// Cancel any existing task
 			this.cancel();
 
-			// Schedule new task using the scheduler abstraction
+			// Schedule new task using the cancellable scheduler method
 			long ticks = milliseconds / 50L;
 			Scheduler scheduler = LibraryPlugin.getInstance().getScheduler();
 			
-			scheduler.runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
+			this.scheduledTask = scheduler.runTaskLaterCancellable(LibraryPlugin.getInstance().getPlugin(), () -> {
 				if (TimerCooldown.this.timer instanceof PlayerTimer && owner != null) {
 					((PlayerTimer) timer).handleExpiry(
 							LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
@@ -57,11 +57,9 @@ public class TimerCooldown {
 				LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(
 						new TimerExpireEvent(TimerCooldown.this.owner, TimerCooldown.this.timer));
 				
-				// Mark task as completed
-				TimerCooldown.this.taskScheduled = false;
+				// Clear the task reference
+				TimerCooldown.this.scheduledTask = null;
 			}, ticks);
-			
-			this.taskScheduled = true;
 		}
 	}
 
@@ -90,10 +88,10 @@ public class TimerCooldown {
 	}
 
 	protected void cancel() throws IllegalStateException {
-		// Note: With the new scheduler abstraction, we can't directly cancel individual tasks
-		// The task will be automatically cleaned up when it completes
-		// We just mark that no task is currently scheduled
-		this.taskScheduled = false;
+		if (this.scheduledTask != null) {
+			this.scheduledTask.cancel();
+			this.scheduledTask = null;
+		}
 	}
 
 	public Timer getTimer() {
@@ -113,6 +111,6 @@ public class TimerCooldown {
 	}
 
 	public boolean isTaskScheduled() {
-		return this.taskScheduled;
+		return this.scheduledTask != null && !this.scheduledTask.isCancelled();
 	}
 }

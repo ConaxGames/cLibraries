@@ -3,7 +3,7 @@ package com.conaxgames.libraries.util.scheduler;
 import com.conaxgames.libraries.LibraryPlugin;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
-
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -67,10 +67,61 @@ public class FoliaScheduler implements Scheduler {
     }
 
     @Override
-    public void cancelTasks(Plugin plugin) {
-        // Folia doesn't provide a direct way to cancel all tasks for a plugin.
-        // Tasks are automatically cleaned up when the plugin is disabled.
-        // This is a limitation of Folia's design - tasks are tied to the plugin lifecycle.
-        // Individual tasks can be cancelled by their ScheduledTask instances, but we don't track those here.
+    public CancellableTask runTaskCancellable(Plugin plugin, Runnable runnable) {
+        ScheduledTask task = plugin.getServer().getGlobalRegionScheduler().run(plugin, scheduledTask -> runnable.run());
+        return new FoliaCancellableTask(task);
+    }
+
+    @Override
+    public CancellableTask runTaskLaterCancellable(Plugin plugin, Runnable runnable, long delay) {
+        ScheduledTask task = plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> runnable.run(), delay);
+        return new FoliaCancellableTask(task);
+    }
+
+    @Override
+    public CancellableTask runTaskTimerCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
+        ScheduledTask task = plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> runnable.run(), (int) delay, (int) period);
+        return new FoliaCancellableTask(task);
+    }
+
+    @Override
+    public CancellableTask runTaskCancellable(Runnable runnable) {
+        ScheduledTask task = plugin.getPlugin().getServer().getGlobalRegionScheduler().run(plugin.getPlugin(), scheduledTask -> runnable.run());
+        return new FoliaCancellableTask(task);
+    }
+
+    @Override
+    public CancellableTask runTaskLaterCancellable(Runnable runnable, long delay) {
+        ScheduledTask task = plugin.getPlugin().getServer().getGlobalRegionScheduler().runDelayed(plugin.getPlugin(), scheduledTask -> runnable.run(), delay);
+        return new FoliaCancellableTask(task);
+    }
+
+    @Override
+    public CancellableTask runTaskTimerCancellable(Runnable runnable, long delay, long period) {
+        ScheduledTask task = plugin.getPlugin().getServer().getGlobalRegionScheduler().runAtFixedRate(plugin.getPlugin(), scheduledTask -> runnable.run(), (int) delay, (int) period);
+        return new FoliaCancellableTask(task);
+    }
+
+    /**
+     * Wrapper for Folia's ScheduledTask to implement CancellableTask interface.
+     */
+    private static class FoliaCancellableTask implements CancellableTask {
+        private final ScheduledTask task;
+        private volatile boolean cancelled = false;
+
+        public FoliaCancellableTask(ScheduledTask task) {
+            this.task = task;
+        }
+
+        @Override
+        public void cancel() {
+            cancelled = true;
+            task.cancel();
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return cancelled;
+        }
     }
 }
