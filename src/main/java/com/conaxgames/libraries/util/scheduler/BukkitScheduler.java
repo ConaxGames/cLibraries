@@ -35,6 +35,11 @@ public class BukkitScheduler implements Scheduler {
     }
 
     @Override
+    public void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period) {
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period);
+    }
+
+    @Override
     public void runTaskTimer(Runnable runnable, long delay, long period) {
         plugin.getPlugin().getServer().getScheduler().runTaskTimer(plugin.getPlugin(), runnable, delay, period);
     }
@@ -57,6 +62,11 @@ public class BukkitScheduler implements Scheduler {
     @Override
     public void runTaskLaterAsynchronously(Runnable runnable, long later) {
         plugin.getPlugin().getServer().getScheduler().runTaskLaterAsynchronously(plugin.getPlugin(), runnable, later);
+    }
+
+    @Override
+    public void runTaskTimerAsynchronously(Runnable runnable, long delay, long period) {
+        plugin.getPlugin().getServer().getScheduler().runTaskTimerAsynchronously(plugin.getPlugin(), runnable, delay, period);
     }
 
     @Override
