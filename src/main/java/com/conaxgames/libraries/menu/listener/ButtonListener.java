@@ -5,7 +5,7 @@ import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
 import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
-import com.conaxgames.libraries.util.scheduler.Scheduler;
+import com.conaxgames.libraries.util.TaskUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,11 +66,7 @@ public class ButtonListener implements Listener {
                     event.setCancelled(cancel);
                 }
                 if (event.isCancelled()) {
-                    LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                        LibraryPlugin.getInstance().getPlugin(), 
-                        player::updateInventory, 
-                        1L
-                    );
+                    Bukkit.getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), player::updateInventory, 1L);
                 }
             } else if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
                 event.setCancelled(true);
@@ -89,25 +85,22 @@ public class ButtonListener implements Listener {
         Player player = (Player)event.getPlayer();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
-            LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                LibraryPlugin.getInstance().getPlugin(), 
-                () -> {
-                    Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
 
-                    if (openMenu.getPrevious() != null) {
-                        MenuBackEvent backEvent = new MenuBackEvent(player, openMenu, openMenu.getPrevious());
-                        backEvent.call();
-                        if (!backEvent.isCancelled()) {
-                            if (newMenu == null) { // only go back if there isn't a new menu opened?
-                                openMenu.getPrevious().openMenu(player);
-                            }
+            TaskUtil.runLater(() -> {
+                Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
+
+                if (openMenu.getPrevious() != null) {
+                    MenuBackEvent backEvent = new MenuBackEvent(player, openMenu, openMenu.getPrevious());
+                    backEvent.call();
+                    if (!backEvent.isCancelled()) {
+                        if (newMenu == null) { // only go back if there isn't a new menu opened?
+                            openMenu.getPrevious().openMenu(player);
                         }
-                    } else if (newMenu == null) { // player didn't open a new menu
-                        new MenuCloseEvent(player, openMenu).call();
                     }
-                }, 
-                2L
-            );
+                } else if (newMenu == null) { // player didn't open a new menu
+                    new MenuCloseEvent(player, openMenu).call();
+                }
+            }, 2L);
 
             openMenu.onClose(player);
 
