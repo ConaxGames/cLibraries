@@ -12,9 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-
+import com.conaxgames.libraries.util.scheduler.Scheduler;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,7 +90,7 @@ public abstract class Menu {
      * Map of update tasks by player name.
      * Used to manage automatic menu updates.
      */
-    public static Map<String, BukkitRunnable> checkTasks;
+    public static Map<String, Scheduler.CancellableTask> checkTasks;
 
     /**
      * Map of open inventories by player name.
@@ -240,9 +238,9 @@ public abstract class Menu {
         currentlyOpenedMenus.put(player.getName(), this);
         this.onOpen(player);
 
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
+        Scheduler.CancellableTask task = LibraryPlugin.getInstance().getScheduler().runTaskTimerCancellable(
+            LibraryPlugin.getInstance().getPlugin(),
+            () -> {
                 if (!player.isOnline()) {
                     cancelCheck(player);
                     currentlyOpenedMenus.remove(player.getName());
@@ -252,11 +250,10 @@ public abstract class Menu {
                 if (Menu.this.isAutoUpdate()) {
                     inv.setContents(Menu.this.createInventory(player).getContents());
                 }
-            }
-        };
-
-        runnable.runTaskTimer(LibraryPlugin.getInstance().getPlugin(), 10L, 20L);
-        checkTasks.put(player.getName(), runnable);
+            },
+            10L, 20L
+        );
+        checkTasks.put(player.getName(), task);
     }
 
     /**
