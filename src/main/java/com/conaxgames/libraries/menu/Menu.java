@@ -196,7 +196,7 @@ public abstract class Menu {
         if (Bukkit.isPrimaryThread()) {
             open(player);
         } else {
-            Bukkit.getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
         }
     }
 

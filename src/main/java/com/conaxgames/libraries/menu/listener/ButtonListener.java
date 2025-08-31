@@ -5,7 +5,6 @@ import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
 import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
-import com.conaxgames.libraries.util.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,7 +65,7 @@ public class ButtonListener implements Listener {
                     event.setCancelled(cancel);
                 }
                 if (event.isCancelled()) {
-                    Bukkit.getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), player::updateInventory, 1L);
+                    LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), player::updateInventory, 1L);
                 }
             } else if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
                 event.setCancelled(true);
