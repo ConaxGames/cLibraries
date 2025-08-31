@@ -1,4 +1,4 @@
-name: Release and Publish to Maven Central
+name: Uploader and Publisher
 
 on:
   push:
