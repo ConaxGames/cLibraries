@@ -5,7 +5,7 @@ import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
 import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
-import com.conaxgames.libraries.util.TaskUtil;
+import com.conaxgames.libraries.util.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -86,7 +86,7 @@ public class ButtonListener implements Listener {
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
 
-            TaskUtil.runLater(() -> {
+            LibraryPlugin.getInstance().getScheduler().runTaskLater(() -> {
                 Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
 
                 if (openMenu.getPrevious() != null) {
