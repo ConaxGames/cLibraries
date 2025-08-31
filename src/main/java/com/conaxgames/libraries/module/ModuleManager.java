@@ -5,7 +5,7 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.module.type.Module;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;

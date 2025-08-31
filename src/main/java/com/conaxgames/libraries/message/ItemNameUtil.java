@@ -1,9 +1,9 @@
 package com.conaxgames.libraries.message;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
-import org.apache.commons.lang.WordUtils;
 
 import java.util.Map;
 

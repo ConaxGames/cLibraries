@@ -1,6 +1,6 @@
 package com.conaxgames.libraries.util;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 public class JsonUtils {
 
