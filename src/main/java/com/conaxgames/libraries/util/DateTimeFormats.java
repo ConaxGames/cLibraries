@@ -1,8 +1,7 @@
 package com.conaxgames.libraries.util;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang.time.FastDateFormat;
-
+import org.apache.commons.lang3.time.FastDateFormat;
 import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.TimeZone;

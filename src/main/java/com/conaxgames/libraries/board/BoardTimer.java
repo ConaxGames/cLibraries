@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.board;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+
 import java.text.DecimalFormat;
 
 /**
