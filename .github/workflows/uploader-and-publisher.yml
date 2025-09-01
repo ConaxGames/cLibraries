@@ -53,5 +53,3 @@ jobs:
         with:
           commit_message: 'docs: Updated to version `${{ github.ref_name }}`.'
           file_pattern: 'README.md'
-          branch: main
-          push_options: '--force'
