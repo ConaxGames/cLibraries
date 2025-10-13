@@ -246,6 +246,24 @@ public class ItemBuilderUtil {
         this.is.setItemMeta(meta);
         return this;
     }
+
+    public ItemBuilderUtil hideAttributes() {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilderUtil showAttributes() {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.removeItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
     
     public ItemBuilderUtil setAmount(int amount) {
         this.is.setAmount(amount);
