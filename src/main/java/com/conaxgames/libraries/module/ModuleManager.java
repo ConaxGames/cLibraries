@@ -43,6 +43,9 @@ public class ModuleManager {
         if (!modules.containsKey(module.getIdentifier().toLowerCase())) {
             modules.put(module.getIdentifier().toLowerCase(), new AbstractMap.SimpleEntry<>(module, false));
         }
+        
+        module.setupFiles();
+        module.reloadConfig();
 
         if (module.isConfiguredToEnable()) {
             this.enableModule(module, false);
@@ -64,8 +67,11 @@ public class ModuleManager {
         }
 
         // Sets up the data files which are required for the module.
-        module.setupFiles();
-        module.reloadConfig();
+        // Only call if not already set up (to avoid duplicate calls from registerModule)
+        if (!module.isEnabled()) {
+            module.setupFiles();
+            module.reloadConfig();
+        }
 
         // Registers as listener and calls onReload & onEnable.
         this.setModuleEnabled(module);
