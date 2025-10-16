@@ -62,10 +62,6 @@ public abstract class Module {
      * @return if module can be enabled.
      */
     public boolean isConfiguredToEnable() {
-        // Sub Modules are handled inside their parent module
-        if (this instanceof SubModule) {
-            return true;
-        }
         return getBoolean("enabled", false);
     }
 
