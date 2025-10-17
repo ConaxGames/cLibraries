@@ -30,10 +30,12 @@ public class HookManager implements Listener {
     @EventHandler
     public void onPluginEnable(LibraryPluginEnableEvent event) {
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            for (Hook disabled : disabledHooks) {
-                if (plugin.isEnabled() && plugin.getName().contains(disabled.getPluginFromAnnotation())) {
+            Iterator<Hook> iterator = disabledHooks.iterator();
+            while (iterator.hasNext()) {
+                Hook disabled = iterator.next();
+                if (plugin.isEnabled() && plugin.getName().equals(disabled.getPluginFromAnnotation())) {
                     hooks.add(disabled);
-                    disabledHooks.remove(disabled);
+                    iterator.remove();
                     break;
                 }
             }
