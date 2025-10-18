@@ -188,28 +188,26 @@ public class BoardEntry {
      * @return Array containing [prefix, suffix]
      */
     public String[] splitText(String input) {
-        final int inputLength = input.length();
-        if (inputLength > MAX_TEXT_LENGTH) {
-            String prefix = input.substring(0, MAX_TEXT_LENGTH);
-            final int lastColorIndex = prefix.lastIndexOf(ChatColor.COLOR_CHAR);
-            String suffix;
-
-            if (lastColorIndex >= 14) {
-                prefix = prefix.substring(0, lastColorIndex);
-                suffix = ChatColor.getLastColors(input.substring(0, 17)) + input.substring(lastColorIndex + 2);
-            } else {
-                suffix = ChatColor.getLastColors(prefix) + input.substring(MAX_TEXT_LENGTH);
-            }
-
-            if (VersioningChecker.getInstance().isServerVersionBefore("1.16.5")) {
-                if (suffix.length() > MAX_TEXT_LENGTH) {
-                    suffix = suffix.substring(0, MAX_TEXT_LENGTH);
-                }
-            }
-            return new String[] {prefix, suffix};
-        } else {
-            return new String[] {input, ""};
+        if (input == null || input.length() <= MAX_TEXT_LENGTH) {
+            return new String[] {input != null ? input : "", ""};
         }
+        
+        String prefix = input.substring(0, MAX_TEXT_LENGTH);
+        int lastColorIndex = prefix.lastIndexOf(ChatColor.COLOR_CHAR);
+        String suffix;
+
+        if (lastColorIndex >= 14) {
+            prefix = prefix.substring(0, lastColorIndex);
+            suffix = ChatColor.getLastColors(input.substring(0, 17)) + input.substring(lastColorIndex + 2);
+        } else {
+            suffix = ChatColor.getLastColors(prefix) + input.substring(MAX_TEXT_LENGTH);
+        }
+
+        if (VersioningChecker.getInstance().isServerVersionBefore("1.16.5") && suffix.length() > MAX_TEXT_LENGTH) {
+            suffix = suffix.substring(0, MAX_TEXT_LENGTH);
+        }
+        
+        return new String[] {prefix, suffix};
     }
 
     /**
@@ -219,8 +217,8 @@ public class BoardEntry {
      * @return This board entry for method chaining
      */
     public BoardEntry setText(String text) {
-        if (!this.text.equals(text)) {
-            this.text = text;
+        if (text == null || !this.text.equals(text)) {
+            this.text = text != null ? text : "";
             this.cachedSplitText = null;
         }
         return this;
