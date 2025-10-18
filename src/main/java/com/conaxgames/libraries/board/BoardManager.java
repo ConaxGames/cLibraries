@@ -41,20 +41,21 @@ public class BoardManager implements Runnable {
     public void run() {
         this.adapter.preLoop();
         
-        // Clean up boards for players with cElement metadata
         cleanupAllCElementBoards();
         
-        // Update all boards synchronously
-        for (Map.Entry<UUID, Board> entry : this.playerBoards.entrySet()) {
+        Iterator<Map.Entry<UUID, Board>> iterator = this.playerBoards.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Board> entry = iterator.next();
             UUID playerUUID = entry.getKey();
             Board board = entry.getValue();
             
             Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(playerUUID);
             if (player == null || !player.isOnline()) {
+                iterator.remove();
+                cleanupBoard(board);
                 continue;
             }
             
-            // Skip players with cElement metadata
             if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) {
                 continue;
             }
@@ -75,33 +76,26 @@ public class BoardManager implements Runnable {
      * @param board The board instance for this player
      */
     private void updatePlayerBoard(Player player, Board board) {
-        Scoreboard scoreboard = board.getScoreboard();
-        Objective objective = board.getObjective();
-
         List<String> scores = this.adapter.getScoreboard(player, board);
 
         if (scores == null || scores.isEmpty()) {
-            // Clear all entries if no scores
             if (!board.getEntries().isEmpty()) {
                 board.clearAllEntries();
             }
             return;
         }
         
-        // Reverse scores for proper positioning
         Collections.reverse(scores);
         
-        // Update title if changed
         String newTitle = this.adapter.getTitle(player);
-        if (newTitle != null && !objective.getDisplayName().equals(newTitle)) {
-            objective.setDisplayName(newTitle);
+        if (newTitle != null && !board.getObjective().getDisplayName().equals(newTitle)) {
+            board.getObjective().setDisplayName(newTitle);
         }
 
-        // Efficiently update entries
-        updateBoardEntries(board, scores, objective);
+        updateBoardEntries(board, scores, board.getObjective());
 
-        this.adapter.onScoreboardCreate(player, scoreboard);
-        player.setScoreboard(scoreboard);
+        this.adapter.onScoreboardCreate(player, board.getScoreboard());
+        player.setScoreboard(board.getScoreboard());
     }
     
     /**
@@ -118,8 +112,7 @@ public class BoardManager implements Runnable {
         // Remove excess entries efficiently
         if (entries.size() > scoresSize) {
             for (int i = entries.size() - 1; i >= scoresSize; i--) {
-                BoardEntry entry = entries.get(i);
-                entry.remove();
+                entries.get(i).remove();
                 entries.remove(i);
             }
         }
@@ -131,17 +124,14 @@ public class BoardManager implements Runnable {
             
             BoardEntry entry;
             if (i < entries.size()) {
-                // Update existing entry
                 entry = entries.get(i);
                 if (!entry.getText().equals(text)) {
                     entry.setText(text).setup();
                 }
             } else {
-                // Create new entry
                 entry = new BoardEntry(board, text);
             }
             
-            // Update position
             entry.send(position);
         }
     }

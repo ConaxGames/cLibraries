@@ -32,7 +32,7 @@ public class BoardTimer {
     public BoardTimer(String id, double duration) {
         this.id = id;
         this.duration = duration;
-        this.end = (long) (System.currentTimeMillis() + (duration * MILLISECONDS_PER_SECOND));
+        this.end = System.currentTimeMillis() + (long) (duration * MILLISECONDS_PER_SECOND);
     }
 
     /**
@@ -49,7 +49,7 @@ public class BoardTimer {
         }
         
         if (format == TimerType.SECONDS) {
-            return SECONDS_FORMATTER.format(remainingTime / 1000.0f);
+            return SECONDS_FORMATTER.format(remainingTime / 1000.0);
         } else {
             return DurationFormatUtils.formatDuration(remainingTime, MINUTES_SECONDS_FORMAT);
         }

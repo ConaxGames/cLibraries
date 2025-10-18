@@ -81,17 +81,15 @@ public class Board {
      * @throws IndexOutOfBoundsException if no more keys are available
      */
     public String getNewKey(BoardEntry entry) {
+        String text = entry.getText();
+        String colorSuffix = text.length() > 16 ? ChatColor.getLastColors(text.substring(0, 16)) : "";
+        
         for (String baseKey : AVAILABLE_KEYS) {
-            String colorText = baseKey;
+            String key = baseKey + colorSuffix;
             
-            if (entry.getText().length() > 16) {
-                String sub = entry.getText().substring(0, 16);
-                colorText = colorText + ChatColor.getLastColors(sub);
-            }
-            
-            if (!usedKeys.containsKey(colorText)) {
-                usedKeys.put(colorText, entry.getText());
-                return colorText;
+            if (!usedKeys.containsKey(key)) {
+                usedKeys.put(key, text);
+                return key;
             }
         }
         
@@ -132,16 +130,16 @@ public class Board {
      */
     public BoardTimer getTimer(String id) {
         BoardTimer timer = timers.get(id);
-        if (timer != null && !timer.isExpired()) {
-            return timer;
+        if (timer == null) {
+            return null;
         }
         
-        // Remove expired timer
-        if (timer != null) {
+        if (timer.isExpired()) {
             timers.remove(id);
+            return null;
         }
         
-        return null;
+        return timer;
     }
 
     /**
@@ -150,9 +148,8 @@ public class Board {
      * @return Map of active timers
      */
     public Map<String, BoardTimer> getTimers() {
-        // Clean up expired timers
         timers.entrySet().removeIf(entry -> entry.getValue().isExpired());
-        return this.timers;
+        return new HashMap<>(timers);
     }
 
     /**
@@ -209,11 +206,4 @@ public class Board {
         return this.objective;
     }
 
-    /**
-     * @deprecated Use {@link #getTimer(String)} instead for better clarity
-     */
-    @Deprecated
-    public BoardTimer getCooldown(String id) {
-        return getTimer(id);
-    }
 }
