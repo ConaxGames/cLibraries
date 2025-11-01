@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.module.manage;
 
 import com.conaxgames.libraries.menu.Button;
+import com.conaxgames.libraries.menu.buttons.CloseButton;
 import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
 import com.conaxgames.libraries.module.ModuleManager;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ public class ModuleMenu extends PaginatedMenu {
 
     public ModuleMenu(ModuleManager moduleManager) {
         this.moduleManager = moduleManager;
+        this.setReservedRows(5);
     }
 
     @Override
@@ -34,13 +36,20 @@ public class ModuleMenu extends PaginatedMenu {
     }
 
     @Override
+    public Map<Integer, Button> getGlobalButtons(Player player) {
+        Map<Integer, Button> buttons = new HashMap<>();
+        buttons.put(49, new CloseButton());
+        return buttons;
+    }
+
+    @Override
     public int previousPageSlot(Player var1) {
-        return 0;
+        return 48;
     }
 
     @Override
     public int nextPageSlot(Player var1) {
-        return 8;
+        return 50;
     }
 
 }
