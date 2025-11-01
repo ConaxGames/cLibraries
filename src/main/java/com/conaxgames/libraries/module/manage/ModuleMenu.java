@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.module.manage;
 
+import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
 import com.conaxgames.libraries.module.ModuleManager;
@@ -13,8 +14,8 @@ public class ModuleMenu extends PaginatedMenu {
 
     private final ModuleManager moduleManager;
 
-    public ModuleMenu(ModuleManager moduleManager) {
-        this.moduleManager = moduleManager;
+    public ModuleMenu() {
+        this.moduleManager = LibraryPlugin.getInstance().getModuleManager();
     }
 
     @Override
