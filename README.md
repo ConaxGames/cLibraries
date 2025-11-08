@@ -36,7 +36,7 @@ public class YourPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         this.libraryPlugin = new LibraryPlugin().onEnable(
-            this, "DebugPrefix", "DebugSecondary", "module", "yourplugin.modules"
+            this, "§2", "§7", "module", "yourplugin.modules"
         );
     }
     
@@ -46,6 +46,14 @@ public class YourPlugin extends JavaPlugin {
     }
 }
 ```
+
+**Parameters:**
+- `debugPrimary` - Color code for primary log messages (e.g., `"§2"` for dark green, `"§b"` for aqua)
+- `debugSecondary` - Color code for secondary log messages (e.g., `"§7"` for gray)
+- `moduleCommandAlias` - Command alias for module management (e.g., `"module"`)
+- `moduleCommandPerm` - Package path for module commands (e.g., `"yourplugin.modules"`)
+
+The logger will automatically format messages as `[YourPlugin] action: message` using the provided color codes.
 
 ## Features
 
