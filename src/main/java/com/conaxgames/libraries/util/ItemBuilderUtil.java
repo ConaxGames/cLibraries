@@ -51,7 +51,7 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setName(String name) {
         ItemMeta im = is.getItemMeta();
-        im.setDisplayName(name);
+        im.setDisplayName(CC.translate(name));
         is.setItemMeta(im);
         return this;
     }
@@ -114,14 +114,14 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setLore(String... lore) {
         ItemMeta im = is.getItemMeta();
-        im.setLore(Arrays.asList(lore));
+        im.setLore(CC.translate(lore));
         is.setItemMeta(im);
         return this;
     }
 
     public ItemBuilderUtil setLore(List<String> lore) {
         ItemMeta im = is.getItemMeta();
-        im.setLore(lore);
+        im.setLore(CC.translate(lore));
         is.setItemMeta(im);
         return this;
     }
@@ -153,7 +153,7 @@ public class ItemBuilderUtil {
         List<String> lore = new ArrayList<String>();
         if (im.hasLore())
             lore = new ArrayList<String>(im.getLore());
-        lore.add(line);
+        lore.add(CC.translate(line));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -165,7 +165,7 @@ public class ItemBuilderUtil {
             List<String> lore = new ArrayList<String>();
             if (im.hasLore())
                 lore = new ArrayList<String>(im.getLore());
-            lore.add(line);
+            lore.add(CC.translate(line));
             im.setLore(lore);
             is.setItemMeta(im);
             return this;
@@ -178,7 +178,7 @@ public class ItemBuilderUtil {
         List<String> lore = new ArrayList<String>();
         if (im.hasLore())
             lore = new ArrayList<String>(im.getLore());
-        lore.addAll(line);
+        lore.addAll(CC.translate(line));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -187,7 +187,7 @@ public class ItemBuilderUtil {
     public ItemBuilderUtil addLoreLine(String line, int pos) {
         ItemMeta im = is.getItemMeta();
         List<String> lore = new ArrayList<String>(im.getLore());
-        lore.set(pos, line);
+        lore.set(pos, CC.translate(line));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
