@@ -1,8 +1,8 @@
 package com.conaxgames.libraries.util;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.cryptomorin.xseries.profiles.builder.XSkull;
+import com.cryptomorin.xseries.profiles.objects.Profileable;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -12,11 +12,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ItemBuilderUtil {
@@ -74,24 +72,16 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setSkullOwner(String name) {
-        SkullMeta meta = (SkullMeta) is.getItemMeta();
-        meta.setOwner(name);
-        this.is.setItemMeta(meta);
+        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
+            this.is = XSkull.of(is).profile(Profileable.username(name)).apply();
+        }
         return this;
     }
 
     public ItemBuilderUtil setSkullProfile(String texture) {
-        SkullMeta meta = (SkullMeta) is.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-        profile.getProperties().put("textures", new Property("textures", texture));
-        try {
-            Field profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, profile);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            e.printStackTrace();
+        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
+            this.is = XSkull.of(is).profile(Profileable.detect(texture)).apply();
         }
-        is.setItemMeta(meta);
         return this;
     }
 
@@ -295,21 +285,7 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setSkin(String texture) {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            final SkullMeta meta = (SkullMeta) is.getItemMeta();
-            if (meta != null) {
-                GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-                profile.getProperties().put("textures", new Property("textures", texture));
-
-                try {
-                    Field profileField = meta.getClass().getDeclaredField("profile");
-                    profileField.setAccessible(true);
-                    profileField.set(meta, profile);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                is.setItemMeta(meta);
-            }
+            this.is = XSkull.of(is).profile(Profileable.detect(texture)).apply();
         }
         return this;
     }
