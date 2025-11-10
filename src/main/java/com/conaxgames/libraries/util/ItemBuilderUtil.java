@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -279,6 +280,20 @@ public class ItemBuilderUtil {
             meta.setCustomModelData(modelData);
         }
         this.is.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemBuilderUtil setGlow() {
+        this.is.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        return this;
+    }
+
+    public ItemBuilderUtil setGlow(boolean glow) {
+        if (glow) {
+            this.is.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        } else {
+            this.is.unsetData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
+        }
         return this;
     }
 

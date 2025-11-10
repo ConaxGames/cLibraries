@@ -1,16 +1,14 @@
 package com.conaxgames.libraries.menu;
 
-import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
+import com.conaxgames.libraries.util.ItemBuilderUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.List;
 
@@ -214,26 +212,23 @@ public abstract class Button {
             material = XMaterial.BEDROCK.get();
         }
 
-        ItemStack buttonItem = new ItemStack(material, this.getAmount(player), (short)this.getDamageValue(player));
-        ItemMeta meta = buttonItem.getItemMeta();
-        meta.setDisplayName(this.getName(player));
-        List<String> description = this.getDescription(player);
+        ItemBuilderUtil builder = new ItemBuilderUtil(material, this.getAmount(player), (byte)this.getDamageValue(player))
+                .setName(this.getName(player));
 
+        List<String> description = this.getDescription(player);
         if (description != null) {
-            meta.setLore(description);
+            builder.setLore(description);
         }
 
         if (skullOwner(player) != null) {
-            SkullMeta skullMeta = (SkullMeta) meta;
-            skullMeta.setOwner(skullOwner(player));
+            builder.setSkullOwner(skullOwner(player));
         }
 
         if (shinyItem(player)) {
-            meta.addEnchant(XEnchantment.UNBREAKING.get(), 1, true);
+            builder.setGlow();
         }
 
-        buttonItem.setItemMeta(meta);
-        return buttonItem;
+        return builder.toItemStack();
     }
 
     /**
