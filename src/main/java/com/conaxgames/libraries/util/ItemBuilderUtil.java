@@ -77,8 +77,12 @@ public class ItemBuilderUtil {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
             ItemMeta meta = is.getItemMeta();
             if (meta instanceof SkullMeta) {
-                XSkull.of(meta).profile(Profileable.of(name)).apply();
-                is.setItemMeta(meta);
+                try {
+                    meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
+                    is.setItemMeta(meta);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return this;
@@ -88,8 +92,12 @@ public class ItemBuilderUtil {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
             ItemMeta meta = is.getItemMeta();
             if (meta instanceof SkullMeta) {
-                XSkull.of(meta).profile(Profileable.of(texture)).apply();
-                is.setItemMeta(meta);
+                try {
+                    meta = XSkull.of(meta).profile(Profileable.detect(texture)).apply();
+                    is.setItemMeta(meta);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return this;
@@ -311,8 +319,12 @@ public class ItemBuilderUtil {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
             ItemMeta meta = is.getItemMeta();
             if (meta instanceof SkullMeta) {
-                XSkull.of(meta).profile(Profileable.of(texture)).apply();
-                is.setItemMeta(meta);
+                try {
+                    meta = XSkull.of(meta).profile(Profileable.detect(texture)).apply();
+                    is.setItemMeta(meta);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return this;
