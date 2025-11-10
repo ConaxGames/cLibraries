@@ -3,10 +3,12 @@ package com.conaxgames.libraries.util;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -78,7 +80,27 @@ public class ItemBuilderUtil {
             ItemMeta meta = is.getItemMeta();
             if (meta instanceof SkullMeta) {
                 try {
-                    meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+                    if (offlinePlayer != null && offlinePlayer.hasPlayedBefore()) {
+                        meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
+                    } else {
+                        meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
+                    }
+                    is.setItemMeta(meta);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return this;
+    }
+
+    public ItemBuilderUtil setSkullOwner(OfflinePlayer offlinePlayer) {
+        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
+            ItemMeta meta = is.getItemMeta();
+            if (meta instanceof SkullMeta) {
+                try {
+                    meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
                     is.setItemMeta(meta);
                 } catch (Exception e) {
                     e.printStackTrace();
