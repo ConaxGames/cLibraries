@@ -94,7 +94,7 @@ public class ModuleManager {
         this.registerModule(module); // register the module with the status of "false"
 
         module.setupFiles(); // Sets up the data files which are required for the module.
-        module.reloadConfig(); // Reload the settings.yml data
+        module.reloadConfig();
 
         module.onReload(); // Call the reload to the module
 

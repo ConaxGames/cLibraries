@@ -30,7 +30,6 @@ public class LibraryPlugin {
     private static LibraryPlugin instance;
     private JavaPlugin plugin;
     private boolean setup;
-    private Settings settings;
     private LibraryLogger libraryLogger;
     private TimerManager timerManager;
     private PaperCommandManager paperCommandManager;
@@ -70,7 +69,6 @@ public class LibraryPlugin {
 
         instance = this;
         this.plugin = plugin;
-        initializeSettings();
         
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.paperCommandManager = new PaperCommandManager(this.plugin);
@@ -105,16 +103,6 @@ public class LibraryPlugin {
         this.boardManager = boardManager;
         long interval = this.boardManager.getAdapter().getInterval();
         this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
-    }
-
-    private void initializeSettings() {
-        try {
-            settings = new Settings();
-        } catch (Exception e) {
-            Bukkit.getLogger().info(" ");
-            Bukkit.getLogger().info("cLibraries settings were unable to load!");
-            Bukkit.getLogger().info(" ");
-        }
     }
 
     private void initializeScheduler() {
