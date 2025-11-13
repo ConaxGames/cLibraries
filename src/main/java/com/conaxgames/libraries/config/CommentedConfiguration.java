@@ -52,7 +52,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @param file The file to save changes into if there are any.
      * @param resource The resource to sync with. Can be provided by JavaPlugin#getResource
      * @param ignoredSections An array of sections that will be ignored, and won't get updated
-     *                        if they are already exist in the config. If they are not in the
+     *                        if they already exist in the config. If they are not in the
      *                        config, they will be synced with the resource's config.
      */
     public void syncWithConfig(File file, InputStream resource, String... ignoredSections) throws IOException{
@@ -224,11 +224,11 @@ public final class CommentedConfiguration extends YamlConfiguration {
         for (String key : section.getKeys(false)) {
             //Parsing the key into a full-path.
             String path = section.getCurrentPath().isEmpty() ? key : section.getCurrentPath() + "." + key;
+            //Checking if the section is ignored.
+            boolean isIgnored = ignoredSections.stream().anyMatch(path::contains);
 
             //Checking if the key is also a section.
             if (section.isConfigurationSection(key)) {
-                //Checking if the section is ignored.
-                boolean isIgnored = ignoredSections.stream().anyMatch(path::contains);
                 //Checking if the config contains the section.
                 boolean containsSection = contains(path);
                 //If the config doesn't contain the section, or it's not ignored - we will sync data.
@@ -240,18 +240,42 @@ public final class CommentedConfiguration extends YamlConfiguration {
 
             //Checking if the config contains the path (not a section).
             else if (!contains(path)) {
-                //Saving the value of the key into the config.
-                set(path, section.get(key));
-                //Updating variables.
-                changed = true;
+                //If the path is ignored, check if the parent section exists.
+                //If parent exists and is ignored, don't sync (preserve existing ignored section).
+                //If parent doesn't exist, we're adding the ignored section, so sync it.
+                boolean shouldSync = true;
+                if (isIgnored) {
+                    String parentPath = getParentPath(path);
+                    if (!parentPath.isEmpty() && contains(parentPath)) {
+                        shouldSync = false;
+                    }
+                }
+                if (shouldSync) {
+                    //Saving the value of the key into the config.
+                    set(path, section.get(key));
+                    //Updating variables.
+                    changed = true;
+                }
             }
 
             //Checking if there is a valid comment for the path, and also making sure the comments are not the same.
             if (commentedConfig.containsComment(path) && !commentedConfig.getComment(path).equals(getComment(path))) {
-                //Saving the comment of the key into the config.
-                setComment(path, commentedConfig.getComment(path));
-                //Updating variable.
-                changed = true;
+                //If the path is ignored, check if the parent section exists.
+                //If parent exists and is ignored, don't sync (preserve existing ignored section).
+                //If parent doesn't exist, we're adding the ignored section, so sync it.
+                boolean shouldSync = true;
+                if (isIgnored) {
+                    String parentPath = getParentPath(path);
+                    if (!parentPath.isEmpty() && contains(parentPath)) {
+                        shouldSync = false;
+                    }
+                }
+                if (shouldSync) {
+                    //Saving the comment of the key into the config.
+                    setComment(path, commentedConfig.getComment(path));
+                    //Updating variable.
+                    changed = true;
+                }
             }
 
         }
