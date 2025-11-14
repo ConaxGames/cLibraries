@@ -11,6 +11,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+/**
+ * @deprecated This class is marked for removal.
+ */
+@Deprecated(forRemoval = true)
 public class StringUtils {
 
 	public static Pattern UUID_REGEX = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");

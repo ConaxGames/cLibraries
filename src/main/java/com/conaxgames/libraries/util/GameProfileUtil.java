@@ -7,8 +7,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
 /**
+ * @deprecated This class is marked for removal.
  * @since 10/9/2017
  */
+@Deprecated(forRemoval = true)
 public class GameProfileUtil {
 
 	public static GameProfile clone(GameProfile gameProfile) {
@@ -21,19 +23,18 @@ public class GameProfileUtil {
 		try {
 			Field nameField = GameProfile.class.getDeclaredField("name");
 
-			// Make the field accessible
 			nameField.setAccessible(true);
 
-			// Use MethodHandles to set the value
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
 			MethodHandle setter = lookup.unreflectSetter(nameField);
 
 			setter.invoke(gameProfile, newName);
 		} catch (ReflectiveOperationException e) {
-			e.printStackTrace(); // Handle or log the exception as needed
+			e.printStackTrace();
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
 		return gameProfile;
 	}
 }
+

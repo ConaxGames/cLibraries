@@ -2,6 +2,10 @@ package com.conaxgames.libraries.util;
 
 import java.util.TreeMap;
 
+/**
+ * @deprecated This class is marked for removal.
+ */
+@Deprecated(forRemoval = true)
 public class RomanNumerals {
 
 	private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
