@@ -317,7 +317,7 @@ public class ItemBuilderUtil {
         if (meta != null) {
             Enchantment enchantment = XEnchantment.UNBREAKING.get();
             if (enchantment != null) {
-                this.is.addUnsafeEnchantment(enchantment, 1);
+                meta.addEnchant(enchantment, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 this.is.setItemMeta(meta);
             }
@@ -326,20 +326,20 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setGlow(boolean glow) {
-        if (glow) {
-            ItemMeta meta = this.is.getItemMeta();
-            if (meta != null) {
-                Enchantment enchantment = XEnchantment.UNBREAKING.get();
-                if (enchantment != null) {
-                    this.is.addUnsafeEnchantment(enchantment, 1);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    this.is.setItemMeta(meta);
-                }
-            }
-        } else {
+        ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
             Enchantment enchantment = XEnchantment.UNBREAKING.get();
             if (enchantment != null) {
-                this.is.removeEnchantment(enchantment);
+                if (glow) {
+                    meta.addEnchant(enchantment, 1, true);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                } else {
+                    meta.removeEnchant(enchantment);
+                    if (!meta.hasEnchants()) {
+                        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    }
+                }
+                this.is.setItemMeta(meta);
             }
         }
         return this;
