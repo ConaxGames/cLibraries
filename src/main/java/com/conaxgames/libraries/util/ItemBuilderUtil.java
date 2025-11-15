@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.util;
 
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 
 import java.util.*;
 
@@ -313,15 +313,34 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setGlow() {
-        this.is.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            Enchantment enchantment = XEnchantment.UNBREAKING.get();
+            if (enchantment != null) {
+                this.is.addUnsafeEnchantment(enchantment, 1);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                this.is.setItemMeta(meta);
+            }
+        }
         return this;
     }
 
     public ItemBuilderUtil setGlow(boolean glow) {
         if (glow) {
-            this.is.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+            ItemMeta meta = this.is.getItemMeta();
+            if (meta != null) {
+                Enchantment enchantment = XEnchantment.UNBREAKING.get();
+                if (enchantment != null) {
+                    this.is.addUnsafeEnchantment(enchantment, 1);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    this.is.setItemMeta(meta);
+                }
+            }
         } else {
-            this.is.unsetData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
+            Enchantment enchantment = XEnchantment.UNBREAKING.get();
+            if (enchantment != null) {
+                this.is.removeEnchantment(enchantment);
+            }
         }
         return this;
     }
