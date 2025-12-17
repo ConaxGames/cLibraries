@@ -111,12 +111,21 @@ public final class CC {
 	/**
 	 * Translates color codes in a string, including hex colors.
 	 * Supports both standard Minecraft color codes (&) and hex colors (&#RRGGBB).
+	 * Also supports custom color codes: &P/&p (PRIMARY), &S/&s (SECONDARY), &T/&t (TERTIARY).
 	 *
 	 * @param string The text to translate
 	 * @return The translated text with all color codes applied
 	 */
 	public static String translate(String string) {
-		String translatedHex = translateHex(string);
+		if (string == null) return null;
+		String result = string
+				.replace("&p", PRIMARY)
+				.replace("&s", SECONDARY)
+				.replace("&t", TERTIARY)
+				.replace("&P", PRIMARY)
+				.replace("&S", SECONDARY)
+				.replace("&T", TERTIARY);
+		String translatedHex = translateHex(result);
 		return ChatColor.translateAlternateColorCodes('&', translatedHex);
 	}
 
