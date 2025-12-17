@@ -82,7 +82,11 @@ public class ItemBuilderUtil {
                 try {
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
                     if (offlinePlayer != null && offlinePlayer.hasPlayedBefore()) {
-                        meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
+                        try {
+                            meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
+                        } catch (IllegalArgumentException e) {
+                            meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
+                        }
                     } else {
                         meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
                     }
@@ -100,7 +104,15 @@ public class ItemBuilderUtil {
             ItemMeta meta = is.getItemMeta();
             if (meta instanceof SkullMeta) {
                 try {
-                    meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
+                    try {
+                        meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
+                    } catch (IllegalArgumentException e) {
+                        if (offlinePlayer.getName() != null) {
+                            meta = XSkull.of(meta).profile(Profileable.username(offlinePlayer.getName())).apply();
+                        } else {
+                            throw e;
+                        }
+                    }
                     is.setItemMeta(meta);
                 } catch (Exception e) {
                     e.printStackTrace();
