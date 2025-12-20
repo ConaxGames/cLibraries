@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.util;
 
+import com.conaxgames.libraries.message.FormatUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
@@ -144,14 +145,22 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setLore(String... lore) {
         ItemMeta im = is.getItemMeta();
-        im.setLore(CC.translate(lore));
+        List<String> wrappedLore = new ArrayList<>();
+        for (String line : lore) {
+            wrappedLore.addAll(FormatUtil.wordWrap(line));
+        }
+        im.setLore(CC.translate(wrappedLore));
         is.setItemMeta(im);
         return this;
     }
 
     public ItemBuilderUtil setLore(List<String> lore) {
         ItemMeta im = is.getItemMeta();
-        im.setLore(CC.translate(lore));
+        List<String> wrappedLore = new ArrayList<>();
+        for (String line : lore) {
+            wrappedLore.addAll(FormatUtil.wordWrap(line));
+        }
+        im.setLore(CC.translate(wrappedLore));
         is.setItemMeta(im);
         return this;
     }
@@ -183,7 +192,10 @@ public class ItemBuilderUtil {
         List<String> lore = new ArrayList<String>();
         if (im.hasLore())
             lore = new ArrayList<String>(im.getLore());
-        lore.add(CC.translate(line));
+        List<String> wrapped = FormatUtil.wordWrap(line);
+        for (String wrappedLine : wrapped) {
+            lore.add(CC.translate(wrappedLine));
+        }
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -195,7 +207,10 @@ public class ItemBuilderUtil {
             List<String> lore = new ArrayList<String>();
             if (im.hasLore())
                 lore = new ArrayList<String>(im.getLore());
-            lore.add(CC.translate(line));
+            List<String> wrapped = FormatUtil.wordWrap(line);
+            for (String wrappedLine : wrapped) {
+                lore.add(CC.translate(wrappedLine));
+            }
             im.setLore(lore);
             is.setItemMeta(im);
             return this;
@@ -208,7 +223,11 @@ public class ItemBuilderUtil {
         List<String> lore = new ArrayList<String>();
         if (im.hasLore())
             lore = new ArrayList<String>(im.getLore());
-        lore.addAll(CC.translate(line));
+        List<String> wrappedLore = new ArrayList<>();
+        for (String l : line) {
+            wrappedLore.addAll(FormatUtil.wordWrap(l));
+        }
+        lore.addAll(CC.translate(wrappedLore));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -216,8 +235,21 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil addLoreLine(String line, int pos) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>(im.getLore());
-        lore.set(pos, CC.translate(line));
+        List<String> lore = new ArrayList<String>();
+        if (im.hasLore() && im.getLore() != null)
+            lore = new ArrayList<String>(im.getLore());
+        List<String> wrapped = FormatUtil.wordWrap(line);
+        if (wrapped.isEmpty()) {
+            return this;
+        }
+        if (pos < 0 || pos >= lore.size()) {
+            lore.addAll(CC.translate(wrapped));
+        } else {
+            lore.set(pos, CC.translate(wrapped.get(0)));
+            for (int i = 1; i < wrapped.size(); i++) {
+                lore.add(pos + i, CC.translate(wrapped.get(i)));
+            }
+        }
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
