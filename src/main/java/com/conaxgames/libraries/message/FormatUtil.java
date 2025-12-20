@@ -31,7 +31,7 @@ public enum FormatUtil {;
     }
 
     public static List<String> wordWrap(String s) {
-        return wordWrap(s, 32, 32);
+        return wordWrap(s, 34, 36);
     }
 
     public static List<String> wordWrap(String s, int lineSize) {
@@ -64,7 +64,7 @@ public enum FormatUtil {;
         while (ix < s.length()) {
             ix = s.indexOf(' ', ix+1);
             if (ix != -1) {
-                String subString = s.substring(jx, ix).trim();
+                String subString = s.substring(jx, ix).replaceAll("\\s+$", "");
                 String f = getFormat(subString);
                 int chars = stripFormatting(subString).length() + 1; // remember the space
                 if (chars >= numChars) {
@@ -81,7 +81,7 @@ public enum FormatUtil {;
                 break;
             }
         }
-        words.add(withFormat(format, s.substring(jx).trim()));
+        words.add(withFormat(format, s.substring(jx).replaceAll("\\s+$", "")));
         return words;
     }
 
