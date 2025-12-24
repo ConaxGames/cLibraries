@@ -289,6 +289,15 @@ public class ItemBuilderUtil {
         return this;
     }
 
+    public ItemBuilderUtil hideEnchants() {
+        final ItemMeta meta = this.is.getItemMeta();
+        if (meta != null) {
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        this.is.setItemMeta(meta);
+        return this;
+    }
+
     public ItemBuilderUtil showAttributes() {
         final ItemMeta meta = this.is.getItemMeta();
         if (meta != null) {
