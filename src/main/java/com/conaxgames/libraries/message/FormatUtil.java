@@ -68,7 +68,7 @@ public enum FormatUtil {;
                 String f = getFormat(subString);
                 int chars = stripFormatting(subString).length() + 1; // remember the space
                 if (chars >= numChars) {
-                    if (f != null) {
+                    if (f != null && subString.startsWith(f)) {
                         format = f;
                     }
                     if (!subString.isEmpty()) {
