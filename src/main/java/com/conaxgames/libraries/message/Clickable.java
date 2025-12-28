@@ -29,7 +29,7 @@ public class Clickable {
 		TextComponent message = new TextComponent(msg);
 
 		if (hoverMsg != null) {
-			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMsg).create()));
+			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverMsg)));
 		}
 
 		if (clickString != null) {
