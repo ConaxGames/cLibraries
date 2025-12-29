@@ -1,8 +1,8 @@
 package com.conaxgames.libraries.message;
 
 import lombok.NoArgsConstructor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
@@ -16,9 +16,7 @@ public class Clickable {
 	private List<TextComponent> components = new ArrayList<>();
 
 	public Clickable(String msg) {
-		TextComponent message = new TextComponent(msg);
-
-		this.components.add(message);
+		this.add(msg);
 	}
 
 	public Clickable(String msg, String hoverMsg, String clickString) {
@@ -26,7 +24,17 @@ public class Clickable {
 	}
 
 	public TextComponent add(String msg, String hoverMsg, String clickString) {
-		TextComponent message = new TextComponent(msg);
+		BaseComponent[] baseComponents = TextComponent.fromLegacyText(msg);
+		TextComponent message;
+
+		if (baseComponents.length == 0) {
+			message = new TextComponent(msg);
+		} else {
+			message = (TextComponent) baseComponents[0];
+			for (int i = 1; i < baseComponents.length; i++) {
+				message.addExtra(baseComponents[i]);
+			}
+		}
 
 		if (hoverMsg != null) {
 			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverMsg)));
@@ -42,7 +50,10 @@ public class Clickable {
 	}
 
 	public void add(String message) {
-		this.components.add(new TextComponent(message));
+		BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
+		for (BaseComponent component : baseComponents) {
+			this.components.add((TextComponent) component);
+		}
 	}
 
 	public void sendToPlayer(Player player) {
