@@ -49,6 +49,32 @@ public class Clickable {
 		return message;
 	}
 
+	public TextComponent addUrl(String msg, String hoverMsg, String url) {
+		BaseComponent[] baseComponents = TextComponent.fromLegacyText(msg);
+		TextComponent message;
+
+		if (baseComponents.length == 0) {
+			message = new TextComponent(msg);
+		} else {
+			message = (TextComponent) baseComponents[0];
+			for (int i = 1; i < baseComponents.length; i++) {
+				message.addExtra(baseComponents[i]);
+			}
+		}
+
+		if (hoverMsg != null) {
+			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverMsg)));
+		}
+
+		if (url != null) {
+			message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+		}
+
+		this.components.add(message);
+
+		return message;
+	}
+
 	public void add(String message) {
 		BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
 		for (BaseComponent component : baseComponents) {
