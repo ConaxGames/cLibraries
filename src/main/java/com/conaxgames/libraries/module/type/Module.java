@@ -84,8 +84,6 @@ public abstract class Module {
 
     public abstract void onEnable();
 
-    public abstract void onReload();
-
     public abstract void onDisable();
 
     /**

@@ -35,7 +35,7 @@ public class ModuleCommands extends BaseCommand {
     }
 
     @Subcommand("enable")
-    @Description("Reload individual modules")
+    @Description("Enable individual modules")
     @CommandCompletion("@modules")
     public void onEnable(CommandSender sender, Module module, boolean persistent) {
         String result = moduleManager.enableModule(module, persistent);
@@ -43,18 +43,10 @@ public class ModuleCommands extends BaseCommand {
     }
 
     @Subcommand("disable")
-    @Description("Reload individual modules")
+    @Description("Disable individual modules")
     @CommandCompletion("@modules")
     public void onDisable(CommandSender sender, Module module, boolean persistent) {
         String result = moduleManager.disableModule(module, persistent);
-        sender.sendMessage(CC.PRIMARY + result);
-    }
-
-    @Subcommand("reload")
-    @Description("Reload individual modules")
-    @CommandCompletion("@modules")
-    public void onReload(CommandSender sender, Module module) {
-        String result = moduleManager.reloadModule(module);
         sender.sendMessage(CC.PRIMARY + result);
     }
 
