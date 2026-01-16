@@ -4,6 +4,7 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
 import com.conaxgames.libraries.module.ModuleManager;
+import lombok.var;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
