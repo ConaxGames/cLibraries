@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ModuleMenu extends PaginatedMenu {
 
@@ -19,29 +18,27 @@ public class ModuleMenu extends PaginatedMenu {
     }
 
     @Override
-    public String getPrePaginatedTitle(Player var1) {
+    public String getPrePaginatedTitle(Player player) {
         return "Modules";
     }
 
     @Override
-    public Map<Integer, Button> getAllPagesButtons(Player var1) {
+    public Map<Integer, Button> getAllPagesButtons(Player player) {
         Map<Integer, Button> buttons = new HashMap<>();
-
-        AtomicInteger index = new AtomicInteger(0);
-        moduleManager.getModules().forEach((id, module) ->
-                buttons.put(index.getAndIncrement(), new ModuleButton(this.moduleManager, module)));
-
+        int index = 0;
+        for (var entry : moduleManager.getModules().entrySet()) {
+            buttons.put(index++, new ModuleButton(moduleManager, entry.getValue()));
+        }
         return buttons;
     }
 
     @Override
-    public int previousPageSlot(Player var1) {
+    public int previousPageSlot(Player player) {
         return 0;
     }
 
     @Override
-    public int nextPageSlot(Player var1) {
+    public int nextPageSlot(Player player) {
         return 8;
     }
-
 }
