@@ -73,7 +73,7 @@ public class ModuleManager {
             module.reloadConfig();
         }
 
-        // Registers as listener and calls onReload & onEnable.
+        // Registers as listener and calls onEnable.
         this.setModuleEnabled(module);
 
         // Save the new value to memory & to file.
@@ -85,23 +85,6 @@ public class ModuleManager {
         return message;
     }
 
-    public String reloadModule(Module module) {
-        Validate.notNull(module, "Module can not be null");
-        Validate.notNull(module.getIdentifier(), "Identifier can not be null");
-
-        if (!module.isEnabled()) return module.getIdentifier() + " was not enabled, so can't be reloaded.";
-
-        this.registerModule(module); // register the module with the status of "false"
-
-        module.setupFiles(); // Sets up the data files which are required for the module.
-        module.reloadConfig();
-
-        module.onReload(); // Call the reload to the module
-
-        String message = "Reloaded " + module.getIdentifier() + "!";
-        library.getLibraryLogger().toConsole("Module Manager", message);
-        return message;
-    }
 
     public String disableModule(Module module, boolean save) {
         boolean isAlreadyRegistered = isRegistered(module.getIdentifier());
@@ -161,7 +144,6 @@ public class ModuleManager {
                 Bukkit.getPluginManager().registerEvents((Listener) module, module.getJavaPlugin());
             }
 
-            module.onReload();
             module.onEnable();
             library.getLibraryLogger().toConsole("Module Manager", "Enabled the " + module.getName() + " module. (listener: " + listener + ")");
             return true;
@@ -192,10 +174,6 @@ public class ModuleManager {
 
     public void disableAllModules() {
         this.getModules().forEach((name, module) -> module.onDisable());
-    }
-
-    public void reloadAllModules() {
-        this.getModules().forEach((name, module) -> this.reloadModule(module));
     }
 
 }
