@@ -3,8 +3,6 @@ package com.conaxgames.libraries.module;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
-import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.module.manage.ModuleMenu;
 import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.CC;
@@ -28,9 +26,7 @@ public class ModuleCommands extends BaseCommand {
         if (sender instanceof Player) {
             new ModuleMenu().openMenu((Player) sender);
         } else {
-            moduleManager.getModules().forEach((id, module) -> {
-                sender.sendMessage(id);
-            });
+            moduleManager.getModules().forEach((id, module) -> sender.sendMessage(id));
         }
     }
 
@@ -38,16 +34,14 @@ public class ModuleCommands extends BaseCommand {
     @Description("Enable individual modules")
     @CommandCompletion("@modules")
     public void onEnable(CommandSender sender, Module module, boolean persistent) {
-        String result = moduleManager.enableModule(module, persistent);
-        sender.sendMessage(CC.PRIMARY + result);
+        sender.sendMessage(CC.PRIMARY + moduleManager.enableModule(module, persistent));
     }
 
     @Subcommand("disable")
     @Description("Disable individual modules")
     @CommandCompletion("@modules")
     public void onDisable(CommandSender sender, Module module, boolean persistent) {
-        String result = moduleManager.disableModule(module, persistent);
-        sender.sendMessage(CC.PRIMARY + result);
+        sender.sendMessage(CC.PRIMARY + moduleManager.disableModule(module, persistent));
     }
 
     @Default
@@ -56,5 +50,4 @@ public class ModuleCommands extends BaseCommand {
     public void onHelp(CommandSender sender, CommandHelp help) {
         help.showHelp();
     }
-
 }

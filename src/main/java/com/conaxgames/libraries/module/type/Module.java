@@ -3,7 +3,6 @@ package com.conaxgames.libraries.module.type;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
 import com.conaxgames.libraries.util.Config;
-import com.conaxgames.libraries.util.VersioningChecker;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -18,20 +17,11 @@ import java.util.List;
 @Setter
 public abstract class Module {
 
-    public LibraryPlugin library;
-    public JavaPlugin javaPlugin;
+    private final LibraryPlugin library = LibraryPlugin.getInstance();
+    private final JavaPlugin javaPlugin;
     private Config settings;
 
-    /**
-     * Create a module object which can be enabled and disabled
-     * on command. Modules are perfect for small to medium features.
-     *
-     * @param javaPlugin The JavaPlugin which owns this module,
-     *                   including its files which will be found
-     *                   in the /modules/... directory..
-     */
     public Module(JavaPlugin javaPlugin) {
-        this.library = LibraryPlugin.getInstance();
         this.javaPlugin = javaPlugin;
         this.settings = getResource();
     }
@@ -40,36 +30,16 @@ public abstract class Module {
         this.settings = getResource();
     }
 
-    /**
-     * The name of this module
-     *
-     * @return The unique name of the module
-     */
     public abstract String getName();
 
-    /**
-     * The placeholder identifier of this module
-     *
-     * @return placeholder identifier that is associated with this module
-     */
     public String getIdentifier() {
         return getName().toLowerCase();
     }
 
-    /**
-     * Check if the module is enabled in config.
-     *
-     * @return if module can be enabled.
-     */
     public boolean isConfiguredToEnable() {
         return getBoolean("enabled", false);
     }
 
-    /**
-     * The name of the plugin that this module hooks into.
-     *
-     * @return plugin name that this module requires to function
-     */
     public String getRequiredPlugin() {
         return null;
     }
@@ -86,92 +56,84 @@ public abstract class Module {
 
     public abstract void onDisable();
 
-    /**
-     * If any requirements need to be checked before this module should register, you can check
-     * them here
-     *
-     * @return true if this hook meets all the requirements to register
-     */
     public boolean canRegister() {
-        if (getRequiredPlugin() == null || Bukkit.getPluginManager().isPluginEnabled(getRequiredPlugin())) {
+        String required = getRequiredPlugin();
+        if (required == null || Bukkit.getPluginManager().isPluginEnabled(required)) {
             return true;
         }
         library.getLibraryLogger().toConsole("ModuleManager",
-                "Required plugin " + getRequiredPlugin() + " is missing. Module " + getIdentifier() + " cannot be registered.");
+                "Required plugin " + required + " is missing. Module " + getIdentifier() + " cannot be registered.");
         return false;
     }
 
     public String getString(String path, String def) {
-        return this.settings.getConfig().getString(path, def);
+        return settings.getConfig().getString(path, def);
     }
 
     public int getInt(String path, int def) {
-        return this.settings.getConfig().getInt(path, def);
+        return settings.getConfig().getInt(path, def);
     }
 
     public long getLong(String path, long def) {
-        return this.settings.getConfig().getLong(path, def);
+        return settings.getConfig().getLong(path, def);
     }
 
     public double getDouble(String path, double def) {
-        return this.settings.getConfig().getDouble(path, def);
+        return settings.getConfig().getDouble(path, def);
     }
 
     public boolean getBoolean(String path, boolean def) {
-        return this.settings.getConfig().getBoolean(path, def);
+        return settings.getConfig().getBoolean(path, def);
     }
 
     public Object get(String path, Object def) {
-        return this.settings.getConfig().get(path, def);
+        return settings.getConfig().get(path, def);
     }
 
     public ConfigurationSection getConfigSection(String path) {
-        return this.settings.getConfig().getConfigurationSection(path);
+        return settings.getConfig().getConfigurationSection(path);
     }
 
     public List<String> getStringList(String path) {
-        return this.settings.getConfig().getStringList(path);
+        return settings.getConfig().getStringList(path);
     }
 
     public void set(String path, Object value) {
-        this.settings.set(path, value);
-        this.getLibrary().getLibraryLogger().toConsole("Module", "Saved " + path + " as " + value + " in " + this.getIdentifier());
-    }
-
-    public Config getResource(boolean sync, boolean syncOnCreation) {
-        return getResource("settings", sync, syncOnCreation);
+        settings.set(path, value);
+        library.getLibraryLogger().toConsole("Module", "Saved " + path + " as " + value + " in " + getIdentifier());
     }
 
     public Config getResource() {
         return getResource("settings", true, true);
     }
 
+    public Config getResource(boolean sync, boolean syncOnCreation) {
+        return getResource("settings", sync, syncOnCreation);
+    }
+
     public Config getResource(@NonNull String destination, boolean forceSync, boolean syncOnCreation) {
         String dest = destination.replace(".yml", "");
-        Config config = new Config("/modules/" + this.getIdentifier() + "/" + dest, javaPlugin);
+        Config config = new Config("/modules/" + getIdentifier() + "/" + dest, javaPlugin);
 
         if (config.getConfigFile() == null) {
-            library.getLibraryLogger().toConsole("Module", "Configuration was null when attempting to getResource. (" + this.getIdentifier() + ", " + this.getJavaPlugin().getName() + ")");
+            library.getLibraryLogger().toConsole("Module", "Configuration was null when attempting to getResource. (" + getIdentifier() + ", " + javaPlugin.getName() + ")");
             return config;
         }
 
-        InputStream fileStream = javaPlugin.getResource("modules/" + this.getIdentifier() + "/" + dest + ".yml");
+        InputStream fileStream = javaPlugin.getResource("modules/" + getIdentifier() + "/" + dest + ".yml");
         if (fileStream == null) {
-            library.getLibraryLogger().toConsole("Module", "Input stream was null when attempting to getResource. (Id: " + this.getIdentifier() + ", JavaPlugin: " + this.getJavaPlugin().getName() +
-                    ")");
+            library.getLibraryLogger().toConsole("Module", "Input stream was null when attempting to getResource. (Id: " + getIdentifier() + ", JavaPlugin: " + javaPlugin.getName() + ")");
             return config;
         }
 
         if (forceSync || (config.isWasCreated() && syncOnCreation)) {
             try {
-                String[] dontSync = (this.noSync() == null ? new String[0] : this.noSync().toArray(new String[0]));
-
+                String[] dontSync = (noSync() == null ? new String[0] : noSync().toArray(new String[0]));
                 CommentedConfiguration commentedConfiguration = CommentedConfiguration.loadConfiguration(config.getConfigFile());
                 commentedConfiguration.syncWithConfig(config.getConfigFile(), fileStream, dontSync);
-
-                library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.");
+                library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + getIdentifier() + "/" + dest + ".yml" + " with config.");
             } catch (Exception exception) {
-                library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + this.getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
+                library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
             }
         }
 
@@ -179,7 +141,6 @@ public abstract class Module {
     }
 
     public boolean isEnabled() {
-        return LibraryPlugin.getInstance().getModuleManager().getStatus(this);
+        return library.getModuleManager().getStatus(this);
     }
-
 }
