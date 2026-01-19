@@ -114,9 +114,9 @@ public class LibraryPlugin {
         }
         
         if (foliaFound) {
-            this.scheduler = new FoliaScheduler(this);
+            this.scheduler = new FoliaScheduler();
         } else {
-            this.scheduler = new BukkitScheduler(this);
+            this.scheduler = new BukkitScheduler();
         }
     }
 
