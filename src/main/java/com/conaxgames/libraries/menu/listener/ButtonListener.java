@@ -85,18 +85,16 @@ public class ButtonListener implements Listener {
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
         if (openMenu != null) {
 
-            LibraryPlugin.getInstance().getScheduler().runTaskLater(() -> {
+            LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
                 Menu newMenu = Menu.currentlyOpenedMenus.get(player.getName());
 
                 if (openMenu.getPrevious() != null) {
                     MenuBackEvent backEvent = new MenuBackEvent(player, openMenu, openMenu.getPrevious());
                     backEvent.call();
-                    if (!backEvent.isCancelled()) {
-                        if (newMenu == null) { // only go back if there isn't a new menu opened?
-                            openMenu.getPrevious().openMenu(player);
-                        }
+                    if (!backEvent.isCancelled() && newMenu == null) {
+                        openMenu.getPrevious().openMenu(player);
                     }
-                } else if (newMenu == null) { // player didn't open a new menu
+                } else if (newMenu == null) {
                     new MenuCloseEvent(player, openMenu).call();
                 }
             }, 2L);
