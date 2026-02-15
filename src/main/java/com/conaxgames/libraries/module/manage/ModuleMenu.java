@@ -1,10 +1,9 @@
 package com.conaxgames.libraries.module.manage;
 
-import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
 import com.conaxgames.libraries.module.ModuleManager;
-import lombok.var;
+import com.conaxgames.libraries.module.type.Module;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -14,8 +13,8 @@ public class ModuleMenu extends PaginatedMenu {
 
     private final ModuleManager moduleManager;
 
-    public ModuleMenu() {
-        this.moduleManager = LibraryPlugin.getInstance().getModuleManager();
+    public ModuleMenu(ModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
     }
 
     @Override
@@ -27,8 +26,8 @@ public class ModuleMenu extends PaginatedMenu {
     public Map<Integer, Button> getAllPagesButtons(Player player) {
         Map<Integer, Button> buttons = new HashMap<>();
         int index = 0;
-        for (var entry : moduleManager.getModules().entrySet()) {
-            buttons.put(index++, new ModuleButton(moduleManager, entry.getValue()));
+        for (Module module : moduleManager.getModules().values()) {
+            buttons.put(index++, new ModuleButton(moduleManager, module));
         }
         return buttons;
     }
