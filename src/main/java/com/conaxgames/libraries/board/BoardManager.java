@@ -126,10 +126,5 @@ public class BoardManager implements Runnable {
         if (board != null) cleanupBoard(board);
     }
 
-    public Board getBoard(Player player) {
-        return playerBoards.get(player.getUniqueId());
-    }
-
-    public Map<UUID, Board> getPlayerBoards() { return playerBoards; }
     public BoardAdapter getAdapter() { return adapter; }
 }

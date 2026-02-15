@@ -28,7 +28,6 @@ public class Board {
     }
 
     private final BoardAdapter adapter;
-    private final Player player;
     private final List<BoardEntry> entries = new ArrayList<>();
     private final Map<String, BoardTimer> timers = new HashMap<>();
     private final Map<String, String> usedKeys = new HashMap<>();
@@ -37,7 +36,6 @@ public class Board {
 
     public Board(Player player, BoardAdapter adapter) {
         this.adapter = adapter;
-        this.player = player;
         org.bukkit.scoreboard.ScoreboardManager sm = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
         this.scoreboard = player.getScoreboard().equals(sm.getMainScoreboard())
             ? sm.getNewScoreboard()
@@ -60,16 +58,6 @@ public class Board {
         throw new IllegalStateException("No free board entry keys");
     }
 
-    public List<String> getBoardEntriesFormatted() {
-        List<String> out = new ArrayList<>(entries.size());
-        for (BoardEntry e : entries) out.add(e.getText());
-        return out;
-    }
-
-    public BoardEntry getByPosition(int position) {
-        return position >= 0 && position < entries.size() ? entries.get(position) : null;
-    }
-
     public BoardTimer getTimer(String id) {
         BoardTimer t = timers.get(id);
         if (t == null || t.isExpired()) {
@@ -77,11 +65,6 @@ public class Board {
             return null;
         }
         return t;
-    }
-
-    public Map<String, BoardTimer> getTimers() {
-        timers.entrySet().removeIf(e -> e.getValue().isExpired());
-        return new HashMap<>(timers);
     }
 
     public void addTimer(BoardTimer timer) {
@@ -98,8 +81,6 @@ public class Board {
         usedKeys.clear();
     }
 
-    public BoardAdapter getAdapter() { return adapter; }
-    public Player getPlayer() { return player; }
     public List<BoardEntry> getEntries() { return entries; }
     public Map<String, String> getUsedKeys() { return usedKeys; }
     public Scoreboard getScoreboard() { return scoreboard; }

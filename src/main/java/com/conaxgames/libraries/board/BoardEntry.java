@@ -23,7 +23,6 @@ public class BoardEntry {
     private static int teamCounter = 0;
 
     @Getter private final Board board;
-    @Getter private final String originalText;
     @Getter private final String key;
     @Getter private Team team;
     @Getter private String text;
@@ -32,7 +31,6 @@ public class BoardEntry {
     public BoardEntry(Board board, String text) {
         this.board = board;
         this.text = text != null ? text : "";
-        this.originalText = this.text;
         this.key = board.getNewKey(this);
         this.setup();
     }
@@ -80,7 +78,7 @@ public class BoardEntry {
         return cachedSplit;
     }
 
-    public String[] splitText(String input) {
+    private String[] splitText(String input) {
         if (input == null || input.length() <= MAX_LINE) {
             return new String[]{ input != null ? input : "", "" };
         }
