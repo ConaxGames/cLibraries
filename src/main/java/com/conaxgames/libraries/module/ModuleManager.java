@@ -124,7 +124,6 @@ public class ModuleManager {
     }
 
     private void setupModule(Module module) {
-        module.setupFiles();
         module.reloadConfig();
     }
 

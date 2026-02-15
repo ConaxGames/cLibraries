@@ -50,8 +50,6 @@ public abstract class Module {
 
     public abstract List<String> noSync();
 
-    public abstract void setupFiles();
-
     public abstract void onEnable();
 
     public abstract void onDisable();
