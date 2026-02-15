@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ItemStackButton extends Button {
 
-    private final ItemStack stack;
+    private ItemStack stack;
 
     public ItemStackButton(ItemStack stack) {
         this.stack = stack;
@@ -17,21 +17,16 @@ public class ItemStackButton extends Button {
 
     @Override
     public ItemStack getButtonItem(Player player) {
-        return this.stack;
+        return (stack);
     }
 
-    @Override
-    public String getName(Player player) {
+    public String getName(Player var1) {
         return null;
     }
-
-    @Override
-    public List<String> getDescription(Player player) {
+    public List<String> getDescription(Player var1) {
         return null;
     }
-
-    @Override
-    public Material getMaterial(Player player) {
+    public Material getMaterial(Player var1) {
         return null;
     }
 }

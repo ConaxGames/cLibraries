@@ -12,17 +12,17 @@ import java.util.List;
 public class CloseButton extends Button {
 
     @Override
-    public String getName(Player player) {
+    public String getName(Player var1) {
         return CC.RED + "Close";
     }
 
     @Override
-    public List<String> getDescription(Player player) {
+    public List<String> getDescription(Player var1) {
         return null;
     }
 
     @Override
-    public Material getMaterial(Player player) {
+    public Material getMaterial(Player var1) {
         return XMaterial.BARRIER.get();
     }
 
