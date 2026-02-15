@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.board;
 
+import lombok.Getter;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.DecimalFormat;
@@ -9,6 +10,7 @@ public class BoardTimer {
     private static final DecimalFormat SECONDS = new DecimalFormat("#0.0");
     private static final String MM_SS = "mm:ss";
 
+    @Getter
     private final String id;
     private final long end;
 
@@ -26,8 +28,6 @@ public class BoardTimer {
     public boolean isExpired() {
         return System.currentTimeMillis() >= end;
     }
-
-    public String getId() { return id; }
 
     public enum TimerType { SECONDS, MINUTES }
 }

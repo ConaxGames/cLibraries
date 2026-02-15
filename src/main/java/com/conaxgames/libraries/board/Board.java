@@ -1,14 +1,12 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,16 +25,18 @@ public class Board {
         }
     }
 
-    private final BoardAdapter adapter;
+    @Getter
     private final List<BoardEntry> entries = new ArrayList<>();
     private final Map<String, BoardTimer> timers = new HashMap<>();
+    @Getter
     private final Map<String, String> usedKeys = new HashMap<>();
-    private Scoreboard scoreboard;
-    private Objective objective;
+    @Getter
+    private final Scoreboard scoreboard;
+    @Getter
+    private final Objective objective;
 
     public Board(Player player, BoardAdapter adapter) {
-        this.adapter = adapter;
-        org.bukkit.scoreboard.ScoreboardManager sm = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
+        ScoreboardManager sm = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
         this.scoreboard = player.getScoreboard().equals(sm.getMainScoreboard())
             ? sm.getNewScoreboard()
             : player.getScoreboard();
@@ -80,9 +80,4 @@ public class Board {
         entries.clear();
         usedKeys.clear();
     }
-
-    public List<BoardEntry> getEntries() { return entries; }
-    public Map<String, String> getUsedKeys() { return usedKeys; }
-    public Scoreboard getScoreboard() { return scoreboard; }
-    public Objective getObjective() { return objective; }
 }
