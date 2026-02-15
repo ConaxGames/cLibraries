@@ -40,7 +40,10 @@ public class Board {
         this.scoreboard = player.getScoreboard().equals(sm.getMainScoreboard())
             ? sm.getNewScoreboard()
             : player.getScoreboard();
-        Component title = LegacyComponentSerializer.legacySection().deserialize(adapter.getTitle(player));
+        String titleStr = adapter.getTitle(player);
+        Component title = titleStr != null
+            ? LegacyComponentSerializer.legacySection().deserialize(titleStr)
+            : Component.empty();
         this.objective = this.scoreboard.registerNewObjective(OBJECTIVE_NAME, Criteria.DUMMY, title);
         this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
