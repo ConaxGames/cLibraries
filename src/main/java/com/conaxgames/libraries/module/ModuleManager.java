@@ -189,10 +189,10 @@ public class ModuleManager {
 
     private boolean setModuleDisabled(Module module) {
         try {
+            module.onDisable();
             if (module instanceof Listener) {
                 HandlerList.unregisterAll((Listener) module);
             }
-            module.onDisable();
             return true;
         } catch (Throwable t) {
             library.getLibraryLogger().toConsole("ModuleManager", "Failed to disable module " + module.getName());
