@@ -9,6 +9,12 @@ import com.conaxgames.libraries.util.CC;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * ACF command for module management. Alias and permission are replaced at registration (e.g.
+ * <code>modules_module</code> with permission <code>yourplugin.modules</code>). Players get a
+ * paginated GUI via {@link com.conaxgames.libraries.module.manage.ModuleMenu}; console gets a
+ * plain list. Enable/disable subcommands take a module (tab-completed) and a persistence flag.
+ */
 @CommandAlias("modules_%moduleCommandAlias")
 @CommandPermission("%moduleCommandPermission")
 public class ModuleCommands extends BaseCommand {
