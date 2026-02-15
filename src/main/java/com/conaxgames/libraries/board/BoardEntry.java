@@ -11,6 +11,11 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.regex.Pattern;
 
+/**
+ * A single line on a {@link Board}. Uses a scoreboard team (prefix + suffix) to show text that may
+ * exceed 16 characters; the line is split with color codes preserved. Created by the board's
+ * {@link Board#getNewKey} and managed by {@link BoardManager} during {@link BoardAdapter#getScoreboard} sync.
+ */
 @Accessors(chain = true)
 public class BoardEntry {
 
@@ -28,6 +33,9 @@ public class BoardEntry {
     @Getter private String text;
     private String[] cachedSplit;
 
+    /**
+     * Creates an entry on the board with the given text. Allocates a key and registers the team.
+     */
     public BoardEntry(Board board, String text) {
         this.board = board;
         this.text = text != null ? text : "";
@@ -35,6 +43,10 @@ public class BoardEntry {
         this.setup();
     }
 
+    /**
+     * Registers the team on the scoreboard if not already done and adds this entry to the board's list.
+     * Chainable. Called after construction and when text changes and the team needs to exist.
+     */
     public BoardEntry setup() {
         if (this.team == null) {
             Scoreboard sb = board.getScoreboard();
@@ -48,6 +60,10 @@ public class BoardEntry {
         return this;
     }
 
+    /**
+     * Updates the team prefix/suffix and score to match current text and position. Called by the
+     * manager each tick for each visible line. Position is the sidebar score (1 = bottom).
+     */
     public BoardEntry send(int position) {
         Objective obj = board.getObjective();
         String[] split = getSplitText();
@@ -60,6 +76,9 @@ public class BoardEntry {
         return this;
     }
 
+    /**
+     * Removes the entry from the scoreboard, frees the key, and unregisters the team.
+     */
     public void remove() {
         board.getUsedKeys().remove(this.key);
         board.getScoreboard().resetScores(this.key);
@@ -94,6 +113,10 @@ public class BoardEntry {
         return new String[]{ prefix, suffix };
     }
 
+    /**
+     * Sets the display text and invalidates the cached split. Chainable. Next {@link #send} will
+     * push the new text to the client.
+     */
     public BoardEntry setText(String text) {
         if (text != null && !this.text.equals(text)) {
             this.text = text;
