@@ -30,11 +30,11 @@ public class ModuleManager {
         commandManager.registerCommand(new ModuleCommands(this));
     }
 
-    public String registerModule(Module module) {
+    public void registerModule(Module module) {
         if (!module.canRegister()) {
             String message = module.getIdentifier() + " cannot be registered as one of its required plugins cannot be found.";
             library.getLibraryLogger().toConsole("ModuleManager", message);
-            return message;
+            return;
         }
 
         String id = module.getIdentifier().toLowerCase();
@@ -49,7 +49,6 @@ public class ModuleManager {
 
         String message = "Registered " + module.getIdentifier() + "!";
         library.getLibraryLogger().toConsole("ModuleManager", message);
-        return message;
     }
 
     public String enableModule(Module module, boolean save) {
