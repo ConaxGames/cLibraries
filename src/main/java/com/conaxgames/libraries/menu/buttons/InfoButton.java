@@ -1,3 +1,4 @@
+
 package com.conaxgames.libraries.menu.buttons;
 
 import com.conaxgames.libraries.menu.Button;
@@ -12,10 +13,10 @@ public class InfoButton extends Button {
     private final List<String> desc;
     private final Material material;
 
-    public InfoButton(String name, List<String> desc, Material material) {
+    public InfoButton(String name, List<String> desc, Material mat) {
         this.name = name;
         this.desc = desc;
-        this.material = material;
+        this.material = mat;
     }
 
     @Override
@@ -33,3 +34,4 @@ public class InfoButton extends Button {
         return this.material;
     }
 }
+

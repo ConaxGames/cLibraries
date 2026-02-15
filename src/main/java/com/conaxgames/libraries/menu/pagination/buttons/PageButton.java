@@ -11,34 +11,43 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
+import java.beans.ConstructorProperties;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PageButton extends Button {
+    private int mod;
+    private PaginatedMenu menu;
 
-    private final int mod;
-    private final PaginatedMenu menu;
-
+    @ConstructorProperties(value={"mod", "menu"})
     public PageButton(int mod, PaginatedMenu menu) {
         this.mod = mod;
         this.menu = menu;
     }
 
     @Override
-    public void clicked(Player player, int slot, ClickType clickType) {
+    public void clicked(Player player, int i, ClickType clickType) {
         if (clickType == ClickType.RIGHT) {
             new ViewAllPagesMenu(this.menu).openMenu(player, false);
             return;
         }
-        if (this.mod == -1) {
+        
+        if (!this.hasNext(player)) {
+            return;
+        }
+
+        if (this.mod == -1) { // previous
             new MenuButtonPreviousEvent(player, menu, this).call();
-        } else if (this.mod == 1) {
+        } else if (this.mod == 1) { // next
             new MenuButtonNextEvent(player, menu, this).call();
         }
-        int targetPage = this.menu.getPage() + this.mod;
-        if (targetPage > 0 && this.menu.getPages(player) >= targetPage) {
-            this.menu.modPage(player, this.mod);
-        }
+
+        this.menu.modPage(player, this.mod);
+    }
+
+    private boolean hasNext(Player player) {
+        int pg = this.menu.getPage() + this.mod;
+        return pg > 0 && this.menu.getPages(player) >= pg;
     }
 
     @Override
@@ -55,4 +64,6 @@ public class PageButton extends Button {
     public Material getMaterial(Player player) {
         return this.mod > 0 ? XMaterial.GREEN_DYE.get() : XMaterial.RED_DYE.get();
     }
+
 }
+
