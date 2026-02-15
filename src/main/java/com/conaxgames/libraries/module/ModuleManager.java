@@ -153,12 +153,6 @@ public class ModuleManager {
         }
     }
 
-    public void disableAllModules() {
-        modules.values().stream()
-                .filter(state -> state.enabled)
-                .forEach(state -> setModuleDisabled(state.module));
-    }
-
     private static class ModuleState {
         final Module module;
         boolean enabled;
