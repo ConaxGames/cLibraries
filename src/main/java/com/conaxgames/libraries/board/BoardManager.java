@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import lombok.Getter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
@@ -17,6 +18,7 @@ public class BoardManager implements Runnable {
 
     private static final String C_ELEMENT_METADATA_KEY = "cElement";
     private final Map<UUID, Board> playerBoards = new HashMap<>();
+    @Getter
     private final BoardAdapter adapter;
 
     public BoardManager(BoardAdapter adapter) {
@@ -125,6 +127,4 @@ public class BoardManager implements Runnable {
         Board board = playerBoards.remove(player.getUniqueId());
         if (board != null) cleanupBoard(board);
     }
-
-    public BoardAdapter getAdapter() { return adapter; }
 }
