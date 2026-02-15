@@ -28,19 +28,16 @@ public class BoardManager implements Runnable {
     @Override
     public void run() {
         adapter.preLoop();
-        cleanupCElementBoards();
         Iterator<Map.Entry<UUID, Board>> it = playerBoards.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<UUID, Board> e = it.next();
-            UUID uuid = e.getKey();
             Board board = e.getValue();
-            Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(uuid);
+            Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(e.getKey());
             if (player == null || !player.isOnline()) {
                 it.remove();
                 cleanupBoard(board);
                 continue;
             }
-            if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) continue;
             try {
                 updateBoard(player, board);
             } catch (Exception ex) {
@@ -91,25 +88,6 @@ public class BoardManager implements Runnable {
         }
     }
 
-    public void cleanupPlayerBoardIfCElement(Player player) {
-        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) {
-            Board board = playerBoards.remove(player.getUniqueId());
-            if (board != null) cleanupBoard(board);
-        }
-    }
-
-    private void cleanupCElementBoards() {
-        Iterator<Map.Entry<UUID, Board>> it = playerBoards.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<UUID, Board> e = it.next();
-            Player p = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(e.getKey());
-            if (p != null && p.isOnline() && p.hasMetadata(C_ELEMENT_METADATA_KEY)) {
-                cleanupBoard(e.getValue());
-                it.remove();
-            }
-        }
-    }
-
     private void cleanupBoard(Board board) {
         if (!board.getEntries().isEmpty()) {
             board.getEntries().forEach(BoardEntry::remove);
@@ -118,12 +96,14 @@ public class BoardManager implements Runnable {
     }
 
     public void createBoard(Player player) {
-        if (!playerBoards.containsKey(player.getUniqueId())) {
-            playerBoards.put(player.getUniqueId(), new Board(player, adapter));
-        }
+        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
+        if (playerBoards.containsKey(player.getUniqueId())) return;
+        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
+        playerBoards.put(player.getUniqueId(), new Board(player, adapter));
     }
 
     public void removeBoard(Player player) {
+        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
         Board board = playerBoards.remove(player.getUniqueId());
         if (board != null) cleanupBoard(board);
     }
