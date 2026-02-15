@@ -35,7 +35,10 @@ public class BoardManager implements Runnable {
             Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(e.getKey());
             if (player == null || !player.isOnline()) {
                 it.remove();
-                cleanupBoard(board);
+                if (!board.getEntries().isEmpty()) {
+                    board.getEntries().forEach(BoardEntry::remove);
+                    board.getEntries().clear();
+                }
                 continue;
             }
             try {
@@ -88,13 +91,6 @@ public class BoardManager implements Runnable {
         }
     }
 
-    private void cleanupBoard(Board board) {
-        if (!board.getEntries().isEmpty()) {
-            board.getEntries().forEach(BoardEntry::remove);
-            board.getEntries().clear();
-        }
-    }
-
     public void createBoard(Player player) {
         if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
         if (playerBoards.containsKey(player.getUniqueId())) return;
@@ -105,6 +101,9 @@ public class BoardManager implements Runnable {
     public void removeBoard(Player player) {
         if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
         Board board = playerBoards.remove(player.getUniqueId());
-        if (board != null) cleanupBoard(board);
+        if (board != null && !board.getEntries().isEmpty()) {
+            board.getEntries().forEach(BoardEntry::remove);
+            board.getEntries().clear();
+        }
     }
 }
