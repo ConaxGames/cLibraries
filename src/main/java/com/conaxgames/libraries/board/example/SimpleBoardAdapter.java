@@ -6,7 +6,6 @@ import com.conaxgames.libraries.board.BoardTimer;
 import com.conaxgames.libraries.util.CC;
 import com.google.common.base.Strings;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
