@@ -4,7 +4,6 @@ import com.conaxgames.libraries.LibraryPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.Collections;
@@ -65,8 +64,11 @@ public class BoardManager implements Runnable {
             }
         }
         syncEntries(board, lines);
-        adapter.onScoreboardCreate(player, board.getScoreboard());
-        player.setScoreboard(board.getScoreboard());
+        Scoreboard sb = board.getScoreboard();
+        if (!player.getScoreboard().equals(sb)) {
+            player.setScoreboard(sb);
+            adapter.onScoreboardCreate(player, sb);
+        }
     }
 
     private void syncEntries(Board board, List<String> lines) {
@@ -92,9 +94,7 @@ public class BoardManager implements Runnable {
     }
 
     public void createBoard(Player player) {
-        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
-        if (playerBoards.containsKey(player.getUniqueId())) return;
-        if (player.hasMetadata(C_ELEMENT_METADATA_KEY)) return;
+        if (player.hasMetadata(C_ELEMENT_METADATA_KEY) || playerBoards.containsKey(player.getUniqueId())) return;
         playerBoards.put(player.getUniqueId(), new Board(player, adapter));
     }
 
