@@ -20,11 +20,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (library.getBoardManager() != null) {
-            if (player.hasMetadata("cElement")) {
-                library.getBoardManager().cleanupPlayerBoardIfCElement(player);
-                return;
-            }
+        if (library.getBoardManager() != null && !player.hasMetadata("cElement")) {
             library.getBoardManager().createBoard(player);
         }
     }
@@ -32,7 +28,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
         Player player = event.getPlayer();
-        if (library.getBoardManager() != null) {
+        if (library.getBoardManager() != null && !player.hasMetadata("cElement")) {
             library.getBoardManager().removeBoard(player);
         }
     }
@@ -40,7 +36,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (library.getBoardManager() != null) {
+        if (library.getBoardManager() != null && !player.hasMetadata("cElement")) {
             library.getBoardManager().removeBoard(player);
         }
     }
