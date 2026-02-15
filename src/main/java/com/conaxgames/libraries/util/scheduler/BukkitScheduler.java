@@ -3,6 +3,10 @@ package com.conaxgames.libraries.util.scheduler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
+/**
+ * {@link Scheduler} implementation for Bukkit and Paper (non-Folia). Uses the standard
+ * {@link org.bukkit.scheduler.BukkitScheduler}. Chosen when Folia's regionized server is not present.
+ */
 public class BukkitScheduler implements Scheduler {
 
     @Override

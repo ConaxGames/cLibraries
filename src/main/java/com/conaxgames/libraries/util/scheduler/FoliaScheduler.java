@@ -4,6 +4,12 @@ import org.bukkit.plugin.Plugin;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * {@link Scheduler} implementation for Folia (and Paper with regionized scheduler). Sync tasks run
+ * on the global region via {@link io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler};
+ * async tasks use {@link io.papermc.paper.threadedregions.scheduler.AsyncScheduler}. Chosen when
+ * {@code io.papermc.paper.threadedregions.RegionizedServer} is on the classpath.
+ */
 public class FoliaScheduler implements Scheduler {
 
     @Override
