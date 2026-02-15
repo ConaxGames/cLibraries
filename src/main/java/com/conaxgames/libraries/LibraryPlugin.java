@@ -91,7 +91,6 @@ public class LibraryPlugin {
      * @return This instance for chaining
      */
     public LibraryPlugin onDisable() {
-        this.moduleManager.disableAllModules();
         return this;
     }
 
