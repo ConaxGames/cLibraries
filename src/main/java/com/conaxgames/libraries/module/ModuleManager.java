@@ -124,7 +124,6 @@ public class ModuleManager {
                 Bukkit.getPluginManager().registerEvents((Listener) module, module.getJavaPlugin());
             }
             module.onEnable();
-            library.getLibraryLogger().toConsole("Module Manager", "Enabled the " + module.getName() + " module.");
         } catch (Throwable t) {
             library.getLibraryLogger().toConsole("Module Manager", "Failed to enable module " + module.getName());
             t.printStackTrace();
@@ -137,7 +136,6 @@ public class ModuleManager {
                 HandlerList.unregisterAll((Listener) module);
             }
             module.onDisable();
-            library.getLibraryLogger().toConsole("Module Manager", "Disabled the " + module.getName() + " module.");
         } catch (Throwable t) {
             library.getLibraryLogger().toConsole("Module Manager", "Failed to disable module " + module.getName());
             t.printStackTrace();

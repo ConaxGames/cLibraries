@@ -26,7 +26,7 @@ public class ModuleCommands extends BaseCommand {
         if (sender instanceof Player) {
             new ModuleMenu().openMenu((Player) sender);
         } else {
-            moduleManager.getModules().forEach((id, module) -> sender.sendMessage(id));
+            moduleManager.getModules().keySet().forEach(sender::sendMessage);
         }
     }
 

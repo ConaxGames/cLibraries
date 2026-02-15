@@ -60,12 +60,9 @@ public class ModuleButton extends Button {
     @Override
     public void clicked(Player player, int slot, ClickType clickType) {
         boolean persistent = !clickType.isShiftClick();
-        String result = enabled 
+        String result = enabled
                 ? moduleManager.disableModule(module, persistent)
                 : moduleManager.enableModule(module, persistent);
-        
-        player.sendMessage(enabled
-                ? CC.RED + "You have disabled " + module.getIdentifier() + CC.GRAY + " (saved: " + persistent + ")"
-                : CC.GREEN + "You have enabled " + module.getIdentifier() + CC.GRAY + " (saved: " + persistent + ")");
+        player.sendMessage(CC.PRIMARY + result + CC.GRAY + " (saved: " + persistent + ")");
     }
 }
