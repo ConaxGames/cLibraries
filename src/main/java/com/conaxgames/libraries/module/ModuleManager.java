@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -100,14 +99,6 @@ public class ModuleManager {
         return message;
     }
 
-    public Set<String> getRegisteredIdentifiers() {
-        return modules.keySet();
-    }
-
-    public boolean isRegistered(String identifier) {
-        return modules.containsKey(identifier.toLowerCase());
-    }
-
     public Map<String, Module> getModules() {
         return modules.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().module));
@@ -118,7 +109,7 @@ public class ModuleManager {
         return state != null ? state.module : null;
     }
 
-    public boolean getStatus(Module module) {
+    public boolean isModuleEnabled(Module module) {
         ModuleState state = modules.get(module.getIdentifier().toLowerCase());
         return state != null && state.enabled;
     }

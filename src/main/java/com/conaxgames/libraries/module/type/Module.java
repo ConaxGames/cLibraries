@@ -105,10 +105,6 @@ public abstract class Module {
         return getResource("settings", true, true);
     }
 
-    public Config getResource(boolean sync, boolean syncOnCreation) {
-        return getResource("settings", sync, syncOnCreation);
-    }
-
     public Config getResource(@NonNull String destination, boolean forceSync, boolean syncOnCreation) {
         String dest = destination.replace(".yml", "");
         Config config = new Config("/modules/" + getIdentifier() + "/" + dest, javaPlugin);
@@ -139,6 +135,6 @@ public abstract class Module {
     }
 
     public boolean isEnabled() {
-        return library.getModuleManager().getStatus(this);
+        return library.getModuleManager().isModuleEnabled(this);
     }
 }
