@@ -12,62 +12,21 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-/**
- * Abstract class representing a clickable button in a menu interface.
- * Buttons are the building blocks of menu GUIs, handling both the visual representation
- * and click interactions for menu items.
- * 
- * <p>Each button can be customized with:</p>
- * <ul>
- *     <li>Custom display name</li>
- *     <li>Custom lore/description</li>
- *     <li>Custom material and data value</li>
- *     <li>Click handlers</li>
- *     <li>Visual effects (enchant glint)</li>
- *     <li>Player skull support</li>
- * </ul>
- */
 public abstract class Button {
 
-    /**
-     * Creates a placeholder button with specified material, data value, and title.
-     * @param material The material type for the button
-     * @param data The data value/durability for the material
-     * @param title Optional title(s) to be joined into a single string
-     * @return A new placeholder button
-     * @deprecated Use {@link #placeholder(Material, String)} instead
-     */
     @Deprecated
     public static Button placeholder(Material material, byte data, String... title) {
         return Button.placeholder(material, data, title == null || title.length == 0 ? "" : Joiner.on("").join(title));
     }
 
-    /**
-     * Creates a placeholder button with just a material.
-     * @param material The material type for the button
-     * @return A new placeholder button with empty title
-     */
     public static Button placeholder(Material material) {
         return Button.placeholder(material, "");
     }
 
-    /**
-     * Creates a placeholder button with material and title.
-     * @param material The material type for the button
-     * @param title The title for the button
-     * @return A new placeholder button
-     */
     public static Button placeholder(Material material, String title) {
-        return Button.placeholder(material, (byte)0, title);
+        return Button.placeholder(material, (byte) 0, title);
     }
 
-    /**
-     * Creates a placeholder button with all properties specified.
-     * @param material The material type for the button
-     * @param data The data value/durability for the material
-     * @param title The title for the button
-     * @return A new placeholder button
-     */
     public static Button placeholder(final Material material, final byte data, final String title) {
         return new Button() {
             @Override
@@ -92,11 +51,6 @@ public abstract class Button {
         };
     }
 
-    /**
-     * Creates a button from an existing ItemStack, preserving all its properties.
-     * @param item The ItemStack to create the button from
-     * @return A new button with the ItemStack's properties
-     */
     public static Button fromItem(final ItemStack item) {
         return new Button() {
             @Override
@@ -121,98 +75,39 @@ public abstract class Button {
         };
     }
 
-    /**
-     * Gets the display name of the button for a specific player.
-     * @param player The player viewing the button
-     * @return The display name of the button
-     */
     public abstract String getName(Player player);
-
-    /**
-     * Gets the lore/description of the button for a specific player.
-     * @param player The player viewing the button
-     * @return The list of lore lines
-     */
     public abstract List<String> getDescription(Player player);
-
-    /**
-     * Gets the material type of the button for a specific player.
-     * @param player The player viewing the button
-     * @return The material type
-     */
     public abstract Material getMaterial(Player player);
 
-    /**
-     * Gets the damage/durability value of the button for a specific player.
-     * @param player The player viewing the button
-     * @return The damage value
-     */
     public int getDamageValue(Player player) {
         return 0;
     }
 
-    /**
-     * Handles click events on the button.
-     * @param player The player who clicked
-     * @param slot The inventory slot that was clicked
-     * @param clickType The type of click performed
-     */
-    public void clicked(Player player, int slot, ClickType clickType) {
-    }
+    public void clicked(Player player, int slot, ClickType clickType) {}
 
-    /**
-     * Determines if the click event should be cancelled.
-     * @param player The player who clicked
-     * @param slot The inventory slot that was clicked
-     * @param clickType The type of click performed
-     * @return true to cancel the event (default), false to allow it
-     */
     public boolean shouldCancel(Player player, int slot, ClickType clickType) {
         return true;
     }
 
-
-
-    /**
-     * Determines if the button should have an enchantment glint.
-     * @param player The player viewing the button
-     * @return true to add glint, false for no glint
-     */
     public boolean shinyItem(Player player) {
         return false;
     }
 
-    /**
-     * Gets the skull owner for player head buttons.
-     * @param player The player viewing the button
-     * @return The name of the skull owner, or null if not a skull
-     */
     public String skullOwner(Player player) {
         return null;
     }
 
-    /**
-     * Gets the stack size of the button.
-     * @param player The player viewing the button
-     * @return The amount to display (default 1)
-     */
     public int getAmount(Player player) {
         return 1;
     }
 
-    /**
-     * Creates the ItemStack representation of the button.
-     * This method combines all button properties into a final ItemStack.
-     * @param player The player to create the button for
-     * @return The complete ItemStack ready to be displayed
-     */
     public ItemStack getButtonItem(Player player) {
         Material material = this.getMaterial(player);
         if (material == null) {
             material = XMaterial.BEDROCK.get();
         }
 
-        ItemBuilderUtil builder = new ItemBuilderUtil(material, this.getAmount(player), (byte)this.getDamageValue(player))
+        ItemBuilderUtil builder = new ItemBuilderUtil(material, this.getAmount(player), (byte) this.getDamageValue(player))
                 .setName(this.getName(player));
 
         List<String> description = this.getDescription(player);
@@ -231,28 +126,15 @@ public abstract class Button {
         return builder.toItemStack();
     }
 
-    /**
-     * Plays a failure sound to the player.
-     * @param player The player to play the sound for
-     */
     public static void playFail(Player player) {
         XSound.BLOCK_GRASS_BREAK.play(player);
     }
 
-    /**
-     * Plays a success sound to the player.
-     * @param player The player to play the sound for
-     */
     public static void playSuccess(Player player) {
         XSound.BLOCK_NOTE_BLOCK_HARP.play(player);
     }
 
-    /**
-     * Plays a neutral/click sound to the player.
-     * @param player The player to play the sound for
-     */
     public static void playNeutral(Player player) {
         XSound.UI_BUTTON_CLICK.play(player);
     }
 }
-

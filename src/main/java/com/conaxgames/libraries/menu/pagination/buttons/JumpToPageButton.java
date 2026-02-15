@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
-import java.beans.ConstructorProperties;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,6 @@ public class JumpToPageButton extends Button {
     @Setter
     private boolean glowing = false;
 
-    @ConstructorProperties(value={"page", "menu"})
     public JumpToPageButton(int page, PaginatedMenu menu) {
         this.page = page;
         this.menu = menu;
@@ -29,17 +27,14 @@ public class JumpToPageButton extends Button {
 
     @Override
     public String getName(Player player) {
-        String prefix = this.glowing ? CC.GOLD + "► " : CC.SECONDARY;
-        return prefix + "Page " + this.page;
+        return (this.glowing ? CC.GOLD + "► " : CC.SECONDARY) + "Page " + this.page;
     }
 
     @Override
     public List<String> getDescription(Player player) {
         List<String> description = new ArrayList<>();
-        
         int currentPage = this.menu.getPage();
         int totalPages = this.menu.getPages(player);
-        
         if (this.page == currentPage) {
             description.add(CC.GRAY + "This is your current page");
         } else {
@@ -47,10 +42,8 @@ public class JumpToPageButton extends Button {
             description.add(CC.GRAY + "Total Pages: " + totalPages);
             description.add(CC.GRAY + "Target Page: " + this.page);
         }
-        
         description.add(" ");
         description.add(CC.YELLOW + "Click to jump to this page!");
-
         return description;
     }
 
@@ -65,9 +58,8 @@ public class JumpToPageButton extends Button {
     }
 
     @Override
-    public void clicked(Player player, int i, ClickType clickType) {
+    public void clicked(Player player, int slot, ClickType clickType) {
         new MenuButtonJumpToEvent(player, menu, this).call();
         this.menu.modPage(player, this.page - this.menu.getPage());
     }
 }
-
