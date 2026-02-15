@@ -56,11 +56,12 @@ public class ModuleMenu extends PaginatedMenu {
             @Override
             public List<String> getDescription(Player player) {
                 List<String> lore = new ArrayList<>();
-                lore.add("");
+                lore.add(CC.DARK_GRAY + "Module overview");
+                lore.add(" ");
                 lore.add(CC.GRAY + "Total Modules: " + CC.WHITE + total);
                 lore.add(CC.GRAY + "Enabled: " + CC.GREEN + enabled);
                 lore.add(CC.GRAY + "Disabled: " + CC.RED + disabled);
-                lore.add("");
+                lore.add(" ");
                 return lore;
             }
 

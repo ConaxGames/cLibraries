@@ -54,7 +54,7 @@ public class ModuleButton extends Button {
 
     @Override
     public Material getMaterial(Player player) {
-        return enabled ? XMaterial.GREEN_DYE.get() : XMaterial.RED_DYE.get();
+        return enabled ? XMaterial.GREEN_WOOL.get() : XMaterial.RED_WOOL.get();
     }
 
     @Override
