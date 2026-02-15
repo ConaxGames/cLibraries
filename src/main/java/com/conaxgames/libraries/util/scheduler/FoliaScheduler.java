@@ -8,7 +8,7 @@ public class FoliaScheduler implements Scheduler {
 
     @Override
     public void runTask(Plugin plugin, Runnable runnable) {
-        plugin.getServer().getGlobalRegionScheduler().run(plugin, task -> runnable.run());
+        plugin.getServer().getGlobalRegionScheduler().execute(plugin, runnable);
     }
 
     @Override
@@ -37,16 +37,15 @@ public class FoliaScheduler implements Scheduler {
 
     @Override
     public void runTaskTimer(Plugin plugin, Runnable runnable, long delay, long period) {
-        long safeDelay = Math.max(1L, delay);
         long safePeriod = Math.max(1L, period);
-        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, task -> runnable.run(), safeDelay, safePeriod);
+        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, task -> runnable.run(), delay, safePeriod);
     }
 
     @Override
     public void runTaskTimerAsynchronously(Plugin plugin, Runnable runnable, long delay, long period) {
-        long safeDelayMs = Math.max(50L, delay * 50L);
-        long safePeriodMs = Math.max(50L, period * 50L);
-        plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, task -> runnable.run(), safeDelayMs, safePeriodMs, TimeUnit.MILLISECONDS);
+        long delayMs = delay * 50L;
+        long periodMs = Math.max(50L, period * 50L);
+        plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, task -> runnable.run(), delayMs, periodMs, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -66,31 +65,30 @@ public class FoliaScheduler implements Scheduler {
 
     @Override
     public CancellableTask runTaskTimerCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
-        long safeDelay = Math.max(1L, delay);
         long safePeriod = Math.max(1L, period);
-        ScheduledTask task = plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, t -> runnable.run(), safeDelay, safePeriod);
+        ScheduledTask task = plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, t -> runnable.run(), delay, safePeriod);
         return new FoliaCancellableTask(task);
     }
 
     @Override
     public CancellableTask runTaskTimerAsynchronouslyCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
-        long safeDelayMs = Math.max(50L, delay * 50L);
-        long safePeriodMs = Math.max(50L, period * 50L);
-        ScheduledTask task = plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, t -> runnable.run(), safeDelayMs, safePeriodMs, TimeUnit.MILLISECONDS);
+        long delayMs = delay * 50L;
+        long periodMs = Math.max(50L, period * 50L);
+        ScheduledTask task = plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, t -> runnable.run(), delayMs, periodMs, TimeUnit.MILLISECONDS);
         return new FoliaCancellableTask(task);
     }
 
     private static class FoliaCancellableTask implements CancellableTask {
         private final ScheduledTask task;
-        private volatile boolean cancelled = false;
+        private volatile boolean cancelled;
 
-        public FoliaCancellableTask(ScheduledTask task) {
+        FoliaCancellableTask(ScheduledTask task) {
             this.task = task;
         }
 
         @Override
         public void cancel() {
-            if (!cancelled && task != null) {
+            if (!cancelled) {
                 cancelled = true;
                 task.cancel();
             }
@@ -98,7 +96,7 @@ public class FoliaScheduler implements Scheduler {
 
         @Override
         public boolean isCancelled() {
-            return cancelled || (task != null && task.isCancelled());
+            return cancelled || task.isCancelled();
         }
     }
 }
