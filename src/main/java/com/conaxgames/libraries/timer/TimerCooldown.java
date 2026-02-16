@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.timer;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.timer.event.TimerExpireEvent;
+import com.conaxgames.libraries.event.impl.timer.TimerExpireEvent;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 
 import java.util.UUID;

@@ -1,10 +1,10 @@
 package com.conaxgames.libraries.timer;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.timer.event.TimerClearEvent;
-import com.conaxgames.libraries.timer.event.TimerExtendEvent;
-import com.conaxgames.libraries.timer.event.TimerPauseEvent;
-import com.conaxgames.libraries.timer.event.TimerStartEvent;
+import com.conaxgames.libraries.event.impl.timer.TimerClearEvent;
+import com.conaxgames.libraries.event.impl.timer.TimerExtendEvent;
+import com.conaxgames.libraries.event.impl.timer.TimerPauseEvent;
+import com.conaxgames.libraries.event.impl.timer.TimerStartEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
