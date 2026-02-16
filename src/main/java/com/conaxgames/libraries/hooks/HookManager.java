@@ -13,6 +13,15 @@ import org.bukkit.plugin.Plugin;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manages plugin hooks, automatically tracking all enabled plugins and providing methods to
+ * check if specific plugins are available. Hooks are registered when plugins enable and
+ * unregistered when they disable.
+ * <p>
+ * <b>Usage:</b> Access via {@link LibraryPlugin#getHookManager()}, then use {@link #isHooked(String)}
+ * to check if a plugin is available, or {@link #getHookByPluginName(String)} to get the hook instance.
+ * Plugin name lookups are case-insensitive.
+ */
 public class HookManager implements Listener {
 
     @Getter
@@ -45,6 +54,12 @@ public class HookManager implements Listener {
         }
     }
 
+    /**
+     * Registers a hook. If the hook or its plugin is null, or the plugin name is empty, registration
+     * is skipped. Duplicate registrations for the same plugin name replace the previous hook.
+     *
+     * @param hook The hook to register
+     */
     public void registerHook(Hook hook) {
         if (hook == null || hook.getPlugin() == null) {
             return;
@@ -62,12 +77,23 @@ public class HookManager implements Listener {
         }
     }
 
+    /**
+     * Unregisters a hook by plugin name. Safe to call even if the hook is not registered.
+     *
+     * @param pluginName The name of the plugin to unregister (case-insensitive)
+     */
     public void unregisterHook(String pluginName) {
         if (pluginName != null) {
             hooks.remove(pluginName.toLowerCase());
         }
     }
 
+    /**
+     * Returns all plugins that depend on cLibraries (have "cLibraries" in their plugin.yml
+     * depend list). Useful for identifying which plugins require this library.
+     *
+     * @return List of plugins that depend on cLibraries
+     */
     public List<Plugin> getDepends() {
         List<Plugin> libraryPluginList = new ArrayList<>();
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -78,15 +104,35 @@ public class HookManager implements Listener {
         return libraryPluginList;
     }
 
+    /**
+     * Gets the hook for a specific plugin by name. Returns null if the plugin is not hooked
+     * or has been disabled.
+     *
+     * @param pluginName The name of the plugin (case-insensitive)
+     * @return The hook instance, or null if not found
+     */
     public Hook getHookByPluginName(String pluginName) {
         if (pluginName == null) return null;
         return hooks.get(pluginName.toLowerCase());
     }
 
+    /**
+     * Checks if a plugin is currently hooked (enabled and registered). Use this to check
+     * plugin availability before accessing plugin-specific APIs.
+     *
+     * @param pluginName The name of the plugin to check (case-insensitive)
+     * @return True if the plugin is hooked, false otherwise
+     */
     public boolean isHooked(String pluginName) {
         return pluginName != null && hooks.containsKey(pluginName.toLowerCase());
     }
 
+    /**
+     * Returns all currently registered hooks. The returned set is a snapshot and modifications
+     * to it will not affect the internal hook registry.
+     *
+     * @return Set of all registered hooks
+     */
     public Set<Hook> getHooks() {
         return new HashSet<>(hooks.values());
     }
