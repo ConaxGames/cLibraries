@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.config;
 
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,7 +11,9 @@ import java.io.IOException;
 public class Config {
 
     private final YamlConfiguration config;
+    @Getter
     private final File configFile;
+    @Getter
     protected boolean wasCreated;
 
     public Config(String name, JavaPlugin plugin) {
@@ -39,16 +42,8 @@ public class Config {
         return this.config;
     }
 
-    public File getConfigFile() {
-        return this.configFile;
-    }
-
     public void set(String path, Object value) {
         this.config.set(path, value);
         this.save();
-    }
-
-    public boolean isWasCreated() {
-        return this.wasCreated;
     }
 }
