@@ -63,6 +63,7 @@ Access the library instance anywhere using `LibraryPlugin.getInstance()`.
 - [Board](src/main/java/com/conaxgames/libraries/board/BoardManager.java) - Scoreboard management
 - [ItemBuilderUtil](src/main/java/com/conaxgames/libraries/util/ItemBuilderUtil.java) - Item builder utility
 - [Player Inventory Snapshot](src/main/java/com/conaxgames/libraries/util/inventory/PlayerInventoryUtil.java) - Player inventory snapshot and restore
+- [Configuration](src/main/java/com/conaxgames/libraries/config/CommentedConfiguration.java) - YAML configuration with comment preservation
 
 ## License
 
