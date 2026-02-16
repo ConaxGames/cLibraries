@@ -68,6 +68,7 @@ Access the library instance anywhere using `LibraryPlugin.getInstance()`.
 - [Center](src/main/java/com/conaxgames/libraries/util/center/Center.java) - Pixel-based chat message centering
 - [ClassUtils](src/main/java/com/conaxgames/libraries/util/ClassUtils.java) - Package class scanning and discovery utilities
 - [XPUtil](src/main/java/com/conaxgames/libraries/util/XPUtil.java) - Experience point calculation and management utilities
+- [ColorMaterialUtil](src/main/java/com/conaxgames/libraries/util/ColorMaterialUtil.java) - Chat color to wool, terracotta, and carpet material mapping
 
 ## License
 
