@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.util;
+package com.conaxgames.libraries.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

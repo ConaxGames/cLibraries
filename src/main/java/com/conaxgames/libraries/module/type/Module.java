@@ -2,7 +2,7 @@ package com.conaxgames.libraries.module.type;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
-import com.conaxgames.libraries.util.Config;
+import com.conaxgames.libraries.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
