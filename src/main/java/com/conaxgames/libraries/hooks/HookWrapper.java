@@ -4,21 +4,15 @@ import org.bukkit.plugin.Plugin;
 
 public class HookWrapper extends Hook {
 
-    public HookType type;
-    public Plugin plugin;
+    private final Plugin plugin;
 
-    public HookWrapper(HookType type, Plugin plugin) {
-        this.type = type;
+    public HookWrapper(Plugin plugin) {
+        super(plugin != null ? plugin.getName() : null);
         this.plugin = plugin;
     }
 
     @Override
     public Plugin getPlugin() {
         return plugin;
-    }
-
-    @Override
-    public HookType getHookType() {
-        return type;
     }
 }
