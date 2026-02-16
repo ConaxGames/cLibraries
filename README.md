@@ -62,7 +62,7 @@ Access the library instance anywhere using `LibraryPlugin.getInstance()`.
 - [Scheduler](src/main/java/com/conaxgames/libraries/util/scheduler/Scheduler.java) - Bukkit/Folia scheduling abstraction
 - [Board](src/main/java/com/conaxgames/libraries/board/BoardManager.java) - Scoreboard management
 - [ItemBuilderUtil](src/main/java/com/conaxgames/libraries/util/ItemBuilderUtil.java) - Item builder utility
-- [InventoryManagement/Restoring](src/main/java/com/conaxgames/libraries/util/inventory/PlayerInventoryUtil.java) - Player inventory snapshot and restore
+- [Player Inventory Snapshot](src/main/java/com/conaxgames/libraries/util/inventory/PlayerInventoryUtil.java) - Player inventory snapshot and restore
 
 ## License
 
