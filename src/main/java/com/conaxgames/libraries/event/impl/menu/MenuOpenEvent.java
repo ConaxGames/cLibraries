@@ -3,9 +3,7 @@ package com.conaxgames.libraries.event.impl.menu;
 import com.conaxgames.libraries.event.CancellableEvent;
 import com.conaxgames.libraries.menu.Menu;
 import lombok.Getter;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 @Getter
 public class MenuOpenEvent extends CancellableEvent {
