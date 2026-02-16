@@ -40,7 +40,7 @@ public class HookButton extends Button {
 
         if (hook != null) {
             description.add(" ");
-            description.add(CC.GRAY + "Plugin Name: " + CC.SECONDARY + hook.getPluginName());
+            description.add(CC.GRAY + "Hook Type: " + CC.SECONDARY + hook.getHookType().name());
             description.add(CC.GRAY + "Plugin Version: " + CC.SECONDARY + hook.getPlugin().getDescription().getVersion());
         }
 
