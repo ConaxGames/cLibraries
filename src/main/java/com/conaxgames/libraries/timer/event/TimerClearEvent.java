@@ -23,7 +23,7 @@ public class TimerClearEvent extends Event {
 	}
 
 	public TimerClearEvent(UUID userUUID, Timer timer) {
-		this.userUUID = Optional.of(userUUID);
+		this.userUUID = Optional.ofNullable(userUUID);
 		this.timer = timer;
 	}
 
