@@ -64,6 +64,8 @@ Access the library instance anywhere using `LibraryPlugin.getInstance()`.
 - [ItemBuilderUtil](src/main/java/com/conaxgames/libraries/util/ItemBuilderUtil.java) - Item builder utility
 - [Player Inventory Snapshot](src/main/java/com/conaxgames/libraries/util/inventory/PlayerInventoryUtil.java) - Player inventory snapshot and restore
 - [Configuration](src/main/java/com/conaxgames/libraries/config/CommentedConfiguration.java) - YAML configuration with comment preservation
+- [CC](src/main/java/com/conaxgames/libraries/util/CC.java) - Chat color constants and translation (including hex)
+- [Center](src/main/java/com/conaxgames/libraries/util/center/Center.java) - Pixel-based chat message centering
 
 ## License
 
