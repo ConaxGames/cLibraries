@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
 
+// TODO: move to csuite
 public enum Tristate {
     NOT_SET,
     FALSE,
