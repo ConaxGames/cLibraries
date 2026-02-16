@@ -185,8 +185,10 @@ public abstract class Menu {
     public void openMenu(Player player, boolean firstOpen) {
         if (firstOpen) {
             MenuOpenEvent openEvent = new MenuOpenEvent(player, this);
-            // If the event is canceled, do not open
-            if (openEvent.call()) {
+            if (Bukkit.isPrimaryThread()) {
+                Bukkit.getServer().getPluginManager().callEvent(openEvent);
+                if (openEvent.isCancelled()) return;
+            } else if (openEvent.call()) {
                 return;
             }
         }
