@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.timer.event;
+package com.conaxgames.libraries.event.impl.timer;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.timer.Timer;
@@ -10,26 +10,24 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TimerExpireEvent extends Event {
+public class TimerClearEvent extends Event {
 
 	private static final HandlerList HANDLERS = new HandlerList();
-
 	private final Optional<UUID> userUUID;
 	private final Timer timer;
-
 	private Optional<Player> player;
 
-	public TimerExpireEvent(Timer timer) {
+	public TimerClearEvent(Timer timer) {
 		this.userUUID = Optional.empty();
 		this.timer = timer;
 	}
 
-	public TimerExpireEvent(UUID userUUID, Timer timer) {
+	public TimerClearEvent(UUID userUUID, Timer timer) {
 		this.userUUID = Optional.ofNullable(userUUID);
 		this.timer = timer;
 	}
 
-	public TimerExpireEvent(Player player, Timer timer) {
+	public TimerClearEvent(Player player, Timer timer) {
 		Objects.requireNonNull(player);
 
 		this.player = Optional.of(player);
@@ -38,7 +36,7 @@ public class TimerExpireEvent extends Event {
 	}
 
 	public static HandlerList getHandlerList() {
-		return TimerExpireEvent.HANDLERS;
+		return TimerClearEvent.HANDLERS;
 	}
 
 	public Optional<Player> getPlayer() {
@@ -60,6 +58,6 @@ public class TimerExpireEvent extends Event {
 
 	@Override
 	public HandlerList getHandlers() {
-		return TimerExpireEvent.HANDLERS;
+		return TimerClearEvent.HANDLERS;
 	}
 }

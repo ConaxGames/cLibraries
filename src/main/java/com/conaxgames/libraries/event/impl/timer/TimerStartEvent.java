@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.timer.event;
+package com.conaxgames.libraries.event.impl.timer;
 
 import com.conaxgames.libraries.timer.Timer;
 import org.bukkit.entity.Player;
