@@ -3,59 +3,73 @@ package com.conaxgames.libraries.util;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 
-import java.lang.ref.WeakReference;
-import java.util.Arrays;
-
+/**
+ * Utility for managing player experience points (XP) and levels. Provides methods to set, get,
+ * and calculate experience using Minecraft's 1.8+ experience formula.
+ * <p>
+ * <b>Usage:</b> Create an instance with a player, then use {@link #setExp(int)} or
+ * {@link #setExp(double)} to set their XP, {@link #getCurrentExp()} to get their total XP,
+ * and {@link #hasExp(int)} to check if they have enough XP.
+ */
 public class XPUtil {
     private final Player player;
     private final String playerName;
 
+    /**
+     * Creates an XP utility instance for the given player.
+     *
+     * @param player The player to manage XP for
+     * @throws NullPointerException if player is null
+     */
     public XPUtil(final Player player) {
-        Preconditions.checkNotNull((Object) player, (Object) "Player cannot be null");
-        this.player =player;
+        Preconditions.checkNotNull(player, "Player cannot be null");
+        this.player = player;
         this.playerName = player.getName();
     }
 
+    /**
+     * Gets the player associated with this utility. Throws an exception if the player is no longer online.
+     *
+     * @return The player instance
+     * @throws IllegalStateException if the player is not online
+     */
     public Player getPlayer() {
-        final Player p = this.player;
-        if (p == null) {
+        if (this.player == null) {
             throw new IllegalStateException("Player " + this.playerName + " is not online");
         }
-        return p;
+        return this.player;
     }
 
-    private static int calculateLevelForExp(final int exp) {
-        int level = 0;
-        for (int curExp = 7, incr = 10; curExp <= exp; curExp += incr, ++level, incr += ((level % 2 == 0) ? 3 : 4)) {
-        }
-        return level;
-    }
-
+    /**
+     * Sets the player's total experience to the given amount (as an integer).
+     *
+     * @param amt The total experience points to set
+     */
     public void setExp(final int amt) {
         this.setExp(0.0, amt);
     }
 
+    /**
+     * Sets the player's total experience to the given amount (as a double).
+     *
+     * @param amt The total experience points to set
+     */
     public void setExp(final double amt) {
         this.setExp(0.0, amt);
     }
 
-    // credit: essentials
     private void setExp(final double base, final double amt) {
         player.setExp(0);
         player.setLevel(0);
         player.setTotalExperience(0);
 
-        //This following code is technically redundant now, as bukkit now calulcates levels more or less correctly
-        //At larger numbers however... player.getExp(3000), only seems to give 2999, putting the below calculations off.
         int amount = (int) amt;
         while (amount > 0) {
             final int expToLevel = getExpAtLevel(player);
             amount -= expToLevel;
             if (amount >= 0) {
-                // give until next level
                 player.giveExp(expToLevel);
             } else {
-                // give the rest
                 amount += expToLevel;
                 player.giveExp(amount);
                 amount = 0;
@@ -63,7 +77,11 @@ public class XPUtil {
         }
     }
 
-    // credit: essentials
+    /**
+     * Gets the player's current total experience points, calculated from their level and progress bar.
+     *
+     * @return The total experience points the player currently has
+     */
     public int getCurrentExp() {
         int exp = Math.round(getExpAtLevel(player) * player.getExp());
         int currentLevel = player.getLevel();
@@ -78,12 +96,23 @@ public class XPUtil {
         return exp;
     }
 
-
+    /**
+     * Checks if the player has at least the specified amount of experience points.
+     *
+     * @param amt The amount of experience to check for
+     * @return true if the player has at least the specified amount of XP
+     */
     public boolean hasExp(final int amt) {
         return this.getCurrentExp() >= amt;
     }
 
-    // credit essentials
+    /**
+     * Calculates the total experience points needed to reach the specified level from level 0.
+     *
+     * @param level The target level (must be >= 0)
+     * @return The total experience points needed to reach that level
+     * @throws IllegalArgumentException if level is negative
+     */
     public int getXpNeededToLevelUp(final int level) {
         Preconditions.checkArgument(level >= 0, "Level may not be negative.");
         int currentLevel = 0;
@@ -103,15 +132,20 @@ public class XPUtil {
         return getExpAtLevel(player.getLevel());
     }
 
-    //new Exp Math from 1.8
+    /**
+     * Gets the experience points required to level up from the given level to the next level.
+     * Uses Minecraft's 1.8+ experience formula.
+     *
+     * @param level The current level
+     * @return The experience points needed to reach the next level
+     */
     public static int getExpAtLevel(final int level) {
         if (level <= 15) {
             return (2 * level) + 7;
         }
-        if ((level >= 16) && (level <= 30)) {
+        if (level <= 30) {
             return (5 * level) - 38;
         }
         return (9 * level) - 158;
-
     }
 }
