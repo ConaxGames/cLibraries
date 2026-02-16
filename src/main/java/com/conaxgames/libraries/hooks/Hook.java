@@ -5,23 +5,15 @@ import org.bukkit.plugin.Plugin;
 
 public abstract class Hook implements Listener {
 
-    public String pluginFromAnnotation;
+    private final String pluginName;
 
-    /**
-     * Return the {@link Plugin} linked to this {@link Hook}.
-     */
     public abstract Plugin getPlugin();
 
-    /**
-     * Return the {@link HookType} linked to this {@link Hook}.
-     */
-    public abstract HookType getHookType();
-
-    public String getPluginFromAnnotation() {
-        return this.pluginFromAnnotation;
+    protected Hook(String pluginName) {
+        this.pluginName = pluginName;
     }
 
-    public void setPluginFromAnnotation(String pluginFromAnnotation) {
-        this.pluginFromAnnotation = pluginFromAnnotation;
+    public String getPluginName() {
+        return pluginName;
     }
 }
