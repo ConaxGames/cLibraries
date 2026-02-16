@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.event.impl.menu;
 
 import com.conaxgames.libraries.event.BaseEvent;
+import com.conaxgames.libraries.event.CancellableEvent;
 import com.conaxgames.libraries.menu.Menu;
 import lombok.Getter;
 import org.bukkit.entity.Player;
