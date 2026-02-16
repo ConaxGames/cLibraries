@@ -66,6 +66,7 @@ Access the library instance anywhere using `LibraryPlugin.getInstance()`.
 - [Configuration](src/main/java/com/conaxgames/libraries/config/CommentedConfiguration.java) - YAML configuration with comment preservation
 - [CC](src/main/java/com/conaxgames/libraries/util/CC.java) - Chat color constants and translation (including hex)
 - [Center](src/main/java/com/conaxgames/libraries/util/center/Center.java) - Pixel-based chat message centering
+- [ClassUtils](src/main/java/com/conaxgames/libraries/util/ClassUtils.java) - Package class scanning and discovery utilities
 
 ## License
 
