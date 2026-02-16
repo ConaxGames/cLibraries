@@ -25,6 +25,8 @@ import java.util.Map;
 
 public final class CommentedConfiguration extends YamlConfiguration {
 
+    // TODO: Fully test the state of CommentedConfiguration
+
     /**
      * Holds all comments for the config.
      * Can be accessed by using the methods that are provided
@@ -40,7 +42,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
 
     public CommentedConfiguration() {
         try {
-            // We don't want the YAML to parse comments at all.
             this.options().parseComments(false);
         } catch (Throwable ignored) {
         }
@@ -128,39 +129,28 @@ public final class CommentedConfiguration extends YamlConfiguration {
      */
     @Override
     public void loadFromString(String contents) throws InvalidConfigurationException {
-        //Load data of the base yaml (keys and values).
         super.loadFromString(contents);
 
-        //Parse the contents into lines.
         String[] lines = contents.split("\n");
         int currentIndex = 0;
 
-        //Variables that are used to track progress.
         StringBuilder comments = new StringBuilder();
         String currentSection = "";
 
         while(currentIndex < lines.length){
-            //Checking if the current line is a comment.
             if(isComment(lines[currentIndex])){
-                //Adding the comment to the builder with a new line at the end.
                 comments.append(lines[currentIndex]).append("\n");
             }
 
-            //Checking if the current line is a valid new section.
             else if(isNewSection(lines[currentIndex])){
-                //Parsing the line into a full-path.
                 currentSection = getSectionPath(this, lines[currentIndex], currentSection);
 
-                //If there is a valid comment for the section.
                 if(comments.length() > 1)
-                    //Adding the comment.
                     setComment(currentSection, comments.toString().substring(0, comments.length() - 1));
 
-                //Reseting the comment variable for further usage.
                 comments = new StringBuilder();
             }
 
-            //Skipping to the next line.
             currentIndex++;
         }
     }
@@ -171,37 +161,27 @@ public final class CommentedConfiguration extends YamlConfiguration {
      */
     @Override
     public String saveToString() {
-        //First, we set headers to null - as we will handle all comments, including headers, in this method.
         this.options().header(null);
 
-        //Get the string of the data (keys and values) and parse it into an array of lines.
         List<String> lines = new ArrayList<>(Arrays.asList(super.saveToString().split("\n")));
 
-        //Variables that are used to track progress.
         int currentIndex = 0;
         String currentSection = "";
 
         while(currentIndex < lines.size()){
             String line = lines.get(currentIndex);
 
-            //Checking if the line is a new section.
             if(isNewSection(line)){
-                //Parsing the line into a full-path.
                 currentSection = getSectionPath(this, line, currentSection);
-                //Checking if that path contains a comment
                 if(containsComment(currentSection)) {
-                    //Adding the comment to the lines array at that index (adding it one line before the actual line)
                     lines.add(currentIndex, getComment(currentSection));
-                    //Skipping one line so the pointer will point to the line we checked again.
                     currentIndex++;
                 }
             }
 
-            //Skipping to the next line.
             currentIndex++;
         }
 
-        //Parsing the array of lines into a one single string.
         StringBuilder contents = new StringBuilder();
         for(String line : lines)
             contents.append("\n").append(line);
@@ -217,40 +197,26 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return Returns true if there were any changes, otherwise false.
      */
     private boolean syncConfigurationSection(CommentedConfiguration commentedConfig, ConfigurationSection section, List<String> ignoredSections){
-        //Variables that are used to track progress.
         boolean changed = false;
 
-        //Going through all the keys of the section.
         for (String key : section.getKeys(false)) {
-            //Parsing the key into a full-path.
             String path = section.getCurrentPath().isEmpty() ? key : section.getCurrentPath() + "." + key;
 
-            //Checking if the key is also a section.
             if (section.isConfigurationSection(key)) {
-                //Checking if the section is ignored.
                 boolean isIgnored = ignoredSections.stream().anyMatch(path::contains);
-                //Checking if the config contains the section.
                 boolean containsSection = contains(path);
-                //If the config doesn't contain the section, or it's not ignored - we will sync data.
                 if(!containsSection || !isIgnored) {
-                    //Syncing data and updating the changed variable.
                     changed = syncConfigurationSection(commentedConfig, section.getConfigurationSection(key), ignoredSections) || changed;
                 }
             }
 
-            //Checking if the config contains the path (not a section).
             else if (!contains(path)) {
-                //Saving the value of the key into the config.
                 set(path, section.get(key));
-                //Updating variables.
                 changed = true;
             }
 
-            //Checking if there is a valid comment for the path, and also making sure the comments are not the same.
             if (commentedConfig.containsComment(path) && !commentedConfig.getComment(path).equals(getComment(path))) {
-                //Saving the comment of the key into the config.
                 setComment(path, commentedConfig.getComment(path));
-                //Updating variable.
                 changed = true;
             }
 
@@ -260,7 +226,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         all of them are ordered correctly (and the new config will look the same
         as the resource that was provided).*/
 
-        //Checking if there was a value that had been added into the config
         if(changed)
             correctIndexes(section, getConfigurationSection(section.getCurrentPath()));
 
@@ -310,10 +275,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
      */
     public static CommentedConfiguration loadConfiguration(Reader reader) {
-        //Creating a blank instance of the config.
         CommentedConfiguration config = new CommentedConfiguration();
 
-        //Parsing the reader into a BufferedReader for an easy reading of it.
         try(BufferedReader bufferedReader = reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader(reader)){
             StringBuilder contents = new StringBuilder();
 
@@ -350,10 +313,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return The full path of the line.
      */
     private static String getSectionPath(CommentedConfiguration commentedConfig, String line, String currentSection){
-        //Removing all spaces and getting the name of the section.
         String newSection = line.trim().split(": ")[0];
 
-        //Parsing some formats to make sure having a plain name.
         if(newSection.endsWith(":"))
             newSection = newSection.substring(0, newSection.length() - 1);
         if(newSection.startsWith("."))
@@ -361,12 +322,10 @@ public final class CommentedConfiguration extends YamlConfiguration {
         if(newSection.startsWith("'") && newSection.endsWith("'"))
             newSection = newSection.substring(1, newSection.length() - 1);
 
-        //Checking if the new section is a child-section of the currentSection.
         if(!currentSection.isEmpty() && commentedConfig.contains(currentSection + "." + newSection)){
             newSection = currentSection + "." + newSection;
         }
 
-        //Looking for the parent of the the new section.
         else{
             String parentSection = currentSection;
 
@@ -376,7 +335,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
             while(!parentSection.isEmpty() &&
                     !commentedConfig.contains((parentSection = getParentPath(parentSection)) + "." + newSection));
 
-            //Parsing and building the new full path.
             newSection = parentSection.trim().isEmpty() ? newSection : parentSection + "." + newSection;
         }
 
@@ -408,22 +366,17 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @param target The target section that will be ordered again.
      */
     private static void correctIndexes(ConfigurationSection section, ConfigurationSection target){
-        //Parsing the sections into ArrayLists with their keys and values.
         List<Pair<String, Object>> sectionMap = getSectionMap(section), correctOrder = new ArrayList<>();
 
-        //Going through the sectionMap, which is in the correct order.
         for (Pair<String, Object> entry : sectionMap) {
-            //Adding the entry into a new list with the correct value from the target section.
             correctOrder.add(new Pair<>(entry.getKey(), target.get(entry.getKey())));
         }
 
         /*The only way to change key-indexes is to add them one-by-one again, in the correct order.
         In order to do so, the section needs to be cleared so the indexes will be reset.*/
 
-        //Clearing the configuration.
         clearConfiguration(target);
 
-        //Adding the entries again in the correct order.
         for(Pair<String, Object> entry : correctOrder)
             target.set(entry.getKey(), entry.getValue());
     }
@@ -434,10 +387,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return A list that contains all the keys and their values.
      */
     private static List<Pair<String, Object>> getSectionMap(ConfigurationSection section){
-        //Creating an empty ArrayList.
         List<Pair<String, Object>> list = new ArrayList<>();
 
-        //Going through all the keys and adding them in the same order.
         for(String key : section.getKeys(false)) {
             list.add(new Pair<>(key, section.get(key)));
         }
