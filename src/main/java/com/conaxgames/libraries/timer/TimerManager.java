@@ -1,18 +1,29 @@
 package com.conaxgames.libraries.timer;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import lombok.Getter;
 import org.bukkit.event.Listener;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Manages registration and retrieval of {@link Timer} instances. Automatically registers timers
+ * as event listeners if they implement {@link Listener}. Use {@link #registerTimer} to add timers
+ * and {@link #getTimer} to retrieve them by class.
+ * <p>
+ * <b>Usage:</b> Access via {@link com.conaxgames.libraries.LibraryPlugin#getTimerManager}. Register
+ * your timer implementations during plugin initialization.
+ */
+@Getter
 public class TimerManager implements Listener {
 	
 	private final Set<Timer> timers = new LinkedHashSet<>();
 
-	public TimerManager() {
-	}
-
+	/**
+	 * Registers a timer instance. If the timer implements {@link Listener}, it is automatically
+	 * registered as an event listener. Use {@link #getTimer} to retrieve it later.
+	 */
 	public void registerTimer(Timer timer) {
 		this.timers.add(timer);
 		if (timer instanceof Listener) {
@@ -20,48 +31,27 @@ public class TimerManager implements Listener {
 		}
 	}
 
+	/**
+	 * Unregisters a timer instance. Does not unregister it as an event listener if it was one.
+	 */
 	public void unregisterTimer(Timer timer) {
 		this.timers.remove(timer);
 	}
 
+	/**
+	 * Returns the timer instance of the given class, or null if not registered. Uses type-safe
+	 * casting via {@link Class#isInstance} and {@link Class#cast}.
+	 *
+	 * @param timerClass the timer class to find
+	 * @param <T> the timer type
+	 * @return the timer instance or null if not found
+	 */
 	public <T extends Timer> T getTimer(Class<T> timerClass) {
 		for (Timer timer : this.timers) {
-			if (timer.getClass().equals(timerClass)) {
-				return (T) timer;
+			if (timerClass.isInstance(timer)) {
+				return timerClass.cast(timer);
 			}
 		}
-
 		return null;
-	}
-
-	public boolean equals(final Object o) {
-		if (o == this) return true;
-		if (!(o instanceof TimerManager)) return false;
-		final TimerManager other = (TimerManager) o;
-		if (!other.canEqual((Object) this)) return false;
-		final Object this$timers = this.getTimers();
-		final Object other$timers = other.getTimers();
-		if (this$timers == null ? other$timers != null : !this$timers.equals(other$timers)) return false;
-		return true;
-	}
-
-	protected boolean canEqual(final Object other) {
-		return other instanceof TimerManager;
-	}
-
-	public int hashCode() {
-		final int PRIME = 59;
-		int result = 1;
-		final Object $timers = this.getTimers();
-		result = result * PRIME + ($timers == null ? 43 : $timers.hashCode());
-		return result;
-	}
-
-	public String toString() {
-		return "TimerManager(timers=" + this.getTimers() + ")";
-	}
-
-	public Set<Timer> getTimers() {
-		return this.timers;
 	}
 }
