@@ -15,13 +15,14 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
 public class ItemBuilderUtil {
+
+    private static final String STEVE_FALLBACK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
 
     private ItemStack is;
 
@@ -77,19 +78,14 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setSkullOwner(String name) {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            ItemMeta meta = is.getItemMeta();
-            if (meta instanceof SkullMeta) {
-                try {
-                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-                    if (offlinePlayer != null && offlinePlayer.hasPlayedBefore()) {
-                        meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
-                    } else {
-                        meta = XSkull.of(meta).profile(Profileable.username(name)).apply();
-                    }
-                    is.setItemMeta(meta);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+                Profileable profile = (offlinePlayer != null && offlinePlayer.hasPlayedBefore())
+                        ? Profileable.of(offlinePlayer)
+                        : Profileable.username(name);
+                XSkull.of(is).profile(profile).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
+            } catch (Exception e) {
+                XSkull.of(is).profile(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
             }
         }
         return this;
@@ -97,14 +93,20 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setSkullOwner(OfflinePlayer offlinePlayer) {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            ItemMeta meta = is.getItemMeta();
-            if (meta instanceof SkullMeta) {
-                try {
-                    meta = XSkull.of(meta).profile(Profileable.of(offlinePlayer)).apply();
-                    is.setItemMeta(meta);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                XSkull.of(is).profile(Profileable.of(offlinePlayer)).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
+            } catch (Exception e) {
+                XSkull.of(is).profile(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
+            }
+        }
+        return this;
+    }
+
+    public ItemBuilderUtil setSkullOwner(java.util.UUID uuid) {
+        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
+            try {
+                XSkull.of(is).profile(Profileable.of(uuid)).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
+            } catch (Exception ignored) {
             }
         }
         return this;
@@ -112,14 +114,9 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setSkullProfile(String texture) {
         if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            ItemMeta meta = is.getItemMeta();
-            if (meta instanceof SkullMeta) {
-                try {
-                    meta = XSkull.of(meta).profile(Profileable.detect(texture)).apply();
-                    is.setItemMeta(meta);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                XSkull.of(is).profile(Profileable.detect(texture)).lenient().apply();
+            } catch (Exception ignored) {
             }
         }
         return this;
@@ -362,21 +359,6 @@ public class ItemBuilderUtil {
             container.set(key, PersistentDataType.STRING, UUID.randomUUID().toString());
         }
         this.is.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilderUtil setSkin(String texture) {
-        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            ItemMeta meta = is.getItemMeta();
-            if (meta instanceof SkullMeta) {
-                try {
-                    meta = XSkull.of(meta).profile(Profileable.detect(texture)).apply();
-                    is.setItemMeta(meta);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         return this;
     }
 
