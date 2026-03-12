@@ -20,7 +20,6 @@ public class ModuleMenu extends PaginatedMenu {
 
     public ModuleMenu(ModuleManager moduleManager) {
         this.moduleManager = moduleManager;
-        setReservedRows(5);
     }
 
     @Override
@@ -82,5 +81,10 @@ public class ModuleMenu extends PaginatedMenu {
     @Override
     public int nextPageSlot(Player player) {
         return 50;
+    }
+
+    @Override
+    public int getMaxItemsPerPage(Player player) {
+        return 45;
     }
 }
