@@ -7,9 +7,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A specialized menu class that provides pagination functionality for displaying large sets of data.
@@ -17,7 +15,6 @@ import java.util.Set;
  * This class extends the base Menu class and adds support for:
  * <ul>
  *   <li>Page navigation with previous/next buttons</li>
- *   <li>Reserving specific rows for navigation or other controls</li>
  *   <li>Automatic calculation of total pages based on content size</li>
  *   <li>Dynamic content distribution across available slots</li>
  * </ul>
@@ -48,30 +45,6 @@ public abstract class PaginatedMenu extends Menu {
      * The current page number (1-based indexing).
      */
     private int page = 1;
-    
-    /**
-     * Set of row numbers that are reserved for navigation or other controls.
-     * Rows are 0-based indexed (0-5 for a standard 6-row inventory).
-     */
-    private Set<Integer> reservedRows = new HashSet<>();
-
-    /**
-     * Sets which specific rows should be reserved for navigation or other controls.
-     * <p>
-     * Reserved rows will be skipped when placing content buttons, allowing you to
-     * place navigation buttons or other controls in specific rows.
-     * </p>
-     * 
-     * @param rows The row numbers to reserve (0-based indexing, where 0 is the top row)
-     */
-    public void setReservedRows(int... rows) {
-        this.reservedRows.clear();
-        for (int row : rows) {
-            if (row >= 0 && row < 6) { // Valid rows are 0-5 (6 rows total)
-                this.reservedRows.add(row);
-            }
-        }
-    }
 
     /**
      * Gets the title for the menu, including the current page number.
@@ -138,7 +111,7 @@ public abstract class PaginatedMenu extends Menu {
      * This method handles:
      * <ul>
      *   <li>Placing navigation buttons in the specified slots</li>
-     *   <li>Distributing content buttons across available slots, skipping reserved rows</li>
+     *   <li>Distributing content buttons across available slots</li>
      *   <li>Adding global buttons that appear on every page</li>
      * </ul>
      * </p>
@@ -166,23 +139,8 @@ public abstract class PaginatedMenu extends Menu {
         for (Map.Entry<Integer, Button> entry : this.getAllPagesButtons(player).entrySet()) {
             int ind = entry.getKey();
             if (ind < minIndex || ind >= maxIndex) continue;
-            
-            // Calculate the target slot, skipping reserved rows
+
             int targetSlot = ind - (int)((double)this.getMaxItemsPerPage(player) * (double)(this.page - 1));
-            int currentRow = targetSlot / 9;
-            int currentCol = targetSlot % 9;
-            
-            // Count how many reserved rows we need to skip before this slot
-            int skippedRows = 0;
-            for (int reservedRow : this.reservedRows) {
-                if (reservedRow < currentRow) {
-                    skippedRows++;
-                }
-            }
-            
-            // Adjust the slot by skipping reserved rows
-            targetSlot = (currentRow - skippedRows) * 9 + currentCol;
-            
             buttons.put(targetSlot, entry.getValue());
         }
 
@@ -198,15 +156,12 @@ public abstract class PaginatedMenu extends Menu {
 
     /**
      * Gets the maximum number of items that can be displayed per page.
-     * <p>
-     * This value is calculated based on the inventory size and the number of reserved rows.
-     * </p>
      * 
      * @param player The player viewing the menu
      * @return The maximum number of items per page
      */
     public int getMaxItemsPerPage(Player player) {
-        return 54 - (this.reservedRows.size() * 9); // Adjust max items based on number of reserved rows
+        return 54;
     }
 
     /**
