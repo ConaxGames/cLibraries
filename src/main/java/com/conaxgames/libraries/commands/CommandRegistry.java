@@ -6,12 +6,12 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.commands.impl.LibraryCommands;
 import com.conaxgames.libraries.module.type.Module;
 import com.conaxgames.libraries.util.EnchantmentProcessor;
+import com.conaxgames.libraries.util.ItemTypeProcessor;
 import com.conaxgames.libraries.util.PotionProcessor;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
@@ -48,16 +48,19 @@ public class CommandRegistry {
 
         commandManager.getCommandContexts().registerContext(ItemStack.class, c -> {
             String argument = c.popFirstArg();
-            try {
-                XMaterial material = XMaterial.valueOf(argument);
-                Material parsedMaterial = material.get();
-                if (parsedMaterial != null) {
-                    return new ItemStack(parsedMaterial);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
+            ItemType type = ItemTypeProcessor.resolve(argument);
+            if (type != null) {
+                return type.createItemStack(1);
             }
+            throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
+        });
 
+        commandManager.getCommandContexts().registerContext(ItemType.class, c -> {
+            String argument = c.popFirstArg();
+            ItemType type = ItemTypeProcessor.resolve(argument);
+            if (type != null) {
+                return type;
+            }
             throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
         });
 
@@ -107,13 +110,8 @@ public class CommandRegistry {
             return values;
         });
 
-        commandManager.getCommandCompletions().registerAsyncCompletion("materials", c -> {
-            List<String> values = new ArrayList<>();
-            for (XMaterial material : XMaterial.values()) {
-                values.add(material.name());
-            }
-            return values;
-        });
+        commandManager.getCommandCompletions().registerAsyncCompletion("materials", c ->
+                ItemTypeProcessor.completions());
 
         commandManager.getCommandCompletions().registerAsyncCompletion("enchantments", c ->
                 EnchantmentProcessor.completions());
