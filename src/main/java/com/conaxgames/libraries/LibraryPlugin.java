@@ -105,16 +105,10 @@ public class LibraryPlugin {
     }
 
     private void initializeScheduler() {
-        boolean foliaFound = false;
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            foliaFound = true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        
-        if (foliaFound) {
             this.scheduler = new FoliaScheduler();
-        } else {
+        } catch (ClassNotFoundException ignored) {
             this.scheduler = new BukkitScheduler();
         }
     }

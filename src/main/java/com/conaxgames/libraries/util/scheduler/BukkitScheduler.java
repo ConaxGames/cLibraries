@@ -41,26 +41,22 @@ public class BukkitScheduler implements Scheduler {
 
     @Override
     public CancellableTask runTaskCancellable(Plugin plugin, Runnable runnable) {
-        BukkitTask task = plugin.getServer().getScheduler().runTask(plugin, runnable);
-        return new BukkitCancellableTask(task);
+        return new BukkitCancellableTask(plugin.getServer().getScheduler().runTask(plugin, runnable));
     }
 
     @Override
     public CancellableTask runTaskLaterCancellable(Plugin plugin, Runnable runnable, long delay) {
-        BukkitTask task = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, delay);
-        return new BukkitCancellableTask(task);
+        return new BukkitCancellableTask(plugin.getServer().getScheduler().runTaskLater(plugin, runnable, delay));
     }
 
     @Override
     public CancellableTask runTaskTimerCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
-        BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, delay, period);
-        return new BukkitCancellableTask(task);
+        return new BukkitCancellableTask(plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, delay, period));
     }
 
     @Override
     public CancellableTask runTaskTimerAsynchronouslyCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
-        BukkitTask task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period);
-        return new BukkitCancellableTask(task);
+        return new BukkitCancellableTask(plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period));
     }
 
     private static class BukkitCancellableTask implements CancellableTask {
