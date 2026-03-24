@@ -63,12 +63,11 @@ public class CommandRegistry {
 
         commandManager.getCommandContexts().registerContext(Enchantment.class, c -> {
             String argument = c.popFirstArg();
-            Enchantment enchantment = Enchantment.getByName(EnchantmentProcessor.process(argument.toUpperCase()));
+            Enchantment enchantment = EnchantmentProcessor.resolve(argument);
             if (enchantment != null) {
                 return enchantment;
-            } else {
-                throw new InvalidCommandArgument("No enchantment matching " + argument + " could be found.");
             }
+            throw new InvalidCommandArgument("No enchantment matching " + argument + " could be found.");
         });
 
         commandManager.getCommandContexts().registerContext(PotionEffectType.class, c -> {
@@ -117,7 +116,7 @@ public class CommandRegistry {
         });
 
         commandManager.getCommandCompletions().registerAsyncCompletion("enchantments", c ->
-                EnchantmentProcessor.enchantmentmap.keySet());
+                EnchantmentProcessor.completions());
 
         commandManager.getCommandCompletions().registerAsyncCompletion("modules", c ->
                 libraryPlugin.getModuleManager().getModules()
