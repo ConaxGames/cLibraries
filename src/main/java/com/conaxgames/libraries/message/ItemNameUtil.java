@@ -1,8 +1,12 @@
 package com.conaxgames.libraries.message;
 
 import com.google.common.collect.ImmutableMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
@@ -667,39 +671,9 @@ public class ItemNameUtil {
         return result;
     }
 
-    private static final Map<String,String> enchantmentmap = ImmutableMap.<String,String>builder()
-            .put("0", "Protection")
-            .put("1", "Fire Protection")
-            .put("2", "Feather Falling")
-            .put("3", "Blast Protection")
-            .put("4", "Projectile Protection")
-            .put("5", "Respiration")
-            .put("6", "Aqua Affinity")
-            .put("7", "Thorns")
-            .put("8", "Depth Strider")
-            .put("16", "Sharpness")
-            .put("17", "Smite")
-            .put("18", "Bane of Arthropods")
-            .put("19", "Knockback")
-            .put("20", "Fire Aspect")
-            .put("21", "Looting")
-            .put("32", "Efficiency")
-            .put("33", "Silk Touch")
-            .put("34", "Unbreaking")
-            .put("35", "Fortune")
-            .put("48", "Power")
-            .put("49", "Punch")
-            .put("50", "Flame")
-            .put("51", "Infinity")
-            .put("61", "Luck of the Sea")
-            .put("62", "Lure")
-            .build();
-
-    public static String enchantLookup(Enchantment enchantment) {
-        String result;
-        String key = enchantment.getName();
-        result = enchantmentmap.get(key);
-        return result;
+    public static String enchantLookup(Enchantment enchantment, Player player) {
+        Component rendered = GlobalTranslator.render(enchantment.description(), player.locale());
+        return LegacyComponentSerializer.legacySection().serialize(rendered);
     }
 }
 
