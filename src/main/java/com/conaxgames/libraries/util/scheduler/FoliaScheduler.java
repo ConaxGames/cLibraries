@@ -1,20 +1,20 @@
 package com.conaxgames.libraries.util.scheduler;
 
-import org.bukkit.plugin.Plugin;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.util.concurrent.TimeUnit;
+import org.bukkit.plugin.Plugin;
 
 /**
- * {@link Scheduler} implementation for Folia (and Paper with regionized scheduler). Sync tasks run
- * on the global region via {@link io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler};
- * async tasks use {@link io.papermc.paper.threadedregions.scheduler.AsyncScheduler}. Chosen when
- * {@code io.papermc.paper.threadedregions.RegionizedServer} is on the classpath.
+ * {@link Scheduler} for Folia: sync work on the
+ * {@link io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler}, async work on the
+ * {@link io.papermc.paper.threadedregions.scheduler.AsyncScheduler}. Used when
+ * {@code io.papermc.paper.threadedregions.RegionizedServer} is present at runtime.
  */
 public class FoliaScheduler implements Scheduler {
 
     @Override
     public void runTask(Plugin plugin, Runnable runnable) {
-        plugin.getServer().getGlobalRegionScheduler().execute(plugin, runnable);
+        plugin.getServer().getGlobalRegionScheduler().run(plugin, t -> runnable.run());
     }
 
     @Override
@@ -86,7 +86,6 @@ public class FoliaScheduler implements Scheduler {
 
     private static class FoliaCancellableTask implements CancellableTask {
         private final ScheduledTask task;
-        private volatile boolean cancelled;
 
         FoliaCancellableTask(ScheduledTask task) {
             this.task = task;
@@ -94,15 +93,12 @@ public class FoliaScheduler implements Scheduler {
 
         @Override
         public void cancel() {
-            if (!cancelled) {
-                cancelled = true;
-                task.cancel();
-            }
+            task.cancel();
         }
 
         @Override
         public boolean isCancelled() {
-            return cancelled || task.isCancelled();
+            return task.isCancelled();
         }
     }
 }
