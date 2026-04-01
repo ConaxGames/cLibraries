@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 
 public final class ItemTypeProcessor {
@@ -23,11 +22,9 @@ public final class ItemTypeProcessor {
         if (trimmed.isEmpty()) {
             return null;
         }
-        Optional<XMaterial> match = XMaterial.matchXMaterial(trimmed);
-        if (!match.isPresent()) {
-            return null;
-        }
-        Material material = match.get().get();
+        Material material = XMaterial.matchXMaterial(trimmed)
+                .map(XMaterial::get)
+                .orElse(null);
         if (material == null || material == Material.AIR) {
             return null;
         }
@@ -45,6 +42,11 @@ public final class ItemTypeProcessor {
                 continue;
             }
             out.add(x.name().toLowerCase(Locale.ROOT));
+            for (String name : x.getNames()) {
+                if (!name.isEmpty()) {
+                    out.add(name.toLowerCase(Locale.ROOT));
+                }
+            }
             out.add(material.name().toLowerCase(Locale.ROOT));
         }
         return new ArrayList<>(out);
