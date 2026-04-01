@@ -1,19 +1,21 @@
 package com.conaxgames.libraries.util;
 
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.inventory.ItemType;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 public final class ItemTypeProcessor {
 
     private ItemTypeProcessor() {
     }
 
-    public static ItemType resolve(String input) {
+    public static Material resolve(String input) {
         if (input == null) {
             return null;
         }
@@ -21,27 +23,30 @@ public final class ItemTypeProcessor {
         if (trimmed.isEmpty()) {
             return null;
         }
-        String lower = trimmed.toLowerCase(Locale.ROOT);
-        NamespacedKey key = NamespacedKey.fromString(lower);
-        ItemType type = key == null ? null : Registry.ITEM.get(key);
-        if (type == null || type == ItemType.AIR) {
+        Optional<XMaterial> match = XMaterial.matchXMaterial(trimmed);
+        if (!match.isPresent()) {
             return null;
         }
-        return type;
+        Material material = match.get().get();
+        if (material == null || material == Material.AIR) {
+            return null;
+        }
+        return material;
     }
 
     public static List<String> completions() {
-        List<String> out = new ArrayList<>();
-        for (ItemType type : Registry.ITEM) {
-            if (type == ItemType.AIR) {
+        Set<String> out = new LinkedHashSet<>();
+        for (XMaterial x : XMaterial.values()) {
+            if (!x.isSupported()) {
                 continue;
             }
-            NamespacedKey key = type.getKey();
-            out.add(key.toString());
-            if ("minecraft".equals(key.getNamespace())) {
-                out.add(key.getKey());
+            Material material = x.get();
+            if (material == null || material == Material.AIR) {
+                continue;
             }
+            out.add(x.name().toLowerCase(Locale.ROOT));
+            out.add(material.name().toLowerCase(Locale.ROOT));
         }
-        return out;
+        return new ArrayList<>(out);
     }
 }
