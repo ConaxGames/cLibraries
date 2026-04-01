@@ -75,7 +75,7 @@ public class CommandRegistry {
 
         commandManager.getCommandContexts().registerContext(PotionEffectType.class, c -> {
             String argument = c.popFirstArg();
-            PotionEffectType effectType = PotionEffectType.getByName(PotionProcessor.process(argument.toUpperCase()));
+            PotionEffectType effectType = PotionProcessor.resolve(argument);
             if (effectType != null) {
                 return effectType;
             } else {
@@ -115,6 +115,9 @@ public class CommandRegistry {
 
         commandManager.getCommandCompletions().registerAsyncCompletion("enchantments", c ->
                 EnchantmentProcessor.completions());
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("potions", c ->
+                PotionProcessor.completions());
 
         commandManager.getCommandCompletions().registerAsyncCompletion("modules", c ->
                 libraryPlugin.getModuleManager().getModules()
