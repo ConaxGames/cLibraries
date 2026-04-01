@@ -9,9 +9,9 @@ import com.conaxgames.libraries.util.EnchantmentProcessor;
 import com.conaxgames.libraries.util.ItemTypeProcessor;
 import com.conaxgames.libraries.util.PotionProcessor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ItemType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
@@ -48,18 +48,18 @@ public class CommandRegistry {
 
         commandManager.getCommandContexts().registerContext(ItemStack.class, c -> {
             String argument = c.popFirstArg();
-            ItemType type = ItemTypeProcessor.resolve(argument);
-            if (type != null) {
-                return type.createItemStack(1);
+            Material material = ItemTypeProcessor.resolve(argument);
+            if (material != null) {
+                return new ItemStack(material, 1);
             }
             throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
         });
 
-        commandManager.getCommandContexts().registerContext(ItemType.class, c -> {
+        commandManager.getCommandContexts().registerContext(Material.class, c -> {
             String argument = c.popFirstArg();
-            ItemType type = ItemTypeProcessor.resolve(argument);
-            if (type != null) {
-                return type;
+            Material material = ItemTypeProcessor.resolve(argument);
+            if (material != null) {
+                return material;
             }
             throw new InvalidCommandArgument("No item matching " + argument + " could be found.");
         });
