@@ -1,7 +1,7 @@
-package com.conaxgames.libraries.util;
+package com.conaxgames.libraries.util.resolvers;
 
-import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.Material;
+import com.cryptomorin.xseries.XPotion;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public final class ItemTypeProcessor {
+public final class PotionProcessor {
 
-    private ItemTypeProcessor() {
+    private PotionProcessor() {
     }
 
-    public static Material resolve(String input) {
+    public static PotionEffectType resolve(String input) {
         if (input == null) {
             return null;
         }
@@ -22,23 +22,19 @@ public final class ItemTypeProcessor {
         if (trimmed.isEmpty()) {
             return null;
         }
-        Material material = XMaterial.matchXMaterial(trimmed)
-                .map(XMaterial::get)
+        return XPotion.of(trimmed)
+                .map(XPotion::get)
                 .orElse(null);
-        if (material == null || material == Material.AIR) {
-            return null;
-        }
-        return material;
     }
 
     public static List<String> completions() {
         Set<String> out = new LinkedHashSet<>();
-        for (XMaterial x : XMaterial.values()) {
+        for (XPotion x : XPotion.REGISTRY.getValues()) {
             if (!x.isSupported()) {
                 continue;
             }
-            Material material = x.get();
-            if (material == null || material == Material.AIR) {
+            PotionEffectType type = x.get();
+            if (type == null) {
                 continue;
             }
             out.add(x.name().toLowerCase(Locale.ROOT));
@@ -47,7 +43,10 @@ public final class ItemTypeProcessor {
                     out.add(name.toLowerCase(Locale.ROOT));
                 }
             }
-            out.add(material.name().toLowerCase(Locale.ROOT));
+            String bukkitName = type.getName();
+            if (!bukkitName.isEmpty()) {
+                out.add(bukkitName.toLowerCase(Locale.ROOT));
+            }
         }
         return new ArrayList<>(out);
     }
