@@ -1,8 +1,7 @@
-package com.conaxgames.libraries.util;
+package com.conaxgames.libraries.util.resolvers;
 
-import com.cryptomorin.xseries.XPotion;
-import org.bukkit.NamespacedKey;
-import org.bukkit.potion.PotionEffectType;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -10,12 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public final class PotionProcessor {
+public final class ItemTypeProcessor {
 
-    private PotionProcessor() {
+    private ItemTypeProcessor() {
     }
 
-    public static PotionEffectType resolve(String input) {
+    public static Material resolve(String input) {
         if (input == null) {
             return null;
         }
@@ -23,19 +22,23 @@ public final class PotionProcessor {
         if (trimmed.isEmpty()) {
             return null;
         }
-        return XPotion.of(trimmed)
-                .map(XPotion::get)
+        Material material = XMaterial.matchXMaterial(trimmed)
+                .map(XMaterial::get)
                 .orElse(null);
+        if (material == null || material == Material.AIR) {
+            return null;
+        }
+        return material;
     }
 
     public static List<String> completions() {
         Set<String> out = new LinkedHashSet<>();
-        for (XPotion x : XPotion.REGISTRY.getValues()) {
+        for (XMaterial x : XMaterial.values()) {
             if (!x.isSupported()) {
                 continue;
             }
-            PotionEffectType type = x.get();
-            if (type == null) {
+            Material material = x.get();
+            if (material == null || material == Material.AIR) {
                 continue;
             }
             out.add(x.name().toLowerCase(Locale.ROOT));
@@ -44,10 +47,7 @@ public final class PotionProcessor {
                     out.add(name.toLowerCase(Locale.ROOT));
                 }
             }
-            String bukkitName = type.getName();
-            if (!bukkitName.isEmpty()) {
-                out.add(bukkitName.toLowerCase(Locale.ROOT));
-            }
+            out.add(material.name().toLowerCase(Locale.ROOT));
         }
         return new ArrayList<>(out);
     }

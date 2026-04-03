@@ -1,4 +1,4 @@
-package com.conaxgames.libraries.util;
+package com.conaxgames.libraries.util.resolvers;
 
 import com.cryptomorin.xseries.XEnchantment;
 import org.bukkit.enchantments.Enchantment;
