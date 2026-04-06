@@ -212,20 +212,21 @@ public abstract class Button {
             material = XMaterial.BEDROCK.get();
         }
 
-        ItemBuilderUtil builder = new ItemBuilderUtil(material, this.getAmount(player), (byte)this.getDamageValue(player))
+        ItemBuilderUtil builder = new ItemBuilderUtil(material, this.getAmount(player), (byte) this.getDamageValue(player))
                 .setName(this.getName(player));
 
         List<String> description = this.getDescription(player);
         if (description != null) {
-            builder.setLore(description);
+            builder = builder.setLore(description);
         }
 
-        if (skullOwner(player) != null) {
-            builder.setSkullOwner(skullOwner(player));
+        String skull = skullOwner(player);
+        if (skull != null) {
+            builder = builder.setSkullOwner(skull);
         }
 
         if (shinyItem(player)) {
-            builder.setGlow();
+            builder = builder.setGlow();
         }
 
         return builder.toItemStack();
