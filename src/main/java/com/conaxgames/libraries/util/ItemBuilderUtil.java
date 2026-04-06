@@ -18,11 +18,12 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ItemBuilderUtil {
-
-    private static final String STEVE_FALLBACK = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
 
     private ItemStack is;
 
@@ -44,7 +45,7 @@ public class ItemBuilderUtil {
 
     @Override
     public ItemBuilderUtil clone() {
-        return new ItemBuilderUtil(is);
+        return new ItemBuilderUtil(is.clone());
     }
 
     public ItemBuilderUtil setDurability(short dur) {
@@ -54,6 +55,9 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setName(String name) {
         ItemMeta im = is.getItemMeta();
+        if (im == null) {
+            return this;
+        }
         im.setDisplayName(CC.translate(name));
         is.setItemMeta(im);
         return this;
@@ -64,9 +68,9 @@ public class ItemBuilderUtil {
         return this;
     }
 
-    public ItemBuilderUtil addUnsafeEnchantmentIf(Boolean bool, Enchantment ench, int level) {
-        if (bool) {
-            is.addUnsafeEnchantment(ench, level);
+    public ItemBuilderUtil addUnsafeEnchantmentIf(boolean condition, Enchantment ench, int level) {
+        if (condition) {
+            return addUnsafeEnchantment(ench, level);
         }
         return this;
     }
@@ -77,53 +81,46 @@ public class ItemBuilderUtil {
     }
 
     public ItemBuilderUtil setSkullOwner(String name) {
-        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            try {
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-                Profileable profile = (offlinePlayer != null && offlinePlayer.hasPlayedBefore())
-                        ? Profileable.of(offlinePlayer)
-                        : Profileable.username(name);
-                XSkull.of(is).profile(profile).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
-            } catch (Exception e) {
-                XSkull.of(is).profile(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
-            }
+        if (!isPlayerHead()) {
+            return this;
         }
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        Profileable profile = offlinePlayer.hasPlayedBefore()
+                ? Profileable.of(offlinePlayer)
+                : Profileable.username(name);
+        XSkull.of(is).profile(profile).lenient().apply();
         return this;
     }
 
     public ItemBuilderUtil setSkullOwner(OfflinePlayer offlinePlayer) {
-        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            try {
-                XSkull.of(is).profile(Profileable.of(offlinePlayer)).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
-            } catch (Exception e) {
-                XSkull.of(is).profile(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
-            }
+        if (!isPlayerHead()) {
+            return this;
         }
+        XSkull.of(is).profile(Profileable.of(offlinePlayer)).lenient().apply();
         return this;
     }
 
-    public ItemBuilderUtil setSkullOwner(java.util.UUID uuid) {
-        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            try {
-                XSkull.of(is).profile(Profileable.of(uuid)).fallback(Profileable.detect(STEVE_FALLBACK)).lenient().apply();
-            } catch (Exception ignored) {
-            }
+    public ItemBuilderUtil setSkullOwner(UUID uuid) {
+        if (!isPlayerHead()) {
+            return this;
         }
+        XSkull.of(is).profile(Profileable.of(uuid)).lenient().apply();
         return this;
     }
 
     public ItemBuilderUtil setSkullProfile(String texture) {
-        if (is.getType() == XMaterial.PLAYER_HEAD.get()) {
-            try {
-                XSkull.of(is).profile(Profileable.detect(texture)).lenient().apply();
-            } catch (Exception ignored) {
-            }
+        if (!isPlayerHead()) {
+            return this;
         }
+        XSkull.of(is).profile(Profileable.detect(texture)).lenient().apply();
         return this;
     }
 
     public ItemBuilderUtil addEnchant(Enchantment ench, int level) {
         ItemMeta im = is.getItemMeta();
+        if (im == null) {
+            return this;
+        }
         im.addEnchant(ench, level, true);
         is.setItemMeta(im);
         return this;
@@ -141,6 +138,9 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setLore(String... lore) {
         ItemMeta im = is.getItemMeta();
+        if (im == null) {
+            return this;
+        }
         im.setLore(CC.translate(lore));
         is.setItemMeta(im);
         return this;
@@ -148,6 +148,9 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setLore(List<String> lore) {
         ItemMeta im = is.getItemMeta();
+        if (im == null) {
+            return this;
+        }
         im.setLore(CC.translate(lore));
         is.setItemMeta(im);
         return this;
@@ -155,10 +158,13 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil removeLoreLine(String line) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>(im.getLore());
-        if (!lore.contains(line))
+        if (im == null) {
             return this;
-        lore.remove(line);
+        }
+        List<String> lore = copyLore(im);
+        if (!lore.remove(line)) {
+            return this;
+        }
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -166,9 +172,13 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil removeLoreLine(int index) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>(im.getLore());
-        if (index < 0 || index > lore.size())
+        if (im == null) {
             return this;
+        }
+        List<String> lore = copyLore(im);
+        if (index < 0 || index >= lore.size()) {
+            return this;
+        }
         lore.remove(index);
         im.setLore(lore);
         is.setItemMeta(im);
@@ -177,35 +187,30 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil addLoreLine(String line) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>();
-        if (im.hasLore())
-            lore = new ArrayList<String>(im.getLore());
+        if (im == null) {
+            return this;
+        }
+        List<String> lore = copyLore(im);
         lore.add(CC.translate(line));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
     }
 
-    public ItemBuilderUtil addLoreLineIf(Boolean bool, String line) {
-        if (bool) {
-            ItemMeta im = is.getItemMeta();
-            List<String> lore = new ArrayList<String>();
-            if (im.hasLore())
-                lore = new ArrayList<String>(im.getLore());
-            lore.add(CC.translate(line));
-            im.setLore(lore);
-            is.setItemMeta(im);
-            return this;
+    public ItemBuilderUtil addLoreLineIf(boolean condition, String line) {
+        if (condition) {
+            return addLoreLine(line);
         }
         return this;
     }
 
-    public ItemBuilderUtil addLoreLineList(List<String> line) {
+    public ItemBuilderUtil addLoreLineList(List<String> lines) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>();
-        if (im.hasLore())
-            lore = new ArrayList<String>(im.getLore());
-        lore.addAll(CC.translate(line));
+        if (im == null) {
+            return this;
+        }
+        List<String> lore = copyLore(im);
+        lore.addAll(CC.translate(lines));
         im.setLore(lore);
         is.setItemMeta(im);
         return this;
@@ -213,7 +218,13 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil addLoreLine(String line, int pos) {
         ItemMeta im = is.getItemMeta();
-        List<String> lore = new ArrayList<String>(im.getLore());
+        if (im == null) {
+            return this;
+        }
+        List<String> lore = copyLore(im);
+        if (pos < 0 || pos >= lore.size()) {
+            return this;
+        }
         lore.set(pos, CC.translate(line));
         im.setLore(lore);
         is.setItemMeta(im);
@@ -222,143 +233,111 @@ public class ItemBuilderUtil {
 
     @SuppressWarnings("deprecation")
     public ItemBuilderUtil setDyeColor(DyeColor color) {
-        this.is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5") ? color.getWoolData() : color.getDyeData());
-        return this;
-    }
-
-    @Deprecated
-    public ItemBuilderUtil setWoolColor(DyeColor color) {
-        if (!is.getType().equals(XMaterial.WHITE_WOOL.get())) {
-            return this;
-        }
-        this.is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5") ? color.getWoolData() : color.getDyeData());
+        is.setDurability(VersioningChecker.getInstance().isServerVersionBefore("1.16.5")
+                ? color.getWoolData()
+                : color.getDyeData());
         return this;
     }
 
     public ItemBuilderUtil setLeatherArmorColor(Color color) {
-        try {
-            LeatherArmorMeta im = (LeatherArmorMeta) is.getItemMeta();
-            im.setColor(color);
-            is.setItemMeta(im);
-        } catch (ClassCastException expected) {
+        ItemMeta meta = is.getItemMeta();
+        if (!(meta instanceof LeatherArmorMeta)) {
+            return this;
         }
+        LeatherArmorMeta im = (LeatherArmorMeta) meta;
+        im.setColor(color);
+        is.setItemMeta(im);
         return this;
     }
 
     public ItemBuilderUtil setUnbreakable() {
-        final ItemMeta meta = this.is.getItemMeta();
+        ItemMeta meta = is.getItemMeta();
         if (meta != null) {
-            setUnbreakable(meta, true); // Your version-agnostic method
+            meta.setUnbreakable(true);
+            is.setItemMeta(meta);
         }
-        this.is.setItemMeta(meta);
         return this;
     }
 
-    public static ItemMeta setUnbreakable(ItemMeta meta, boolean value) {
-        meta.setUnbreakable(value); // Default behavior (1.20 NMS)
-        return meta;
-    }
-
     public ItemBuilderUtil setFlags(ItemFlag... flags) {
-        final ItemMeta meta = this.is.getItemMeta();
+        ItemMeta meta = is.getItemMeta();
         if (meta != null) {
             meta.addItemFlags(flags);
+            is.setItemMeta(meta);
         }
-        this.is.setItemMeta(meta);
         return this;
     }
 
     public ItemBuilderUtil removeFlags(ItemFlag... flags) {
-        final ItemMeta meta = this.is.getItemMeta();
+        ItemMeta meta = is.getItemMeta();
         if (meta != null) {
             meta.removeItemFlags(flags);
+            is.setItemMeta(meta);
         }
-        this.is.setItemMeta(meta);
         return this;
     }
 
     public ItemBuilderUtil hideAttributes() {
-        final ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        }
-        this.is.setItemMeta(meta);
-        return this;
+        return setFlags(ItemFlag.HIDE_ATTRIBUTES);
     }
 
     public ItemBuilderUtil hideEnchants() {
-        final ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        this.is.setItemMeta(meta);
-        return this;
+        return setFlags(ItemFlag.HIDE_ENCHANTS);
     }
 
     public ItemBuilderUtil showAttributes() {
-        final ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            meta.removeItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        }
-        this.is.setItemMeta(meta);
-        return this;
+        return removeFlags(ItemFlag.HIDE_ATTRIBUTES);
     }
-    
+
     public ItemBuilderUtil setAmount(int amount) {
-        this.is.setAmount(amount);
+        is.setAmount(amount);
         return this;
     }
 
     public ItemBuilderUtil setCustomModelData(int modelData) {
-        final ItemMeta meta = this.is.getItemMeta();
+        ItemMeta meta = is.getItemMeta();
         if (meta != null) {
             meta.setCustomModelData(modelData);
+            is.setItemMeta(meta);
         }
-        this.is.setItemMeta(meta);
         return this;
     }
 
     public ItemBuilderUtil setGlow() {
-        ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            Enchantment enchantment = XEnchantment.UNBREAKING.get();
-            if (enchantment != null) {
-                meta.addEnchant(enchantment, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                this.is.setItemMeta(meta);
-            }
-        }
-        return this;
+        return setGlow(true);
     }
 
     public ItemBuilderUtil setGlow(boolean glow) {
-        ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            Enchantment enchantment = XEnchantment.UNBREAKING.get();
-            if (enchantment != null) {
-                if (glow) {
-                    meta.addEnchant(enchantment, 1, true);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                } else {
-                    meta.removeEnchant(enchantment);
-                    if (!meta.hasEnchants()) {
-                        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    }
-                }
-                this.is.setItemMeta(meta);
+        ItemMeta meta = is.getItemMeta();
+        if (meta == null) {
+            return this;
+        }
+        Enchantment unbreaking = XEnchantment.UNBREAKING.get();
+        if (unbreaking == null) {
+            return this;
+        }
+        if (glow) {
+            meta.addEnchant(unbreaking, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        } else {
+            meta.removeEnchant(unbreaking);
+            if (!meta.hasEnchants()) {
+                meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
         }
+        is.setItemMeta(meta);
         return this;
     }
 
     public ItemBuilderUtil setUnstackable() {
-        final ItemMeta meta = this.is.getItemMeta();
-        if (meta != null) {
-            final PersistentDataContainer container = meta.getPersistentDataContainer();
-            final NamespacedKey key = new NamespacedKey("conaxgames", "unstackable");
-            container.set(key, PersistentDataType.STRING, UUID.randomUUID().toString());
+        ItemMeta meta = is.getItemMeta();
+        if (meta == null) {
+            return this;
         }
-        this.is.setItemMeta(meta);
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey("conaxgames", "unstackable");
+        container.set(key, PersistentDataType.STRING, UUID.randomUUID().toString());
+        is.setItemMeta(meta);
         return this;
     }
 
@@ -368,5 +347,14 @@ public class ItemBuilderUtil {
 
     public ItemStack build() {
         return is;
+    }
+
+    private boolean isPlayerHead() {
+        return is.getType() == XMaterial.PLAYER_HEAD.get();
+    }
+
+    private static List<String> copyLore(ItemMeta im) {
+        List<String> lore = im.getLore();
+        return lore == null ? new ArrayList<>() : new ArrayList<>(lore);
     }
 }
