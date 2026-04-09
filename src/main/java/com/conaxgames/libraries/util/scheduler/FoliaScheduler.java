@@ -66,13 +66,13 @@ public class FoliaScheduler implements Scheduler {
     private record FoliaCancellableTask(ScheduledTask task) implements CancellableTask {
 
         @Override
-            public void cancel() {
-                task.cancel();
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return task.isCancelled();
-            }
+        public void cancel() {
+            task.cancel();
         }
+
+        @Override
+        public boolean isCancelled() {
+            return task.isCancelled();
+        }
+    }
 }
