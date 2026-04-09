@@ -62,13 +62,13 @@ public class BukkitScheduler implements Scheduler {
     private record BukkitCancellableTask(BukkitTask task) implements CancellableTask {
 
         @Override
-            public void cancel() {
-                task.cancel();
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return task.isCancelled();
-            }
+        public void cancel() {
+            task.cancel();
         }
+
+        @Override
+        public boolean isCancelled() {
+            return task.isCancelled();
+        }
+    }
 }
