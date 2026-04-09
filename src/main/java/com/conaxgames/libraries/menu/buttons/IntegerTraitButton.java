@@ -4,7 +4,6 @@ import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -44,9 +43,8 @@ public final class IntegerTraitButton<T> extends Button {
 
     @Override
     public List<String> getDescription(Player player) {
-        ArrayList<String> lore = new ArrayList<>();
 
-        lore.addAll(FormatUtil.wordWrap(CC.GRAY + description));
+        ArrayList<String> lore = new ArrayList<>(FormatUtil.wordWrap(CC.GRAY + description));
         lore.add(" ");
         lore.add(CC.GRAY + "Current: " + CC.WHITE + readFunction.apply(target));
         lore.add(" ");
@@ -79,7 +77,7 @@ public final class IntegerTraitButton<T> extends Button {
         writeFunction.accept(target, current + change);
         saveFunction.accept(target);
 
-        player.sendMessage(ChatColor.GREEN + "Set " + trait + " to " + (current + change) + ".");
+        player.sendMessage(CC.GREEN + "Set " + trait + " to " + (current + change) + ".");
     }
 
 }
