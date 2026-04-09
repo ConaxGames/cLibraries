@@ -5,13 +5,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BoardManager implements Runnable {
@@ -42,7 +36,7 @@ public class BoardManager implements Runnable {
 				updateBoard(player, board);
 			} catch (Exception ex) {
 				LibraryPlugin.getInstance().getPlugin().getLogger()
-					.severe("Scoreboard error for " + player.getName() + ": " + ex.getMessage());
+						.severe("Scoreboard error for " + player.getName() + ": " + ex.getMessage());
 			}
 		}
 	}
