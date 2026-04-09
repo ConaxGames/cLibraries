@@ -44,6 +44,7 @@ public class HookManager implements Listener {
 
     /**
      * Register a {@link Hook}.
+     *
      * @param hook The hook to attempt to find.
      */
     public void registerHook(Hook hook) {

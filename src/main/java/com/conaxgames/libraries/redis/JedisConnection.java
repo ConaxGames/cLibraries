@@ -26,11 +26,11 @@ public class JedisConnection {
         this.logger.info("[cLib-Jedis] " + message);
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

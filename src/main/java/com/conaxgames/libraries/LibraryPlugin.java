@@ -9,9 +9,9 @@ import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.timer.TimerManager;
-import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.conaxgames.libraries.util.scheduler.BukkitScheduler;
 import com.conaxgames.libraries.util.scheduler.FoliaScheduler;
+import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -41,6 +41,7 @@ public class LibraryPlugin {
 
     /**
      * Gets the library instance.
+     *
      * @return LibraryPlugin instance
      * @throws IllegalPluginAccessException if not initialized
      */
@@ -53,15 +54,16 @@ public class LibraryPlugin {
 
     /**
      * Initializes the library.
-     * @param plugin Main plugin instance
-     * @param debugPrimary Primary debug key
-     * @param debugSecondary Secondary debug key
+     *
+     * @param plugin             Main plugin instance
+     * @param debugPrimary       Primary debug key
+     * @param debugSecondary     Secondary debug key
      * @param moduleCommandAlias Module command alias
-     * @param moduleCommandPerm Module command permission
+     * @param moduleCommandPerm  Module command permission
      * @return This instance for chaining
      */
-    public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary, 
-                                 String moduleCommandAlias, String moduleCommandPerm) {
+    public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary,
+                                  String moduleCommandAlias, String moduleCommandPerm) {
         if (this.setup) {
             logMultipleInitializationWarning();
             return this;
@@ -69,14 +71,14 @@ public class LibraryPlugin {
 
         instance = this;
         this.plugin = plugin;
-        
+
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.paperCommandManager = new PaperCommandManager(this.plugin);
         this.commandRegistry = new CommandRegistry(this, paperCommandManager);
         this.hookManager = new HookManager(this);
         this.timerManager = new TimerManager();
         this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);
-        
+
         initializeScheduler();
         registerEventListeners();
 
@@ -88,6 +90,7 @@ public class LibraryPlugin {
 
     /**
      * Shuts down the library.
+     *
      * @return This instance for chaining
      */
     public LibraryPlugin onDisable() {
@@ -96,6 +99,7 @@ public class LibraryPlugin {
 
     /**
      * Sets the board manager and starts its update task.
+     *
      * @param boardManager Board manager instance
      */
     public void setBoardManager(BoardManager boardManager) {
@@ -115,35 +119,35 @@ public class LibraryPlugin {
 
     private void registerEventListeners() {
         Arrays.asList(
-            new PlayerListener(this),
-            this.hookManager
-        ).forEach(listener -> 
-            Bukkit.getPluginManager().registerEvents(listener, this.plugin)
+                new PlayerListener(this),
+                this.hookManager
+        ).forEach(listener ->
+                Bukkit.getPluginManager().registerEvents(listener, this.plugin)
         );
     }
 
     private void logMultipleInitializationWarning() {
         String authors = Joiner.on(", ").join(this.plugin.getDescription().getAuthors());
         libraryLogger.toConsole(
-            "cLibraries",
-            Arrays.asList(
-                " ",
-                "cLibraries is already setup!", this.plugin.getName() + " has called onEnable twice!",
-                "Please nag " + authors + " to fix this!",
-                " "
-            )
+                "cLibraries",
+                Arrays.asList(
+                        " ",
+                        "cLibraries is already setup!", this.plugin.getName() + " has called onEnable twice!",
+                        "Please nag " + authors + " to fix this!",
+                        " "
+                )
         );
     }
 
     private void logSuccessfulInitialization() {
         String authors = Joiner.on(", ").join(this.plugin.getDescription().getAuthors());
         this.libraryLogger.toConsole(
-            "cLibraries",
-            Arrays.asList(
-                " ",
-                "cLibraries instance has been setup for " + this.plugin.getName() + " (" + authors + ")",
-                " "
-            )
+                "cLibraries",
+                Arrays.asList(
+                        " ",
+                        "cLibraries instance has been setup for " + this.plugin.getName() + " (" + authors + ")",
+                        " "
+                )
         );
     }
 }

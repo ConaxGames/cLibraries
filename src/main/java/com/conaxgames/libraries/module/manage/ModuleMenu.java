@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ModuleMenu extends PaginatedMenu {
-    
+
     private final ModuleManager moduleManager;
 
     public ModuleMenu(ModuleManager moduleManager) {

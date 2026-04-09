@@ -24,6 +24,6 @@ public enum HookType {
     KITPVP,
     FFA,
     CGLOBE,
-    SKYBLOCK;
+    SKYBLOCK
 
 }

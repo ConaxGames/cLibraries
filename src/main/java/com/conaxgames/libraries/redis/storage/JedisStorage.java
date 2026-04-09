@@ -1,9 +1,8 @@
 package com.conaxgames.libraries.redis.storage;
 
-import com.conaxgames.libraries.redis.JedisCredentials;
 import com.conaxgames.libraries.redis.JedisConnection;
+import com.conaxgames.libraries.redis.JedisCredentials;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 
 import java.util.Map;

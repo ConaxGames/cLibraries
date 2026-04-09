@@ -1,8 +1,8 @@
 package com.conaxgames.libraries.menu;
 
+import com.conaxgames.libraries.util.ItemBuilderUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import com.conaxgames.libraries.util.ItemBuilderUtil;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -75,6 +75,18 @@ public abstract class Button {
         };
     }
 
+    public static void playFail(Player player) {
+        XSound.BLOCK_GRASS_BREAK.play(player);
+    }
+
+    public static void playSuccess(Player player) {
+        XSound.BLOCK_NOTE_BLOCK_HARP.play(player);
+    }
+
+    public static void playNeutral(Player player) {
+        XSound.UI_BUTTON_CLICK.play(player);
+    }
+
     public abstract String getName(Player player);
 
     public abstract List<String> getDescription(Player player);
@@ -128,17 +140,5 @@ public abstract class Button {
         }
 
         return builder.toItemStack();
-    }
-
-    public static void playFail(Player player) {
-        XSound.BLOCK_GRASS_BREAK.play(player);
-    }
-
-    public static void playSuccess(Player player) {
-        XSound.BLOCK_NOTE_BLOCK_HARP.play(player);
-    }
-
-    public static void playNeutral(Player player) {
-        XSound.UI_BUTTON_CLICK.play(player);
     }
 }

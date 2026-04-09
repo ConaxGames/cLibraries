@@ -34,8 +34,8 @@ public class ModuleManager {
      * Creates the manager and registers the module command. The command alias and permission are
      * replaced via ACF (e.g. <code>modules_%moduleCommandAlias</code>).
      *
-     * @param library the library plugin instance
-     * @param commandAlias alias for the module command (e.g. "module")
+     * @param library           the library plugin instance
+     * @param commandAlias      alias for the module command (e.g. "module")
      * @param commandPermission permission root (e.g. "yourplugin.modules")
      */
     public ModuleManager(LibraryPlugin library, String commandAlias, String commandPermission) {
@@ -81,7 +81,7 @@ public class ModuleManager {
      * registered, registers it first. Use <code>save = true</code> to persist <code>enabled: true</code>.
      *
      * @param module the module to enable
-     * @param save whether to write <code>enabled: true</code> to the module config
+     * @param save   whether to write <code>enabled: true</code> to the module config
      * @return a short status message (e.g. "Enabled example!")
      */
     public String enableModule(Module module, boolean save) {
@@ -116,7 +116,7 @@ public class ModuleManager {
      * applicable. Use <code>save = true</code> to persist <code>enabled: false</code>.
      *
      * @param module the module to disable
-     * @param save whether to write <code>enabled: false</code> to the module config
+     * @param save   whether to write <code>enabled: false</code> to the module config
      * @return a short status message, or an error message if not registered or not enabled
      */
     public String disableModule(Module module, boolean save) {

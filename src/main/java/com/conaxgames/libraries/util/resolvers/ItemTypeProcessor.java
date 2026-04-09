@@ -3,11 +3,7 @@ package com.conaxgames.libraries.util.resolvers;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public final class ItemTypeProcessor {
 

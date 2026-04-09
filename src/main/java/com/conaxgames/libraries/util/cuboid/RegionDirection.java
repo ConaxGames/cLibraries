@@ -10,16 +10,26 @@ public enum RegionDirection {
 
     public RegionDirection opposite() {
         switch (this) {
-            case NORTH: return SOUTH;
-            case EAST: return WEST;
-            case SOUTH: return NORTH;
-            case WEST: return EAST;
-            case UP: return DOWN;
-            case DOWN: return UP;
-            case HORIZONTAL: return VERTICAL;
-            case VERTICAL: return HORIZONTAL;
-            case BOTH: return BOTH;
-            default: return this;
+            case NORTH:
+                return SOUTH;
+            case EAST:
+                return WEST;
+            case SOUTH:
+                return NORTH;
+            case WEST:
+                return EAST;
+            case UP:
+                return DOWN;
+            case DOWN:
+                return UP;
+            case HORIZONTAL:
+                return VERTICAL;
+            case VERTICAL:
+                return HORIZONTAL;
+            case BOTH:
+                return BOTH;
+            default:
+                return this;
         }
     }
 }

@@ -23,9 +23,11 @@ public class ItemStackButton extends Button {
     public String getName(Player var1) {
         return null;
     }
+
     public List<String> getDescription(Player var1) {
         return null;
     }
+
     public Material getMaterial(Player var1) {
         return null;
     }

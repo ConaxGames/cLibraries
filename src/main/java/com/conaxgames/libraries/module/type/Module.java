@@ -195,8 +195,8 @@ public abstract class Module {
      * file is synced from the plugin jar; keys in {@link #noSync()} are left unchanged. Use for
      * extra config files or when you need to skip sync.
      *
-     * @param destination base name without .yml (e.g. "settings")
-     * @param forceSync whether to always sync from jar
+     * @param destination    base name without .yml (e.g. "settings")
+     * @param forceSync      whether to always sync from jar
      * @param syncOnCreation whether to sync when the file is newly created
      */
     public Config getResource(@NonNull String destination, boolean forceSync, boolean syncOnCreation) {

@@ -25,9 +25,9 @@ public final class ProgressionBar {
     /**
      * Builds a progress bar with the given number of segments and default symbol and colors.
      *
-     * @param current    Current value (clamped to max)
-     * @param max        Maximum value
-     * @param totalBars  Number of segments in the bar
+     * @param current   Current value (clamped to max)
+     * @param max       Maximum value
+     * @param totalBars Number of segments in the bar
      * @return A colored string of segments representing the progress
      */
     public static String construct(int current, int max, int totalBars) {
@@ -42,7 +42,7 @@ public final class ProgressionBar {
      * @param totalBars         Number of segments in the bar
      * @param symbol            Character used for each segment
      * @param completedColor    Color string (e.g. {@link CC#GREEN}) for filled segments
-     * @param notCompletedColor  Color string (e.g. {@link CC#GRAY}) for unfilled segments
+     * @param notCompletedColor Color string (e.g. {@link CC#GRAY}) for unfilled segments
      * @return A colored string of segments representing the progress
      */
     public static String construct(int current, int max, int totalBars, char symbol, String completedColor, String notCompletedColor) {

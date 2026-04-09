@@ -4,12 +4,7 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +20,7 @@ import java.util.UUID;
 
 public class ItemBuilderUtil {
 
-    private ItemStack is;
+    private final ItemStack is;
 
     public ItemBuilderUtil(Material m) {
         this(m, 1);
@@ -41,6 +36,11 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil(Material m, int amount, byte durability) {
         is = new ItemStack(m, amount, durability);
+    }
+
+    private static List<String> copyLore(ItemMeta im) {
+        List<String> lore = im.getLore();
+        return lore == null ? new ArrayList<>() : new ArrayList<>(lore);
     }
 
     @Override
@@ -241,10 +241,9 @@ public class ItemBuilderUtil {
 
     public ItemBuilderUtil setLeatherArmorColor(Color color) {
         ItemMeta meta = is.getItemMeta();
-        if (!(meta instanceof LeatherArmorMeta)) {
+        if (!(meta instanceof LeatherArmorMeta im)) {
             return this;
         }
-        LeatherArmorMeta im = (LeatherArmorMeta) meta;
         im.setColor(color);
         is.setItemMeta(im);
         return this;
@@ -351,10 +350,5 @@ public class ItemBuilderUtil {
 
     private boolean isPlayerHead() {
         return is.getType() == XMaterial.PLAYER_HEAD.get();
-    }
-
-    private static List<String> copyLore(ItemMeta im) {
-        List<String> lore = im.getLore();
-        return lore == null ? new ArrayList<>() : new ArrayList<>(lore);
     }
 }

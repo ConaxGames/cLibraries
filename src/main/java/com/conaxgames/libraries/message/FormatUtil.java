@@ -14,8 +14,28 @@ import java.util.regex.Pattern;
 /**
  * Format utility
  */
-public enum FormatUtil {;
+public enum FormatUtil {
+    ;
     private static final Pattern FORMATTING = Pattern.compile("^.*(?<format>(\u00a7[0-9a-fklmor])+).*");
+    private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
+
+    static {
+        ROMAN_NUMERALS.put(1000, "M");
+        ROMAN_NUMERALS.put(900, "CM");
+        ROMAN_NUMERALS.put(500, "D");
+        ROMAN_NUMERALS.put(400, "CD");
+        ROMAN_NUMERALS.put(100, "C");
+        ROMAN_NUMERALS.put(90, "XC");
+        ROMAN_NUMERALS.put(50, "L");
+        ROMAN_NUMERALS.put(40, "XL");
+        ROMAN_NUMERALS.put(10, "X");
+        ROMAN_NUMERALS.put(9, "IX");
+        ROMAN_NUMERALS.put(5, "V");
+        ROMAN_NUMERALS.put(4, "IV");
+        ROMAN_NUMERALS.put(1, "I");
+        ROMAN_NUMERALS.put(0, ""); // Safety
+    }
+
     public static String stripFormatting(String format) {
         if (format == null || format.trim().isEmpty()) {
             return "";
@@ -40,7 +60,7 @@ public enum FormatUtil {;
 
     /**
      * Wraps the string rather lazyly around the linesize (over).
-     *
+     * <p>
      * I.e.
      * <pre>
      *   this is a line of words
@@ -62,7 +82,7 @@ public enum FormatUtil {;
         int ix = 0;
         int jx = 0;
         while (ix < s.length()) {
-            ix = s.indexOf(' ', ix+1);
+            ix = s.indexOf(' ', ix + 1);
             if (ix != -1) {
                 String subString = s.substring(jx, ix).trim();
                 String f = getFormat(subString);
@@ -93,7 +113,7 @@ public enum FormatUtil {;
         }
         String[] words = s.split(" ");
         String line = "";
-        for (String word: words) {
+        for (String word : words) {
             String test = stripFormatting(line + " " + word).trim();
             if (test.length() <= lineLength) {
                 // add word
@@ -103,7 +123,7 @@ public enum FormatUtil {;
                 String f = getFormat(word);
                 String strip = stripFormatting(word);
                 do {
-                    int len = Math.min(strip.length(), lineLength-line.length()-1);
+                    int len = Math.min(strip.length(), lineLength - line.length() - 1);
                     lines.add(withFormat(format, line + (line.isEmpty() ? "" : " ") + strip.substring(0, len)));
                     strip = strip.substring(len);
                     if (f != null) {
@@ -177,6 +197,7 @@ public enum FormatUtil {;
 
     /**
      * Escapes formatting by "denormalizing" back to using &amp; instead of §.
+     *
      * @param formatString A formatstring (formerly normalized).
      * @return A non-format string using &amp; instead of §.
      * @since 1.10
@@ -189,7 +210,7 @@ public enum FormatUtil {;
     }
 
     public static String possessiveString(String str) {
-        return str + (str.endsWith("s") ? "'": "'s");
+        return str + (str.endsWith("s") ? "'" : "'s");
     }
 
     public static String formatTps(double tps) {
@@ -198,26 +219,6 @@ public enum FormatUtil {;
         String asterisk = (tps > 20.0) ? "*" : "";
 
         return color + asterisk + String.format("%.2f", roundedTps);
-    }
-
-
-    private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
-
-    static {
-        ROMAN_NUMERALS.put(1000, "M");
-        ROMAN_NUMERALS.put(900, "CM");
-        ROMAN_NUMERALS.put(500, "D");
-        ROMAN_NUMERALS.put(400, "CD");
-        ROMAN_NUMERALS.put(100, "C");
-        ROMAN_NUMERALS.put(90, "XC");
-        ROMAN_NUMERALS.put(50, "L");
-        ROMAN_NUMERALS.put(40, "XL");
-        ROMAN_NUMERALS.put(10, "X");
-        ROMAN_NUMERALS.put(9, "IX");
-        ROMAN_NUMERALS.put(5, "V");
-        ROMAN_NUMERALS.put(4, "IV");
-        ROMAN_NUMERALS.put(1, "I");
-        ROMAN_NUMERALS.put(0, ""); // Safety
     }
 
     public static String toRoman(int number) {

@@ -1,4 +1,3 @@
-
 package com.conaxgames.libraries.menu.buttons;
 
 import com.conaxgames.libraries.menu.Button;
@@ -15,7 +14,7 @@ import java.util.List;
 public class BackButton extends Button {
     private final Menu back;
 
-    @ConstructorProperties(value={"back"})
+    @ConstructorProperties(value = {"back"})
     public BackButton(Menu back) {
         this.back = back;
     }

@@ -6,6 +6,7 @@ import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.menu.MenuInventoryHolder;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.inventory.Inventory;
 
 import java.util.UUID;
@@ -22,15 +22,13 @@ public class ButtonListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
     public void onButtonPress(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
-        Player player = (Player) event.getWhoClicked();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof MenuInventoryHolder)) {
+        if (!(top.getHolder() instanceof MenuInventoryHolder holder)) {
             return;
         }
-        MenuInventoryHolder holder = (MenuInventoryHolder) top.getHolder();
         if (!holder.getViewerId().equals(player.getUniqueId())) {
             return;
         }
@@ -98,16 +96,14 @@ public class ButtonListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player)) {
+        if (!(event.getPlayer() instanceof Player player)) {
             return;
         }
-        Player player = (Player) event.getPlayer();
         UUID id = player.getUniqueId();
         Inventory inv = event.getInventory();
-        if (!(inv.getHolder() instanceof MenuInventoryHolder)) {
+        if (!(inv.getHolder() instanceof MenuInventoryHolder holder)) {
             return;
         }
-        MenuInventoryHolder holder = (MenuInventoryHolder) inv.getHolder();
         if (!holder.getViewerId().equals(id)) {
             return;
         }

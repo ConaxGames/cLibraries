@@ -34,21 +34,21 @@ public class ModuleButton extends Button {
     public List<String> getDescription(Player player) {
         List<String> description = new ArrayList<>();
         String ownedPlugin = module.getJavaPlugin() == null ? "Unknown" : module.getJavaPlugin().getName();
-        
+
         description.add(CC.DARK_GRAY + ownedPlugin);
         description.add(" ");
         description.addAll(FormatUtil.wordWrap(CC.GRAY + module.getDescription()));
         description.add(" ");
         description.add(CC.GRAY + "Author: " + CC.WHITE + module.getAuthor());
-        
+
         if (module.getRequiredPlugin() != null) {
             description.add(CC.GRAY + "Requires: " + CC.WHITE + module.getRequiredPlugin());
         }
-        
+
         description.add(" ");
         description.add(CC.YELLOW + (enabled ? "Click to disable." : "Click to enable."));
         description.addAll(FormatUtil.wordWrap(CC.GRAY + "(Use a Shift-Click to not save this change over reboots)"));
-        
+
         return description;
     }
 

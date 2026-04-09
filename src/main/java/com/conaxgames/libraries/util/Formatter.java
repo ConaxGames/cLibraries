@@ -8,6 +8,25 @@ import java.util.concurrent.TimeUnit;
 
 public class Formatter {
 
+    private static final NavigableMap<Double, String> suffixes = new TreeMap<>();
+
+    static {
+        suffixes.put(1_000D, "k");
+        suffixes.put(1_000_000D, "M");
+        suffixes.put(1_000_000_000D, "B");
+        suffixes.put(1_000_000_000_000D, "T");
+        suffixes.put(1_000_000_000_000_000D, "QD");
+        suffixes.put(1_000_000_000_000_000_000D, "QT");
+        suffixes.put(1_000_000_000_000_000_000_000D, "SX");
+        suffixes.put(1_000_000_000_000_000_000_000_000D, "ST");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000D, "O");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000D, "N");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000D, "D");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000D, "U");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000D, "DU");
+        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000_000D, "TD");
+    }
+
     public static String commaFormatInteger(Integer integer) {
         return NumberFormat.getIntegerInstance().format(integer);
     }
@@ -66,24 +85,6 @@ public class Formatter {
         long hours = minutesCount / 60;
 
         return (hours > 0 ? (hours < 10 ? "0" : "") + hours + ":" : "") + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-    }
-
-    private static final NavigableMap<Double, String> suffixes = new TreeMap<>();
-    static {
-        suffixes.put(1_000D, "k");
-        suffixes.put(1_000_000D, "M");
-        suffixes.put(1_000_000_000D, "B");
-        suffixes.put(1_000_000_000_000D, "T");
-        suffixes.put(1_000_000_000_000_000D, "QD");
-        suffixes.put(1_000_000_000_000_000_000D, "QT");
-        suffixes.put(1_000_000_000_000_000_000_000D, "SX");
-        suffixes.put(1_000_000_000_000_000_000_000_000D, "ST");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000D, "O");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000_000D, "N");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000D, "D");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000D, "U");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000D, "DU");
-        suffixes.put(1_000_000_000_000_000_000_000_000_000_000_000_000_000_000D, "TD");
     }
 
 }

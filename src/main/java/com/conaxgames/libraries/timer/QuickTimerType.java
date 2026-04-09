@@ -13,18 +13,18 @@ import java.util.UUID;
 @Getter
 public class QuickTimerType {
 
-	public UUID player;
-	public long time;
-	private final boolean announce;
-	public HashMap<String, QuickTimerType> timerMap = new HashMap<>();
+    private final boolean announce;
+    public UUID player;
+    public long time;
+    public HashMap<String, QuickTimerType> timerMap = new HashMap<>();
 
-	/**
-	 * Creates a timer type for the given player UUID with the specified expiry time (in milliseconds)
-	 * and announce flag.
-	 */
-	public QuickTimerType(UUID player, long time, boolean announce) {
-		this.player = player;
-		this.time = time;
-		this.announce = announce;
-	}
+    /**
+     * Creates a timer type for the given player UUID with the specified expiry time (in milliseconds)
+     * and announce flag.
+     */
+    public QuickTimerType(UUID player, long time, boolean announce) {
+        this.player = player;
+        this.time = time;
+        this.announce = announce;
+    }
 }

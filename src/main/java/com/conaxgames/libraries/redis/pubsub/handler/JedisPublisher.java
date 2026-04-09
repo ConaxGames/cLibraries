@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.redis.pubsub.handler;
 
-import com.conaxgames.libraries.redis.JedisCredentials;
 import com.conaxgames.libraries.redis.JedisConnection;
+import com.conaxgames.libraries.redis.JedisCredentials;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.Jedis;

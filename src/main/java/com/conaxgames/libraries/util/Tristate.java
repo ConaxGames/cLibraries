@@ -11,6 +11,14 @@ public enum Tristate {
     FALSE,
     TRUE;
 
+    public static @NotNull Tristate fromBoolean(final boolean value) {
+        return value ? TRUE : FALSE;
+    }
+
+    public static @NotNull Tristate fromBoolean(final @Nullable Boolean value) {
+        return value == null ? NOT_SET : fromBoolean(value);
+    }
+
     public @Nullable Boolean toBoolean() {
         switch (this) {
             case TRUE:
@@ -42,13 +50,5 @@ public enum Tristate {
             default:
                 return supplier.getAsBoolean();
         }
-    }
-
-    public static @NotNull Tristate fromBoolean(final boolean value) {
-        return value ? TRUE : FALSE;
-    }
-
-    public static @NotNull Tristate fromBoolean(final @Nullable Boolean value) {
-        return value == null ? NOT_SET : fromBoolean(value);
     }
 }

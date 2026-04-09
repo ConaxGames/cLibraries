@@ -23,11 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Setter
 public abstract class Menu {
 
-    private static final long MENU_UPDATE_DELAY_TICKS = 10L;
-    private static final long MENU_UPDATE_PERIOD_TICKS = 20L;
-
     public static final Map<UUID, Menu> currentlyOpenedMenus = new ConcurrentHashMap<>();
     public static final Map<UUID, Scheduler.CancellableTask> checkTasks = new ConcurrentHashMap<>();
+    private static final long MENU_UPDATE_DELAY_TICKS = 10L;
+    private static final long MENU_UPDATE_PERIOD_TICKS = 20L;
 
     static {
         Bukkit.getServer().getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
@@ -49,6 +48,13 @@ public abstract class Menu {
 
     public static Menu getOpenMenu(Player player) {
         return currentlyOpenedMenus.get(player.getUniqueId());
+    }
+
+    public static void cancelCheck(Player player) {
+        Scheduler.CancellableTask task = checkTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     public void openMenu(Player player) {
@@ -75,8 +81,7 @@ public abstract class Menu {
         UUID id = player.getUniqueId();
         Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
 
-        if (refreshInPlaceWhenPossible() && top.getHolder() instanceof MenuInventoryHolder) {
-            MenuInventoryHolder existing = (MenuInventoryHolder) top.getHolder();
+        if (refreshInPlaceWhenPossible() && top.getHolder() instanceof MenuInventoryHolder existing) {
             if (existing.getMenu() == this && existing.getViewerId().equals(id)) {
                 Map<Integer, Button> defined = getButtons(player);
                 int invSize = size(defined);
@@ -147,11 +152,10 @@ public abstract class Menu {
                     if (!Menu.this.autoUpdate) {
                         return;
                     }
-                    if (!(inv.getHolder() instanceof MenuInventoryHolder)) {
+                    if (!(inv.getHolder() instanceof MenuInventoryHolder h)) {
                         cancelCheck(player);
                         return;
                     }
-                    MenuInventoryHolder h = (MenuInventoryHolder) inv.getHolder();
                     if (h.getMenu() != Menu.this || !h.getViewerId().equals(id)) {
                         return;
                     }
@@ -171,10 +175,9 @@ public abstract class Menu {
 
     public void buttonUpdate(Player player) {
         Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
-        if (!(top.getHolder() instanceof MenuInventoryHolder)) {
+        if (!(top.getHolder() instanceof MenuInventoryHolder h)) {
             return;
         }
-        MenuInventoryHolder h = (MenuInventoryHolder) top.getHolder();
         if (h.getMenu() != this || !h.getViewerId().equals(player.getUniqueId())) {
             return;
         }
@@ -185,13 +188,6 @@ public abstract class Menu {
             return;
         }
         fillInventory(h, player, defined, invSize);
-    }
-
-    public static void cancelCheck(Player player) {
-        Scheduler.CancellableTask task = checkTasks.remove(player.getUniqueId());
-        if (task != null) {
-            task.cancel();
-        }
     }
 
     public int size(Map<Integer, Button> buttons) {

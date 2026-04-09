@@ -43,9 +43,9 @@ public final class CustomLocation {
             return null;
         }
         return new CustomLocation(
-            location.getWorld().getName(),
-            location.getX(), location.getY(), location.getZ(),
-            location.getYaw(), location.getPitch()
+                location.getWorld().getName(),
+                location.getX(), location.getY(), location.getZ(),
+                location.getYaw(), location.getPitch()
         );
     }
 
@@ -121,40 +121,59 @@ public final class CustomLocation {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%.2f, %.2f, %.2f", x, y, z));
-        
+
         if (yaw != 0.0f || pitch != 0.0f) {
             sb.append(String.format(", %.2f, %.2f", yaw, pitch));
         }
-        
+
         if (!"world".equals(world)) {
             sb.append(", ").append(world);
         }
-        
+
         return sb.toString();
     }
 
     // Getters
-    public String getWorld() { return world; }
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getZ() { return z; }
-    public float getYaw() { return yaw; }
-    public float getPitch() { return pitch; }
-    public long getTimestamp() { return timestamp; }
+    public String getWorld() {
+        return world;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 
     // Object methods
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof CustomLocation)) return false;
-        
-        CustomLocation other = (CustomLocation) obj;
+        if (!(obj instanceof CustomLocation other)) return false;
+
         return Double.compare(other.x, x) == 0 &&
-               Double.compare(other.y, y) == 0 &&
-               Double.compare(other.z, z) == 0 &&
-               Float.compare(other.yaw, yaw) == 0 &&
-               Float.compare(other.pitch, pitch) == 0 &&
-               world.equals(other.world);
+                Double.compare(other.y, y) == 0 &&
+                Double.compare(other.z, z) == 0 &&
+                Float.compare(other.yaw, yaw) == 0 &&
+                Float.compare(other.pitch, pitch) == 0 &&
+                world.equals(other.world);
     }
 
     @Override

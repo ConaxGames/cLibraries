@@ -2,8 +2,6 @@ package com.conaxgames.libraries.commands.message;
 
 import com.conaxgames.libraries.util.CC;
 
-import java.util.Locale;
-
 public enum ACFCoreMessage {
 
     UNKNOWN_COMMAND(CC.RED + "Unknown command, please type /help."),

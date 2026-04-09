@@ -11,22 +11,22 @@ import lombok.Getter;
  */
 public abstract class Timer {
 
-	protected final String name;
-	@Getter
-	protected final long defaultCooldown;
+    protected final String name;
+    @Getter
+    protected final long defaultCooldown;
 
-	/**
-	 * Creates a timer with the given name and default cooldown duration (in milliseconds).
-	 */
-	public Timer(String name, long defaultCooldown) {
-		this.name = name;
-		this.defaultCooldown = defaultCooldown;
-	}
+    /**
+     * Creates a timer with the given name and default cooldown duration (in milliseconds).
+     */
+    public Timer(String name, long defaultCooldown) {
+        this.name = name;
+        this.defaultCooldown = defaultCooldown;
+    }
 
-	/**
-	 * Returns the display name of this timer.
-	 */
-	public final String getDisplayName() {
-		return this.name;
-	}
+    /**
+     * Returns the display name of this timer.
+     */
+    public final String getDisplayName() {
+        return this.name;
+    }
 }

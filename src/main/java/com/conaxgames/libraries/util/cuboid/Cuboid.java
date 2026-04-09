@@ -6,11 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Simple and efficient 3D cuboid region implementation.
@@ -26,7 +22,7 @@ public final class Cuboid implements Iterable<Location> {
         if (l1 == null || l2 == null || l1.getWorld() == null || l2.getWorld() == null) {
             throw new IllegalArgumentException("Cuboid corners must have non-null worlds");
         }
-        
+
         this.worldName = l1.getWorld().getName();
         this.minX = Math.min(l1.getBlockX(), l2.getBlockX());
         this.maxX = Math.max(l1.getBlockX(), l2.getBlockX());
@@ -76,10 +72,10 @@ public final class Cuboid implements Iterable<Location> {
     }
 
     public Location getCenter() {
-        return new Location(getWorld(), 
-            minX + (maxX - minX) / 2.0,
-            minY + (maxY - minY) / 2.0,
-            minZ + (maxZ - minZ) / 2.0);
+        return new Location(getWorld(),
+                minX + (maxX - minX) / 2.0,
+                minY + (maxY - minY) / 2.0,
+                minZ + (maxZ - minZ) / 2.0);
     }
 
     public World getWorld() {
@@ -91,10 +87,21 @@ public final class Cuboid implements Iterable<Location> {
     }
 
     // Size and volume
-    public int getSizeX() { return maxX - minX + 1; }
-    public int getSizeY() { return maxY - minY + 1; }
-    public int getSizeZ() { return maxZ - minZ + 1; }
-    public int getVolume() { return getSizeX() * getSizeY() * getSizeZ(); }
+    public int getSizeX() {
+        return maxX - minX + 1;
+    }
+
+    public int getSizeY() {
+        return maxY - minY + 1;
+    }
+
+    public int getSizeZ() {
+        return maxZ - minZ + 1;
+    }
+
+    public int getVolume() {
+        return getSizeX() * getSizeY() * getSizeZ();
+    }
 
     // Containment checks
     public boolean contains(int x, int y, int z) {
@@ -106,9 +113,9 @@ public final class Cuboid implements Iterable<Location> {
     }
 
     public boolean contains(Location location) {
-        return location != null && 
-               worldName.equals(location.getWorld().getName()) &&
-               contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return location != null &&
+                worldName.equals(location.getWorld().getName()) &&
+                contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public boolean contains(Block block) {
@@ -118,13 +125,20 @@ public final class Cuboid implements Iterable<Location> {
     // Expansion and modification
     public Cuboid expand(RegionDirection direction, int amount) {
         switch (direction) {
-            case NORTH: return new Cuboid(worldName, minX - amount, minY, minZ, maxX, maxY, maxZ);
-            case SOUTH: return new Cuboid(worldName, minX, minY, minZ, maxX + amount, maxY, maxZ);
-            case EAST: return new Cuboid(worldName, minX, minY, minZ - amount, maxX, maxY, maxZ);
-            case WEST: return new Cuboid(worldName, minX, minY, minZ, maxX, maxY, maxZ + amount);
-            case DOWN: return new Cuboid(worldName, minX, minY - amount, minZ, maxX, maxY, maxZ);
-            case UP: return new Cuboid(worldName, minX, minY, minZ, maxX, maxY + amount, maxZ);
-            default: throw new IllegalArgumentException("Invalid direction: " + direction);
+            case NORTH:
+                return new Cuboid(worldName, minX - amount, minY, minZ, maxX, maxY, maxZ);
+            case SOUTH:
+                return new Cuboid(worldName, minX, minY, minZ, maxX + amount, maxY, maxZ);
+            case EAST:
+                return new Cuboid(worldName, minX, minY, minZ - amount, maxX, maxY, maxZ);
+            case WEST:
+                return new Cuboid(worldName, minX, minY, minZ, maxX, maxY, maxZ + amount);
+            case DOWN:
+                return new Cuboid(worldName, minX, minY - amount, minZ, maxX, maxY, maxZ);
+            case UP:
+                return new Cuboid(worldName, minX, minY, minZ, maxX, maxY + amount, maxZ);
+            default:
+                throw new IllegalArgumentException("Invalid direction: " + direction);
         }
     }
 
@@ -136,15 +150,15 @@ public final class Cuboid implements Iterable<Location> {
         switch (direction) {
             case HORIZONTAL:
                 return expand(RegionDirection.NORTH, amount)
-                       .expand(RegionDirection.SOUTH, amount)
-                       .expand(RegionDirection.EAST, amount)
-                       .expand(RegionDirection.WEST, amount);
+                        .expand(RegionDirection.SOUTH, amount)
+                        .expand(RegionDirection.EAST, amount)
+                        .expand(RegionDirection.WEST, amount);
             case VERTICAL:
                 return expand(RegionDirection.DOWN, amount)
-                       .expand(RegionDirection.UP, amount);
+                        .expand(RegionDirection.UP, amount);
             case BOTH:
                 return outset(RegionDirection.HORIZONTAL, amount)
-                       .outset(RegionDirection.VERTICAL, amount);
+                        .outset(RegionDirection.VERTICAL, amount);
             default:
                 throw new IllegalArgumentException("Invalid direction: " + direction);
         }
@@ -157,32 +171,39 @@ public final class Cuboid implements Iterable<Location> {
     // Face operations
     public Cuboid getFace(RegionDirection direction) {
         switch (direction) {
-            case DOWN: return new Cuboid(worldName, minX, minY, minZ, maxX, minY, maxZ);
-            case UP: return new Cuboid(worldName, minX, maxY, minZ, maxX, maxY, maxZ);
-            case NORTH: return new Cuboid(worldName, minX, minY, minZ, minX, maxY, maxZ);
-            case SOUTH: return new Cuboid(worldName, maxX, minY, minZ, maxX, maxY, maxZ);
-            case EAST: return new Cuboid(worldName, minX, minY, minZ, maxX, maxY, minZ);
-            case WEST: return new Cuboid(worldName, minX, minY, maxZ, maxX, maxY, maxZ);
-            default: throw new IllegalArgumentException("Invalid direction: " + direction);
+            case DOWN:
+                return new Cuboid(worldName, minX, minY, minZ, maxX, minY, maxZ);
+            case UP:
+                return new Cuboid(worldName, minX, maxY, minZ, maxX, maxY, maxZ);
+            case NORTH:
+                return new Cuboid(worldName, minX, minY, minZ, minX, maxY, maxZ);
+            case SOUTH:
+                return new Cuboid(worldName, maxX, minY, minZ, maxX, maxY, maxZ);
+            case EAST:
+                return new Cuboid(worldName, minX, minY, minZ, maxX, maxY, minZ);
+            case WEST:
+                return new Cuboid(worldName, minX, minY, maxZ, maxX, maxY, maxZ);
+            default:
+                throw new IllegalArgumentException("Invalid direction: " + direction);
         }
     }
 
     public Cuboid[] getWalls() {
         return new Cuboid[]{
-            getFace(RegionDirection.NORTH),
-            getFace(RegionDirection.SOUTH),
-            getFace(RegionDirection.EAST),
-            getFace(RegionDirection.WEST)
+                getFace(RegionDirection.NORTH),
+                getFace(RegionDirection.SOUTH),
+                getFace(RegionDirection.EAST),
+                getFace(RegionDirection.WEST)
         };
     }
 
     // Bounding operations
     public Cuboid getBoundingCuboid(Cuboid other) {
         if (other == null) return this;
-        
+
         return new Cuboid(worldName,
-            Math.min(minX, other.minX), Math.min(minY, other.minY), Math.min(minZ, other.minZ),
-            Math.max(maxX, other.maxX), Math.max(maxY, other.maxY), Math.max(maxZ, other.maxZ));
+                Math.min(minX, other.minX), Math.min(minY, other.minY), Math.min(minZ, other.minZ),
+                Math.max(maxX, other.maxX), Math.max(maxY, other.maxY), Math.max(maxZ, other.maxZ));
     }
 
     // Block access
@@ -198,27 +219,27 @@ public final class Cuboid implements Iterable<Location> {
     public List<Chunk> getChunks() {
         List<Chunk> chunks = new ArrayList<>();
         World world = getWorld();
-        
+
         int chunkMinX = minX >> 4;
         int chunkMaxX = maxX >> 4;
         int chunkMinZ = minZ >> 4;
         int chunkMaxZ = maxZ >> 4;
-        
+
         for (int x = chunkMinX; x <= chunkMaxX; x++) {
             for (int z = chunkMinZ; z <= chunkMaxZ; z++) {
                 chunks.add(world.getChunkAt(x, z));
             }
         }
-        
+
         return chunks;
     }
 
     // Random location
     public Location getRandomLocation() {
         return new Location(getWorld(),
-            minX + Math.random() * (maxX - minX + 1),
-            minY + Math.random() * (maxY - minY + 1),
-            minZ + Math.random() * (maxZ - minZ + 1));
+                minX + Math.random() * (maxX - minX + 1),
+                minY + Math.random() * (maxY - minY + 1),
+                minZ + Math.random() * (maxZ - minZ + 1));
     }
 
     // Serialization
@@ -241,9 +262,72 @@ public final class Cuboid implements Iterable<Location> {
         return new CuboidIterator();
     }
 
+    // Object methods
+    @Override
+    public String toString() {
+        return String.format("Cuboid[%s: (%d,%d,%d) to (%d,%d,%d)]",
+                worldName, minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Cuboid other)) return false;
+
+        return worldName.equals(other.worldName) &&
+                minX == other.minX && maxX == other.maxX &&
+                minY == other.minY && maxY == other.maxY &&
+                minZ == other.minZ && maxZ == other.maxZ;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = worldName.hashCode();
+        result = 31 * result + minX;
+        result = 31 * result + maxX;
+        result = 31 * result + minY;
+        result = 31 * result + maxY;
+        result = 31 * result + minZ;
+        result = 31 * result + maxZ;
+        return result;
+    }
+
+    // Getters
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     private class CuboidIterator implements Iterator<Location> {
-        private int x = minX, y = minY, z = minZ;
         private final World world = getWorld();
+        private int x = minX, y = minY, z = minZ;
 
         @Override
         public boolean hasNext() {
@@ -263,45 +347,4 @@ public final class Cuboid implements Iterable<Location> {
             return location;
         }
     }
-
-    // Object methods
-    @Override
-    public String toString() {
-        return String.format("Cuboid[%s: (%d,%d,%d) to (%d,%d,%d)]", 
-            worldName, minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Cuboid)) return false;
-        
-        Cuboid other = (Cuboid) obj;
-        return worldName.equals(other.worldName) &&
-               minX == other.minX && maxX == other.maxX &&
-               minY == other.minY && maxY == other.maxY &&
-               minZ == other.minZ && maxZ == other.maxZ;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = worldName.hashCode();
-        result = 31 * result + minX;
-        result = 31 * result + maxX;
-        result = 31 * result + minY;
-        result = 31 * result + maxY;
-        result = 31 * result + minZ;
-        result = 31 * result + maxZ;
-        return result;
-    }
-
-    // Getters
-    public String getWorldName() { return worldName; }
-    public int getMinX() { return minX; }
-    public int getMinY() { return minY; }
-    public int getMinZ() { return minZ; }
-    public int getMaxX() { return maxX; }
-    public int getMaxY() { return maxY; }
-    public int getMaxZ() { return maxZ; }
-    public String getName() { return name; }
 }
