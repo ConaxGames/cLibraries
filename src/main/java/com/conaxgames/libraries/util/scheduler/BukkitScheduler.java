@@ -59,21 +59,16 @@ public class BukkitScheduler implements Scheduler {
         return new BukkitCancellableTask(plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, period));
     }
 
-    private static class BukkitCancellableTask implements CancellableTask {
-        private final BukkitTask task;
-
-        BukkitCancellableTask(BukkitTask task) {
-            this.task = task;
-        }
+    private record BukkitCancellableTask(BukkitTask task) implements CancellableTask {
 
         @Override
-        public void cancel() {
-            task.cancel();
-        }
+            public void cancel() {
+                task.cancel();
+            }
 
-        @Override
-        public boolean isCancelled() {
-            return task.isCancelled();
+            @Override
+            public boolean isCancelled() {
+                return task.isCancelled();
+            }
         }
-    }
 }

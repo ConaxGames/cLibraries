@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.redis.pubsub;
 
-import com.conaxgames.libraries.redis.JedisCredentials;
 import com.conaxgames.libraries.redis.JedisConnection;
+import com.conaxgames.libraries.redis.JedisCredentials;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import redis.clients.jedis.Jedis;

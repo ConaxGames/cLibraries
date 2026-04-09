@@ -2,6 +2,7 @@ package com.conaxgames.libraries.util;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.time.FastDateFormat;
+
 import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -9,8 +10,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DateTimeFormats {
 
+    // The format used to show one decimal without a trailing zero.
+    public static final ThreadLocal<DecimalFormat> REMAINING_SECONDS = new ThreadLocal<DecimalFormat>() {
+        @Override
+        protected DecimalFormat initialValue() {
+            return new DecimalFormat("0.#");
+        }
+    };
+    public static final ThreadLocal<DecimalFormat> REMAINING_SECONDS_TRAILING = new ThreadLocal<DecimalFormat>() {
+        @Override
+        protected DecimalFormat initialValue() {
+            return new DecimalFormat("0.0");
+        }
+    };
     private static final AtomicBoolean loaded = new AtomicBoolean(false);
-
     public static FastDateFormat DAY_MTH_HR_MIN_SECS;
     public static FastDateFormat DAY_MTH_YR_HR_MIN_AMPM;
     public static FastDateFormat DAY_MTH_HR_MIN_AMPM;
@@ -33,20 +46,5 @@ public class DateTimeFormats {
         HR_MIN = FastDateFormat.getInstance("hh:mm", timeZone, Locale.ENGLISH);
         KOTH_FORMAT = FastDateFormat.getInstance("m:ss", timeZone, Locale.ENGLISH);
     }
-
-    // The format used to show one decimal without a trailing zero.
-    public static final ThreadLocal<DecimalFormat> REMAINING_SECONDS = new ThreadLocal<DecimalFormat>() {
-        @Override
-        protected DecimalFormat initialValue() {
-            return new DecimalFormat("0.#");
-        }
-    };
-
-    public static final ThreadLocal<DecimalFormat> REMAINING_SECONDS_TRAILING = new ThreadLocal<DecimalFormat>() {
-        @Override
-        protected DecimalFormat initialValue() {
-            return new DecimalFormat("0.0");
-        }
-    };
 
 }

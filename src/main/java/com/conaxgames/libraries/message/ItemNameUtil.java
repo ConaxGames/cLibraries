@@ -630,7 +630,7 @@ public class ItemNameUtil {
 //        return CC.GRAY + stack.getAmount() + "x " + CC.WHITE + s;
 //    }
 
-    private static final Map<String,String> potionmap = ImmutableMap.<String,String>builder()
+    private static final Map<String, String> potionmap = ImmutableMap.<String, String>builder()
             .put("speed", "Speed")
             .put("slowness", "Slowness")
             .put("haste", "Haste")
@@ -660,11 +660,11 @@ public class ItemNameUtil {
         String result;
         String key = potion.getName().toLowerCase();
         result = potionmap.get(key);
-        
+
         if (result == null) {
             result = WordUtils.capitalizeFully(potion.getName().replace("_", " "));
         }
-        
+
         return result;
     }
 

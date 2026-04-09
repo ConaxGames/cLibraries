@@ -24,7 +24,8 @@ public final class IntegerTraitButton<T> extends Button {
     private final Consumer<T> saveFunction;
 
     public IntegerTraitButton(T target, String trait, String description, BiConsumer<T, Integer> writeFunction, Function<T, Integer> readFunction) {
-        this(target, trait, description, writeFunction, readFunction, (i) -> {});
+        this(target, trait, description, writeFunction, readFunction, (i) -> {
+        });
     }
 
     public IntegerTraitButton(T target, String trait, String description, BiConsumer<T, Integer> writeFunction, Function<T, Integer> readFunction, Consumer<T> saveFunction) {

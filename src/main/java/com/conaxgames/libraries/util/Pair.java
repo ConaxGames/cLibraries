@@ -10,17 +10,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Pair<K, V>{
+public class Pair<K, V> {
 
     private K key;
     private V value;
 
+    public static <K, V> Pair<K, V> of(K key, V value) {
+        return new Pair<K, V>(key, value);
+    }
+
+    public static Pair<Integer, Integer> fromString(String s) {
+        String[] nums = s.split(",");
+        return new Pair<Integer, Integer>(Integer.parseInt(nums[0]), Integer.parseInt(nums[1]));
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Pair))
+        if (!(obj instanceof Pair<?, ?> objPair))
             return false;
 
-        Pair<?, ?> objPair = (Pair<?, ?>) obj;
         return this.key.equals(objPair.key) && this.value.equals(objPair.value);
     }
 
@@ -32,15 +40,6 @@ public class Pair<K, V>{
     @Override
     public String toString() {
         return this.key + ", " + this.value;
-    }
-
-    public static <K, V> Pair<K, V> of(K key, V value) {
-        return new Pair<K, V>(key, value);
-    }
-
-    public static Pair<Integer, Integer> fromString(String s) {
-        String[] nums = s.split(",");
-        return new Pair<Integer, Integer>(Integer.parseInt(nums[0]), Integer.parseInt(nums[1]));
     }
 
 }

@@ -76,9 +76,14 @@ public interface Scheduler {
      * Handle for a scheduled task that can be cancelled. Safe to call {@link #cancel()} more than once.
      */
     interface CancellableTask {
-        /** Stops the task from running (or from running again if it is repeating). */
+        /**
+         * Stops the task from running (or from running again if it is repeating).
+         */
         void cancel();
-        /** Returns true if the task has been cancelled or has already finished. */
+
+        /**
+         * Returns true if the task has been cancelled or has already finished.
+         */
         boolean isCancelled();
     }
 }

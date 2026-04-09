@@ -20,12 +20,12 @@ public class Center {
         boolean isBold = false;
 
         for (char c : message.toCharArray()) {
-            if(c == '§'){
+            if (c == '§') {
                 previousCode = true;
-            } else if(previousCode){
+            } else if (previousCode) {
                 previousCode = false;
                 isBold = c == 'l' || c == 'L';
-            } else{
+            } else {
                 DefaultFontInfo dFI = DefaultFontInfo.getDefaultFontInfo(c);
                 messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                 messagePxSize++;
@@ -37,12 +37,12 @@ public class Center {
         int spaceLength = DefaultFontInfo.SPACE.getLength() + 1;
         int compensated = 0;
         StringBuilder sb = new StringBuilder();
-        while(compensated < toCompensate){
+        while (compensated < toCompensate) {
             sb.append(" ");
             compensated += spaceLength;
         }
 
-        return sb.toString() + message;
+        return sb + message;
     }
 
     public static void sendCenteredMessage(Player player, String message) {

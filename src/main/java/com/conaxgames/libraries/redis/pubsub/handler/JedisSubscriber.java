@@ -3,8 +3,8 @@ package com.conaxgames.libraries.redis.pubsub.handler;
 import com.conaxgames.libraries.redis.JedisConnection;
 import com.conaxgames.libraries.redis.JedisCredentials;
 import com.conaxgames.libraries.redis.message.MessageTypeEnum;
-import com.conaxgames.libraries.redis.message.UniversalMessageTypeResolver;
 import com.conaxgames.libraries.redis.message.MessageTypeResolver;
+import com.conaxgames.libraries.redis.message.UniversalMessageTypeResolver;
 import com.conaxgames.libraries.redis.pubsub.SubscribeObject;
 import com.conaxgames.libraries.redis.subscription.generator.JsonJedisSubscriptionGenerator;
 import com.conaxgames.libraries.redis.subscription.model.JedisSubscriptionGenerator;
@@ -32,14 +32,11 @@ public class JedisSubscriber<K> {
     private final JedisConnection connection;
     private final Class<K> typeParameter;
     private final JedisCredentials jedisSettings;
-    private volatile Jedis jedis;
-
-    @Getter
-    private JedisPubSub pubSub;
-
-    private JedisSubscriptionHandler<K> jedisSubscriptionHandler;
-
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private volatile Jedis jedis;
+    @Getter
+    private final JedisPubSub pubSub;
+    private final JedisSubscriptionHandler<K> jedisSubscriptionHandler;
     private volatile boolean isShutdown = false;
 
     /**
@@ -96,10 +93,10 @@ public class JedisSubscriber<K> {
                     // Ignore close errors
                 }
             }
-            
+
             // Create new connection
             this.jedis = new Jedis(this.jedisSettings.getAddress(), this.jedisSettings.getPort());
-            
+
             // Authenticate if password is provided
             if (this.jedisSettings.hasPassword()) {
                 this.jedis.auth(this.jedisSettings.getPassword());
@@ -110,7 +107,7 @@ public class JedisSubscriber<K> {
                 // Test the connection even without password
                 this.jedis.ping();
             }
-            
+
         } catch (Exception e) {
             this.connection.toConsole("JedisSubscriber: Failed to create new connection for (" + this.channel + "): " + e.getMessage());
             // Clean up failed connection
@@ -131,17 +128,17 @@ public class JedisSubscriber<K> {
      */
     private void attemptConnect() {
         if (isShutdown) return;
-        
+
         new Thread(() -> {
             try {
                 // Ensure we have a valid connection before subscribing
                 if (jedis == null || !jedis.isConnected()) {
                     throw new IllegalStateException("Jedis connection is null or not connected");
                 }
-                
+
                 // Test connection and authentication with ping before subscribing
                 jedis.ping();
-                
+
                 // Additional authentication verification if password is required
                 if (this.jedisSettings.hasPassword()) {
                     // Try a simple operation to verify authentication is still valid
@@ -154,9 +151,9 @@ public class JedisSubscriber<K> {
                         jedis.ping(); // Verify auth worked
                     }
                 }
-                
+
                 this.connection.toConsole("JedisSubscriber: Subscribing to channel (" + this.channel + ")");
-                
+
                 // Subscribe to the channel
                 this.jedis.subscribe(this.pubSub, this.channel);
             } catch (Exception e) {
@@ -170,7 +167,7 @@ public class JedisSubscriber<K> {
 
     private void scheduleReconnect() {
         if (isShutdown) return;
-        
+
         try {
             scheduler.scheduleAtFixedRate(() -> {
                 if (isShutdown) {
@@ -184,10 +181,10 @@ public class JedisSubscriber<K> {
                 try {
                     this.closeConnection();
                     this.createNewConnection(); // Create new connection with authentication
-                    
+
                     // Wait a moment for the connection to be fully established
                     Thread.sleep(1000);
-                    
+
                     // Verify connection is still valid before attempting to connect
                     if (jedis != null && jedis.isConnected()) {
                         // Test authentication again before subscribing
@@ -200,12 +197,12 @@ public class JedisSubscriber<K> {
                                 return; // Skip this reconnect attempt
                             }
                         }
-                        
+
                         this.attemptConnect();
-                        
+
                         // Give the connection attempt time to complete
                         Thread.sleep(2000);
-                        
+
                         // Check if connection succeeded
                         if (jedis != null && pubSub.isSubscribed()) {
                             jedisConnection.toConsole("JedisSubscriber: JedisSubscriber (" + channel + ") has reconnected");

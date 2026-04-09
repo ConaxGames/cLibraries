@@ -24,7 +24,8 @@ public final class BooleanTraitButton<T> extends Button {
     private final Consumer<T> saveFunction;
 
     public BooleanTraitButton(T target, String trait, String description, BiConsumer<T, Boolean> writeFunction, Function<T, Boolean> readFunction) {
-        this(target, trait, description, writeFunction, readFunction, (i) -> {});
+        this(target, trait, description, writeFunction, readFunction, (i) -> {
+        });
     }
 
     public BooleanTraitButton(T target, String trait, String description, BiConsumer<T, Boolean> writeFunction, Function<T, Boolean> readFunction, Consumer<T> saveFunction) {

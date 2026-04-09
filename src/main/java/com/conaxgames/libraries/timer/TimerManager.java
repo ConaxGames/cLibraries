@@ -17,41 +17,41 @@ import java.util.Set;
  */
 @Getter
 public class TimerManager implements Listener {
-	
-	private final Set<Timer> timers = new LinkedHashSet<>();
 
-	/**
-	 * Registers a timer instance. If the timer implements {@link Listener}, it is automatically
-	 * registered as an event listener. Use {@link #getTimer} to retrieve it later.
-	 */
-	public void registerTimer(Timer timer) {
-		this.timers.add(timer);
-		if (timer instanceof Listener) {
-			LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().registerEvents((Listener) timer, LibraryPlugin.getInstance().getPlugin());
-		}
-	}
+    private final Set<Timer> timers = new LinkedHashSet<>();
 
-	/**
-	 * Unregisters a timer instance. Does not unregister it as an event listener if it was one.
-	 */
-	public void unregisterTimer(Timer timer) {
-		this.timers.remove(timer);
-	}
+    /**
+     * Registers a timer instance. If the timer implements {@link Listener}, it is automatically
+     * registered as an event listener. Use {@link #getTimer} to retrieve it later.
+     */
+    public void registerTimer(Timer timer) {
+        this.timers.add(timer);
+        if (timer instanceof Listener) {
+            LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().registerEvents((Listener) timer, LibraryPlugin.getInstance().getPlugin());
+        }
+    }
 
-	/**
-	 * Returns the timer instance of the given class, or null if not registered. Uses type-safe
-	 * casting via {@link Class#isInstance} and {@link Class#cast}.
-	 *
-	 * @param timerClass the timer class to find
-	 * @param <T> the timer type
-	 * @return the timer instance or null if not found
-	 */
-	public <T extends Timer> T getTimer(Class<T> timerClass) {
-		for (Timer timer : this.timers) {
-			if (timerClass.isInstance(timer)) {
-				return timerClass.cast(timer);
-			}
-		}
-		return null;
-	}
+    /**
+     * Unregisters a timer instance. Does not unregister it as an event listener if it was one.
+     */
+    public void unregisterTimer(Timer timer) {
+        this.timers.remove(timer);
+    }
+
+    /**
+     * Returns the timer instance of the given class, or null if not registered. Uses type-safe
+     * casting via {@link Class#isInstance} and {@link Class#cast}.
+     *
+     * @param timerClass the timer class to find
+     * @param <T>        the timer type
+     * @return the timer instance or null if not found
+     */
+    public <T extends Timer> T getTimer(Class<T> timerClass) {
+        for (Timer timer : this.timers) {
+            if (timerClass.isInstance(timer)) {
+                return timerClass.cast(timer);
+            }
+        }
+        return null;
+    }
 }

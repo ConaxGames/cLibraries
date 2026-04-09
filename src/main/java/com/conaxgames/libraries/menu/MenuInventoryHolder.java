@@ -28,6 +28,10 @@ public final class MenuInventoryHolder implements InventoryHolder {
         this.slotButtons = Collections.emptyMap();
     }
 
+    static Map<Integer, Button> copyLayout(Map<Integer, Button> source) {
+        return new HashMap<>(source);
+    }
+
     public Button getButton(int slot) {
         return slotButtons.get(slot);
     }
@@ -39,9 +43,5 @@ public final class MenuInventoryHolder implements InventoryHolder {
     @Override
     public @NonNull Inventory getInventory() {
         return inventory;
-    }
-
-    static Map<Integer, Button> copyLayout(Map<Integer, Button> source) {
-        return new HashMap<>(source);
     }
 }

@@ -21,7 +21,7 @@ public class JumpToPageButton extends Button {
     @Setter
     private boolean glowing = false;
 
-    @ConstructorProperties(value={"page", "menu"})
+    @ConstructorProperties(value = {"page", "menu"})
     public JumpToPageButton(int page, PaginatedMenu menu) {
         this.page = page;
         this.menu = menu;
@@ -36,10 +36,10 @@ public class JumpToPageButton extends Button {
     @Override
     public List<String> getDescription(Player player) {
         List<String> description = new ArrayList<>();
-        
+
         int currentPage = this.menu.getPage();
         int totalPages = this.menu.getPages(player);
-        
+
         if (this.page == currentPage) {
             description.add(CC.GRAY + "This is your current page");
         } else {
@@ -47,7 +47,7 @@ public class JumpToPageButton extends Button {
             description.add(CC.GRAY + "Total Pages: " + totalPages);
             description.add(CC.GRAY + "Target Page: " + this.page);
         }
-        
+
         description.add(" ");
         description.add(CC.YELLOW + "Click to jump to this page!");
 

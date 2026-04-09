@@ -27,6 +27,27 @@ public class XPUtil {
         this.playerName = player.getName();
     }
 
+    private static int getExpAtLevel(final Player player) {
+        return getExpAtLevel(player.getLevel());
+    }
+
+    /**
+     * Gets the experience points required to level up from the given level to the next level.
+     * Uses Minecraft's 1.8+ experience formula.
+     *
+     * @param level The current level
+     * @return The experience points needed to reach the next level
+     */
+    public static int getExpAtLevel(final int level) {
+        if (level <= 15) {
+            return (2 * level) + 7;
+        }
+        if (level <= 30) {
+            return (5 * level) - 38;
+        }
+        return (9 * level) - 158;
+    }
+
     /**
      * Gets the player associated with this utility. Throws an exception if the player is no longer online.
      *
@@ -126,26 +147,5 @@ public class XPUtil {
             exp = Integer.MAX_VALUE;
         }
         return exp;
-    }
-
-    private static int getExpAtLevel(final Player player) {
-        return getExpAtLevel(player.getLevel());
-    }
-
-    /**
-     * Gets the experience points required to level up from the given level to the next level.
-     * Uses Minecraft's 1.8+ experience formula.
-     *
-     * @param level The current level
-     * @return The experience points needed to reach the next level
-     */
-    public static int getExpAtLevel(final int level) {
-        if (level <= 15) {
-            return (2 * level) + 7;
-        }
-        if (level <= 30) {
-            return (5 * level) - 38;
-        }
-        return (9 * level) - 158;
     }
 }

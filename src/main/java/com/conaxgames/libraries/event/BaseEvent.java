@@ -9,28 +9,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class BaseEvent extends Event {
 
-	private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
 
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 
-	public boolean call() {
-		JavaPlugin plugin = LibraryPlugin.getInstance().getPlugin();
+    public boolean call() {
+        JavaPlugin plugin = LibraryPlugin.getInstance().getPlugin();
 
-		if (plugin == null) {
-			Bukkit.getServer().getPluginManager().callEvent(this);
-		} else {
-			LibraryPlugin.getInstance().getScheduler().runTask(plugin, () -> 
-				Bukkit.getServer().getPluginManager().callEvent(this)
-			);
-		}
+        if (plugin == null) {
+            Bukkit.getServer().getPluginManager().callEvent(this);
+        } else {
+            LibraryPlugin.getInstance().getScheduler().runTask(plugin, () ->
+                    Bukkit.getServer().getPluginManager().callEvent(this)
+            );
+        }
 
-		return this instanceof Cancellable && ((Cancellable) this).isCancelled();
-	}
+        return this instanceof Cancellable && ((Cancellable) this).isCancelled();
+    }
 }

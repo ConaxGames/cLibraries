@@ -1,7 +1,6 @@
 package com.conaxgames.libraries.commands.message;
 
 import com.conaxgames.libraries.util.CC;
-import java.util.Locale;
 
 public enum ACFMinecraftMessage {
 
@@ -20,7 +19,7 @@ public enum ACFMinecraftMessage {
 
     private final String message;
 
-    private ACFMinecraftMessage(String message) {
+    ACFMinecraftMessage(String message) {
         this.message = message;
     }
 

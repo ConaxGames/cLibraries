@@ -43,13 +43,13 @@ public abstract class PaginatedMenu extends Menu {
         if (buttonAmount == 0) {
             return 1;
         }
-        return (int)Math.ceil((double)buttonAmount / (double)this.getMaxItemsPerPage(player));
+        return (int) Math.ceil((double) buttonAmount / (double) this.getMaxItemsPerPage(player));
     }
 
     @Override
     public final Map<Integer, Button> getButtons(Player player) {
-        int minIndex = (int)((double)(this.page - 1) * (double)this.getMaxItemsPerPage(player));
-        int maxIndex = (int)((double)this.page * (double)this.getMaxItemsPerPage(player));
+        int minIndex = (int) ((double) (this.page - 1) * (double) this.getMaxItemsPerPage(player));
+        int maxIndex = (int) ((double) this.page * (double) this.getMaxItemsPerPage(player));
 
         int previousSlot = this.previousPageSlot(player);
         int nextSlot = this.nextPageSlot(player);
@@ -67,7 +67,7 @@ public abstract class PaginatedMenu extends Menu {
             int ind = entry.getKey();
             if (ind < minIndex || ind >= maxIndex) continue;
 
-            int targetSlot = ind - (int)((double)this.getMaxItemsPerPage(player) * (double)(this.page - 1));
+            int targetSlot = ind - (int) ((double) this.getMaxItemsPerPage(player) * (double) (this.page - 1));
             buttons.put(targetSlot, entry.getValue());
         }
 

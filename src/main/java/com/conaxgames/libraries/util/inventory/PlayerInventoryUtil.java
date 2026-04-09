@@ -1,8 +1,8 @@
 package com.conaxgames.libraries.util.inventory;
 
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -46,11 +46,11 @@ public final class PlayerInventoryUtil {
         if (snapshot == null) return;
         clear(player);
         PlayerInventory inv = player.getInventory();
-        inv.setContents(snapshot.getContents());
-        inv.setArmorContents(snapshot.getArmor());
-        inv.setExtraContents(snapshot.getExtraContents());
-        snapshot.getPotionEffects().forEach(player::addPotionEffect);
-        player.setLevel(snapshot.getLevel());
-        player.setExp(snapshot.getExp());
+        inv.setContents(snapshot.contents());
+        inv.setArmorContents(snapshot.armor());
+        inv.setExtraContents(snapshot.extraContents());
+        snapshot.potionEffects().forEach(player::addPotionEffect);
+        player.setLevel(snapshot.level());
+        player.setExp(snapshot.exp());
     }
 }

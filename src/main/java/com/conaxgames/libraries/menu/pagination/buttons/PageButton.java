@@ -19,7 +19,7 @@ public class PageButton extends Button {
     private final int mod;
     private final PaginatedMenu menu;
 
-    @ConstructorProperties(value={"mod", "menu"})
+    @ConstructorProperties(value = {"mod", "menu"})
     public PageButton(int mod, PaginatedMenu menu) {
         this.mod = mod;
         this.menu = menu;
@@ -31,7 +31,7 @@ public class PageButton extends Button {
             new ViewAllPagesMenu(this.menu).openMenu(player, false);
             return;
         }
-        
+
         if (!this.hasNext(player)) {
             return;
         }

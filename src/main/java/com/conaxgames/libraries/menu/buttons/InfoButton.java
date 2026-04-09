@@ -1,4 +1,3 @@
-
 package com.conaxgames.libraries.menu.buttons;
 
 import com.conaxgames.libraries.menu.Button;

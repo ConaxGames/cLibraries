@@ -19,6 +19,13 @@ public class BooleanButton extends Button {
     private final Callback<Boolean> callback;
     private final String details;
 
+    @ConstructorProperties(value = {"confirm", "callback"})
+    public BooleanButton(boolean confirm, Callback<Boolean> callback, String details) {
+        this.details = details;
+        this.confirm = confirm;
+        this.callback = callback;
+    }
+
     @Override
     public void clicked(Player player, int i, ClickType clickType) {
         player.closeInventory();
@@ -45,19 +52,12 @@ public class BooleanButton extends Button {
 
     @Override
     public int getDamageValue(Player player) {
-        return this.confirm ? (byte)5 : 14;
+        return this.confirm ? (byte) 5 : 14;
     }
 
     @Override
     public Material getMaterial(Player player) {
         return ColorMaterialUtil.convertCCToXClay(this.confirm ? CC.GREEN : CC.RED).get();
-    }
-
-    @ConstructorProperties(value={"confirm", "callback"})
-    public BooleanButton(boolean confirm, Callback<Boolean> callback, String details) {
-        this.details = details;
-        this.confirm = confirm;
-        this.callback = callback;
     }
 }
 

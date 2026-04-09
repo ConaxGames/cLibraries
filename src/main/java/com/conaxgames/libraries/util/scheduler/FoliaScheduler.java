@@ -1,8 +1,9 @@
 package com.conaxgames.libraries.util.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import java.util.concurrent.TimeUnit;
 import org.bukkit.plugin.Plugin;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@link Scheduler} for Folia: sync work on the
@@ -62,21 +63,16 @@ public class FoliaScheduler implements Scheduler {
         return new FoliaCancellableTask(plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, task -> runnable.run(), delay * 50L, period * 50L, TimeUnit.MILLISECONDS));
     }
 
-    private static class FoliaCancellableTask implements CancellableTask {
-        private final ScheduledTask task;
-
-        FoliaCancellableTask(ScheduledTask task) {
-            this.task = task;
-        }
+    private record FoliaCancellableTask(ScheduledTask task) implements CancellableTask {
 
         @Override
-        public void cancel() {
-            task.cancel();
-        }
+            public void cancel() {
+                task.cancel();
+            }
 
-        @Override
-        public boolean isCancelled() {
-            return task.isCancelled();
+            @Override
+            public boolean isCancelled() {
+                return task.isCancelled();
+            }
         }
-    }
 }
