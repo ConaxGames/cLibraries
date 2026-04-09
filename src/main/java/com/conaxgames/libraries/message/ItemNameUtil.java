@@ -1,9 +1,6 @@
 package com.conaxgames.libraries.message;
 
 import com.google.common.collect.ImmutableMap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -672,8 +669,8 @@ public class ItemNameUtil {
     }
 
     public static String enchantLookup(Enchantment enchantment, Player player) {
-        Component rendered = GlobalTranslator.render(enchantment.description(), player.locale());
-        return LegacyComponentSerializer.legacySection().serialize(rendered);
+        String key = enchantment.getKey().getKey();
+        return WordUtils.capitalizeFully(key.replace('_', ' ').replace('-', ' '));
     }
 }
 
