@@ -44,9 +44,8 @@ public final class BooleanTraitButton<T> extends Button {
 
     @Override
     public List<String> getDescription(Player player) {
-        ArrayList<String> lore = new ArrayList<>();
 
-        lore.addAll(FormatUtil.wordWrap(CC.GRAY + "" + description, 24));
+        ArrayList<String> lore = new ArrayList<>(FormatUtil.wordWrap(CC.GRAY + description, 24));
         lore.add(" ");
         lore.add(CC.GRAY + "Current: " + CC.WHITE + (readFunction.apply(target) ? "Enabled" : "Disabled"));
         lore.add(" ");

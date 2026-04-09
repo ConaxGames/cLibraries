@@ -13,7 +13,7 @@ import java.beans.ConstructorProperties;
 import java.util.List;
 
 public class BackButton extends Button {
-    private Menu back;
+    private final Menu back;
 
     @ConstructorProperties(value={"back"})
     public BackButton(Menu back) {

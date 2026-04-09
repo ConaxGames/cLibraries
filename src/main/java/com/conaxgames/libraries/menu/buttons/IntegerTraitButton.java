@@ -46,7 +46,7 @@ public final class IntegerTraitButton<T> extends Button {
     public List<String> getDescription(Player player) {
         ArrayList<String> lore = new ArrayList<>();
 
-        lore.addAll(FormatUtil.wordWrap(CC.GRAY + "" + description));
+        lore.addAll(FormatUtil.wordWrap(CC.GRAY + description));
         lore.add(" ");
         lore.add(CC.GRAY + "Current: " + CC.WHITE + readFunction.apply(target));
         lore.add(" ");

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ItemStackButton extends Button {
 
-    private ItemStack stack;
+    private final ItemStack stack;
 
     public ItemStackButton(ItemStack stack) {
         this.stack = stack;
