@@ -18,10 +18,14 @@ public class BoardEntry {
 	private static final String TEAM_PREFIX = "sb_";
 	private static int teamCounter = 0;
 
-	@Getter private final Board board;
-	@Getter private final String key;
-	@Getter private Team team;
-	@Getter private String text;
+	@Getter
+	private final Board board;
+	@Getter
+	private final String key;
+	@Getter
+	private Team team;
+	@Getter
+	private String text;
 	private String[] cachedSplit;
 
 	public BoardEntry(Board board, String text) {

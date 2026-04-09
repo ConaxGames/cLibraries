@@ -48,8 +48,8 @@ public class Board {
 	private static Scoreboard resolveScoreboard(Player player) {
 		var sm = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
 		return player.getScoreboard().equals(sm.getMainScoreboard())
-			? sm.getNewScoreboard()
-			: player.getScoreboard();
+				? sm.getNewScoreboard()
+				: player.getScoreboard();
 	}
 
 	public String getNewKey(BoardEntry entry) {
@@ -95,12 +95,12 @@ public class Board {
 		usedKeys.clear();
 	}
 
-	void setLastAppliedTitle(String title) {
-		this.lastAppliedTitle = title;
-	}
-
 	String getLastAppliedTitle() {
 		return lastAppliedTitle;
+	}
+
+	void setLastAppliedTitle(String title) {
+		this.lastAppliedTitle = title;
 	}
 
 }
