@@ -41,9 +41,7 @@ public class BoardEntry {
 			}
 			this.team = sb.registerNewTeam(name);
 			this.team.addEntry(this.key);
-			if (!board.getEntries().contains(this)) {
-				board.getEntries().add(this);
-			}
+			board.getEntries().add(this);
 		}
 	}
 
@@ -52,8 +50,8 @@ public class BoardEntry {
 		String[] split = getSplitText();
 		int maxP = BoardHandler.maxPrefixLength();
 		int maxS = BoardHandler.maxSuffixLength();
-		String prefix = split[0].length() > maxP ? split[0].substring(0, maxP) : split[0];
-		String suffix = split[1].length() > maxS ? split[1].substring(0, maxS) : split[1];
+		String prefix = BoardHandler.clipToLength(split[0], maxP);
+		String suffix = BoardHandler.clipToLength(split[1], maxS);
 		if (!prefix.equals(team.getPrefix())) {
 			team.setPrefix(prefix);
 		}
@@ -84,8 +82,8 @@ public class BoardEntry {
 
 	private String[] splitLine(String input) {
 		int unit = BoardHandler.lineSplitUnit();
-		if (input == null || input.length() <= unit) {
-			return new String[]{input != null ? input : "", ""};
+		if (input.length() <= unit) {
+			return new String[]{input, ""};
 		}
 		String prefix = input.substring(0, unit);
 		int lastColor = prefix.lastIndexOf('\u00a7');

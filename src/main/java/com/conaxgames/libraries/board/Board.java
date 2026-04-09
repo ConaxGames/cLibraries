@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,10 @@ public class Board {
 	}
 
 	@Getter
-    private final List<BoardEntry> entries = Collections.synchronizedList(new java.util.ArrayList<>());
+	private final List<BoardEntry> entries = Collections.synchronizedList(new ArrayList<>());
 	private final Map<String, BoardTimer> timers = new ConcurrentHashMap<>();
 	@Getter
-    private final Map<String, String> usedKeys = new ConcurrentHashMap<>();
+	private final Map<String, String> usedKeys = new ConcurrentHashMap<>();
 	@Getter
 	private final Scoreboard scoreboard;
 	@Getter
@@ -51,7 +52,7 @@ public class Board {
 			: player.getScoreboard();
 	}
 
-    public String getNewKey(BoardEntry entry) {
+	public String getNewKey(BoardEntry entry) {
 		String text = entry.getText();
 		int unit = BoardHandler.lineSplitUnit();
 		String suffix = text.length() > unit ? CC.getLastColors(text.substring(0, unit)) : "";
@@ -66,10 +67,11 @@ public class Board {
 
 	public BoardTimer getTimer(String id) {
 		BoardTimer t = timers.get(id);
-		if (t == null || t.isExpired()) {
-			if (t != null) {
-				timers.remove(id, t);
-			}
+		if (t == null) {
+			return null;
+		}
+		if (t.isExpired()) {
+			timers.remove(id, t);
 			return null;
 		}
 		return t;

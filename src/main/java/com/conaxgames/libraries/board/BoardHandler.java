@@ -53,25 +53,24 @@ public final class BoardHandler {
 		return maxObjectiveTitleLength;
 	}
 
+	static String clipToLength(String value, int maxChars) {
+		return value.length() <= maxChars ? value : value.substring(0, maxChars);
+	}
+
 	public static Objective createSidebarObjective(Scoreboard scoreboard, String name, String rawTitle) {
-		String translated = rawTitle != null ? CC.translate(rawTitle) : "";
-		String clipped = clipTitle(translated);
 		Objective objective = scoreboard.registerNewObjective(name, DUMMY_CRITERIA);
-		objective.setDisplayName(clipped);
+		objective.setDisplayName(sidebarTitle(rawTitle));
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		return objective;
 	}
 
 	public static void applyObjectiveTitle(Objective objective, String rawTitle) {
-		String translated = rawTitle != null ? CC.translate(rawTitle) : "";
-		objective.setDisplayName(clipTitle(translated));
+		objective.setDisplayName(sidebarTitle(rawTitle));
 	}
 
-	private static String clipTitle(String translated) {
-		if (translated.length() <= maxObjectiveTitleLength) {
-			return translated;
-		}
-		return translated.substring(0, maxObjectiveTitleLength);
+	private static String sidebarTitle(String rawTitle) {
+		String t = rawTitle != null ? CC.translate(rawTitle) : "";
+		return clipToLength(t != null ? t : "", maxObjectiveTitleLength);
 	}
 
 }
