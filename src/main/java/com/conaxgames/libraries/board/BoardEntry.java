@@ -70,15 +70,8 @@ public class BoardEntry {
 		board.getUsedKeys().remove(this.key);
 		board.getScoreboard().resetScores(this.key);
 		if (team != null) {
-			try {
-				if (team.getEntries().contains(this.key)) {
-					team.removeEntry(this.key);
-				}
-				if (team.getEntries().isEmpty()) {
-					team.unregister();
-				}
-			} catch (IllegalStateException ignored) {
-			}
+			team.removeEntry(this.key);
+			team.unregister();
 		}
 	}
 
