@@ -1,6 +1,5 @@
 package com.conaxgames.libraries.message;
 
-import lombok.NoArgsConstructor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -10,10 +9,12 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
 public class Clickable {
 
-	private List<TextComponent> components = new ArrayList<>();
+	private final List<TextComponent> components = new ArrayList<>();
+
+	public Clickable() {
+	}
 
 	public Clickable(String msg) {
 		this.add(msg);
@@ -24,61 +25,28 @@ public class Clickable {
 	}
 
 	public TextComponent add(String msg, String hoverMsg, String clickString) {
-		BaseComponent[] baseComponents = TextComponent.fromLegacyText(msg);
-		TextComponent message;
-
-		if (baseComponents.length == 0) {
-			message = new TextComponent(msg);
-		} else {
-			message = (TextComponent) baseComponents[0];
-			for (int i = 1; i < baseComponents.length; i++) {
-				message.addExtra(baseComponents[i]);
-			}
-		}
-
-		if (hoverMsg != null) {
-			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverMsg)));
-		}
-
-		if (clickString != null) {
-			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, clickString));
-		}
-
-		this.components.add(message);
-
-		return message;
+		return append(msg, hoverMsg, clickString == null ? null : new ClickEvent(ClickEvent.Action.RUN_COMMAND, clickString));
 	}
 
 	public TextComponent addUrl(String msg, String hoverMsg, String url) {
-		BaseComponent[] baseComponents = TextComponent.fromLegacyText(msg);
-		TextComponent message;
+		return append(msg, hoverMsg, url == null ? null : new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+	}
 
-		if (baseComponents.length == 0) {
-			message = new TextComponent(msg);
-		} else {
-			message = (TextComponent) baseComponents[0];
-			for (int i = 1; i < baseComponents.length; i++) {
-				message.addExtra(baseComponents[i]);
-			}
-		}
-
+	private TextComponent append(String msg, String hoverMsg, ClickEvent clickEvent) {
+		TextComponent message = mergeLegacyText(msg);
 		if (hoverMsg != null) {
 			message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverMsg)));
 		}
-
-		if (url != null) {
-			message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+		if (clickEvent != null) {
+			message.setClickEvent(clickEvent);
 		}
-
 		this.components.add(message);
-
 		return message;
 	}
 
 	public void add(String message) {
-		BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
-		for (BaseComponent component : baseComponents) {
-			this.components.add((TextComponent) component);
+		for (BaseComponent part : TextComponent.fromLegacyText(message)) {
+			this.components.add((TextComponent) part);
 		}
 	}
 
@@ -88,5 +56,17 @@ public class Clickable {
 
 	public TextComponent[] asComponents() {
 		return this.components.toArray(new TextComponent[0]);
+	}
+
+	private static TextComponent mergeLegacyText(String msg) {
+		BaseComponent[] parts = TextComponent.fromLegacyText(msg);
+		if (parts.length == 0) {
+			return new TextComponent(msg);
+		}
+		TextComponent root = (TextComponent) parts[0];
+		for (int i = 1; i < parts.length; i++) {
+			root.addExtra(parts[i]);
+		}
+		return root;
 	}
 }
