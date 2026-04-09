@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +22,6 @@ public class BoardManager implements Runnable {
 	private final BoardAdapter adapter;
 
 	public BoardManager(BoardAdapter adapter) {
-		BoardHandler.init();
 		this.adapter = adapter;
 	}
 
@@ -35,7 +35,7 @@ public class BoardManager implements Runnable {
 			Player player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(e.getKey());
 			if (player == null || !player.isOnline()) {
 				it.remove();
-				clearBoardEntries(board);
+				board.clearAllEntries();
 				continue;
 			}
 			try {
@@ -47,25 +47,17 @@ public class BoardManager implements Runnable {
 		}
 	}
 
-	private static void clearBoardEntries(Board board) {
-		if (!board.getEntries().isEmpty()) {
-			board.clearAllEntries();
-		}
-	}
-
 	private void updateBoard(Player player, Board board) {
 		List<String> raw = adapter.getLines(player, board);
 		if (raw == null || raw.isEmpty()) {
-			if (!board.getEntries().isEmpty()) {
-				board.clearAllEntries();
-			}
+			board.clearAllEntries();
 			return;
 		}
 		List<String> lines = new ArrayList<>(raw);
 		Collections.reverse(lines);
 
 		String newTitle = adapter.getTitle(player);
-		if (!java.util.Objects.equals(newTitle, board.getLastAppliedTitle())) {
+		if (!Objects.equals(newTitle, board.getLastAppliedTitle())) {
 			board.setLastAppliedTitle(newTitle);
 			BoardHandler.applyObjectiveTitle(board.getObjective(), newTitle);
 		}
@@ -116,7 +108,7 @@ public class BoardManager implements Runnable {
 			return;
 		}
 		Board board = playerBoards.remove(player.getUniqueId());
-		if (board != null && !board.getEntries().isEmpty()) {
+		if (board != null) {
 			board.clearAllEntries();
 		}
 	}
