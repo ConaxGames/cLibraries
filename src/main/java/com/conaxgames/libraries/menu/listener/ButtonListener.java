@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.inventory.Inventory;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class ButtonListener implements Listener {
             return;
         }
         Player player = (Player) event.getWhoClicked();
-        Inventory top = event.getView().getTopInventory();
+        Inventory top = XInventoryView.of(event.getView()).getTopInventory();
         if (!(top.getHolder() instanceof MenuInventoryHolder)) {
             return;
         }
@@ -88,7 +89,7 @@ public class ButtonListener implements Listener {
 
     private void handleShiftIntoTopWhenEmptySlot(InventoryClickEvent event, Player player, Menu menu) {
         if (menu.isNoncancellingInventory() && event.getCurrentItem() != null) {
-            player.getOpenInventory().getTopInventory().addItem(event.getCurrentItem());
+            XInventoryView.of(player.getOpenInventory()).getTopInventory().addItem(event.getCurrentItem());
             event.setCurrentItem(null);
         } else if (event.getCurrentItem() != null) {
             event.setCancelled(true);
