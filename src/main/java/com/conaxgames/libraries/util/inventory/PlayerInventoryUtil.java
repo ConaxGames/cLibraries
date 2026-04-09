@@ -2,6 +2,7 @@ package com.conaxgames.libraries.util.inventory;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -23,7 +24,7 @@ public final class PlayerInventoryUtil {
     }
 
     public static void clear(Player player) {
-        if (player.getOpenInventory() != null) player.getOpenInventory().setCursor(null);
+        XInventoryView.of(player.getOpenInventory()).setCursor(null);
         player.clearActiveItem();
         PlayerInventory inv = player.getInventory();
         inv.clear();

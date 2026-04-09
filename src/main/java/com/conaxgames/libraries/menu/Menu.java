@@ -6,6 +6,7 @@ import com.conaxgames.libraries.menu.listener.ButtonListener;
 import com.conaxgames.libraries.util.CC;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -72,7 +73,7 @@ public abstract class Menu {
 
     private void open(Player player) {
         UUID id = player.getUniqueId();
-        Inventory top = player.getOpenInventory().getTopInventory();
+        Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
 
         if (refreshInPlaceWhenPossible() && top.getHolder() instanceof MenuInventoryHolder) {
             MenuInventoryHolder existing = (MenuInventoryHolder) top.getHolder();
@@ -169,7 +170,7 @@ public abstract class Menu {
     }
 
     public void buttonUpdate(Player player) {
-        Inventory top = player.getOpenInventory().getTopInventory();
+        Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
         if (!(top.getHolder() instanceof MenuInventoryHolder)) {
             return;
         }
