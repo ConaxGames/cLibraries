@@ -14,7 +14,7 @@ public class ConfirmMenu extends Menu {
 
     private final String title;
     private final String details;
-    private Callback<Boolean> response;
+    private final Callback<Boolean> response;
 
     @ConstructorProperties(value={"title", "response"})
     public ConfirmMenu(String title, Callback<Boolean> response, String details) {

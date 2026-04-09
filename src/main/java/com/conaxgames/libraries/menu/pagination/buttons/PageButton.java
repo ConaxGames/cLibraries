@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PageButton extends Button {
-    private int mod;
-    private PaginatedMenu menu;
+    private final int mod;
+    private final PaginatedMenu menu;
 
     @ConstructorProperties(value={"mod", "menu"})
     public PageButton(int mod, PaginatedMenu menu) {

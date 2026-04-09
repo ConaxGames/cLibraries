@@ -28,11 +28,7 @@ public final class MenuBackButton extends Button {
 
     @Override
     public List<String> getDescription(Player player) {
-        ArrayList<String> lore = new ArrayList<>();
-
-        lore.addAll(FormatUtil.wordWrap(CC.GRAY + "Click here to return to the previous menu.", 24));
-
-        return lore;
+        return new ArrayList<>(FormatUtil.wordWrap(CC.GRAY + "Click here to return to the previous menu.", 24));
     }
 
     @Override
