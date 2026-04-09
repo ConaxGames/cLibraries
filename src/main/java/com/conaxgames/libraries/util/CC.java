@@ -180,4 +180,8 @@ public final class CC {
 		return ChatColor.stripColor(input);
 	}
 
+	public static String getLastColors(String input) {
+		return ChatColor.getLastColors(input);
+	}
+
 }

@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 
 /**
  * Simple countdown timer for use on a {@link Board}. Created with a duration; {@link #getFormattedString}
- * returns remaining time in the chosen format. Use in {@link BoardAdapter#getScoreboard} with
+ * returns remaining time in the chosen format. Use in {@link BoardAdapter#getLines} with
  * {@link Board#getTimer} and {@link Board#addTimer} to show countdowns (e.g. event end).
  */
 public class BoardTimer {
