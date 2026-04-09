@@ -4,7 +4,6 @@ import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -39,7 +38,7 @@ public final class BooleanTraitButton<T> extends Button {
 
     @Override
     public String getName(Player player) {
-        return ChatColor.GOLD + "Edit " + trait;
+        return CC.GOLD + "Edit " + trait;
     }
 
     @Override
