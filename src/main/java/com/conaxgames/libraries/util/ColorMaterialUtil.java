@@ -6,6 +6,8 @@ import java.util.List;
 
 public final class ColorMaterialUtil {
 
+    private static final int DEFAULT_WOOL_DATA = 0;
+
     private static final List<String> COLOR_CCS = List.of(
             CC.WHITE,
             CC.GOLD,
@@ -63,13 +65,23 @@ public final class ColorMaterialUtil {
 
     private static int requireWoolData(String color) {
         int data = convertCCToWoolData(color);
-        if (data < 0) {
-            throw new IllegalArgumentException("Unknown CC color string");
-        }
-        return data;
+        return data < 0 ? DEFAULT_WOOL_DATA : data;
     }
 
     private static String normalize(String color) {
+        if (color == null) {
+            return CC.WHITE;
+        }
+        for (int i = 0; i < color.length() - 1; i++) {
+            if (color.charAt(i) != '§' && color.charAt(i) != '&') {
+                continue;
+            }
+            char code = Character.toLowerCase(color.charAt(i + 1));
+            if ((code >= '0' && code <= '9') || (code >= 'a' && code <= 'f')) {
+                color = "§" + code;
+                break;
+            }
+        }
         if (CC.DARK_RED.equals(color)) {
             return CC.RED;
         }
