@@ -9,9 +9,8 @@ import com.conaxgames.libraries.hooks.HookManager;
 import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.timer.TimerManager;
-import com.conaxgames.libraries.util.scheduler.BukkitScheduler;
-import com.conaxgames.libraries.util.scheduler.FoliaScheduler;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
+import com.conaxgames.libraries.util.scheduler.Schedulers;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -109,12 +108,7 @@ public class LibraryPlugin {
     }
 
     private void initializeScheduler() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            this.scheduler = new FoliaScheduler();
-        } catch (ClassNotFoundException ignored) {
-            this.scheduler = new BukkitScheduler();
-        }
+        this.scheduler = Schedulers.forServer(this.plugin.getServer());
     }
 
     private void registerEventListeners() {
