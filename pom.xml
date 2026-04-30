@@ -37,6 +37,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.release>21</maven.compiler.release>
+        <paper.api.version>26.1.2.build.52-beta</paper.api.version>
+        <acf.commands.revision>a084fec32125045b6d94028046f95450373abb1e</acf.commands.revision>
     </properties>
 
     <repositories>
@@ -61,6 +63,10 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
             <id>minecraft-repo</id>
             <url>https://libraries.minecraft.net/</url>
         </repository>
@@ -76,7 +82,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.11-R0.1-SNAPSHOT</version>
+            <version>${paper.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -92,9 +98,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>co.aikar</groupId>
+            <groupId>com.github.aikar.commands</groupId>
             <artifactId>acf-paper</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>${acf.commands.revision}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
