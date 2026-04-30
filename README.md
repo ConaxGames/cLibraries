@@ -75,4 +75,4 @@ Use `LibraryPlugin.getInstance()` anywhere after `onEnable`.
 
 <i>clibraries ships against papermc tooling and owes its stability to upstream platform work:</i>
 
-[PaperMC](https://papermc.io/) · [Folia](https://papermc.io/software/folia)
+[Paper](https://papermc.io/software/paper) · [Folia](https://papermc.io/software/folia) · [Velocity](https://papermc.io/software/velocity) · [XSeries](https://github.com/CryptoMorin/XSeries)
