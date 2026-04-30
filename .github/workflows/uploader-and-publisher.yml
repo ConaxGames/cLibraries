@@ -17,7 +17,7 @@ jobs:
       MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
