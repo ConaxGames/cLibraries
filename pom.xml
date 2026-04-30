@@ -38,7 +38,6 @@
         <maven.compiler.optimize>true</maven.compiler.optimize>
         <maven.compiler.release>21</maven.compiler.release>
         <paper.api.version>26.1.2.build.52-beta</paper.api.version>
-        <acf.commands.revision>a084fec32125045b6d94028046f95450373abb1e</acf.commands.revision>
     </properties>
 
     <repositories>
@@ -61,10 +60,6 @@
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>minecraft-repo</id>
@@ -98,9 +93,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.aikar.commands</groupId>
+            <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
-            <version>${acf.commands.revision}</version>
+            <version>0.5.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -220,6 +215,8 @@
                 <version>3.6.1</version>
 
                 <configuration>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
                             <pattern>com.cryptomorin.xseries</pattern>
@@ -279,6 +276,15 @@
                     </execution>
                 </executions>
 
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.4</version>
+                <configuration>
+                    <pomFile>${project.build.directory}/dependency-reduced-pom.xml</pomFile>
+                </configuration>
             </plugin>
 
             <plugin>
