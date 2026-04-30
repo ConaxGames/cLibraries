@@ -11,7 +11,7 @@ A Bukkit/PaperMC plugin development framework.
 <dependency>
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.7</version>
     <scope>compile</scope>
 </dependency>
 ```
