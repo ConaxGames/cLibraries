@@ -14,7 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.base_ref }}
+          ref: ${{ github.ref }}
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -51,5 +52,6 @@ jobs:
           replace: "version: '${{ github.ref_name }}'"
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
           commit_message: 'docs: Updated to version `${{ github.ref_name }}`.'
           file_pattern: 'README.md'
