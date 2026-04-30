@@ -37,7 +37,7 @@ jobs:
           find: <version>dev</version>
           replace: <version>${{ github.ref_name }}</version>
       - run: mvn --batch-mode --update-snapshots verify deploy
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: target/*.jar
           generate_release_notes: true
