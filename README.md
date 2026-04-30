@@ -11,7 +11,7 @@ A Bukkit/PaperMC plugin development framework.
 <dependency>
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>1.2.7</version>
+    <version>1.3.0</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ A Bukkit/PaperMC plugin development framework.
 
 ```groovy
 dependencies {
-    implementation 'com.conaxgames:clibraries:1.2.2'
+    implementation 'com.conaxgames:clibraries:1.3.0'
 }
 ```
 
