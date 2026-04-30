@@ -8,6 +8,7 @@ on:
 jobs:
   publish-and-upload:
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     permissions:
       contents: write
       packages: write
