@@ -1,23 +1,31 @@
 package com.conaxgames.libraries.event.impl.timer;
 
 import com.conaxgames.libraries.timer.Timer;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
 public class TimerExtendEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
+    @Getter
     private final Optional<Player> player;
+    @Getter
     private final Optional<UUID> userUUID;
+    @Getter
     private final Timer timer;
+    @Getter
     private final long previousDuration;
     private boolean cancelled;
+    @Setter
+    @Getter
     private long newDuration;
 
     public TimerExtendEvent(Timer timer, long previousDuration, long newDuration) {
@@ -28,9 +36,9 @@ public class TimerExtendEvent extends Event implements Cancellable {
         this.newDuration = newDuration;
     }
 
-    public TimerExtendEvent(@Nullable Player player, UUID uniqueId, Timer timer, long previousDuration,
+    public TimerExtendEvent(@NotNull Player player, UUID uniqueId, Timer timer, long previousDuration,
                             long newDuration) {
-        this.player = Optional.ofNullable(player);
+        this.player = Optional.of(player);
         this.userUUID = Optional.ofNullable(uniqueId);
         this.timer = timer;
         this.previousDuration = previousDuration;
@@ -39,30 +47,6 @@ public class TimerExtendEvent extends Event implements Cancellable {
 
     public static HandlerList getHandlerList() {
         return TimerExtendEvent.HANDLERS;
-    }
-
-    public Optional<Player> getPlayer() {
-        return this.player;
-    }
-
-    public Optional<UUID> getUserUUID() {
-        return this.userUUID;
-    }
-
-    public Timer getTimer() {
-        return this.timer;
-    }
-
-    public long getPreviousDuration() {
-        return this.previousDuration;
-    }
-
-    public long getNewDuration() {
-        return this.newDuration;
-    }
-
-    public void setNewDuration(long newDuration) {
-        this.newDuration = newDuration;
     }
 
     @Override
