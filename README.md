@@ -1,7 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
 
 <div align="center">
-    <h2><i>cLibraries</i></h2>
+    <h2>cLibraries</h2>
     <h3>PaperMC helpers for Minecraft server plugins maintained by ConaxGames.</h3>
     <a href="https://github.com/ConaxGames/cLibraries/actions/workflows/uploader-and-publisher.yml"><img src="https://img.shields.io/github/actions/workflow/status/ConaxGames/cLibraries/uploader-and-publisher.yml?style=for-the-badge&logo=github" alt="CI"></a>
     <img src="https://img.shields.io/github/license/ConaxGames/cLibraries?style=for-the-badge&logo=github" alt="License">
