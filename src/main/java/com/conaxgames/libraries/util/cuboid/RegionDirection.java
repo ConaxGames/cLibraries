@@ -1,8 +1,5 @@
 package com.conaxgames.libraries.util.cuboid;
 
-/**
- * Represents directions for cuboid operations.
- */
 public enum RegionDirection {
     NORTH, EAST, SOUTH, WEST,
     UP, DOWN,

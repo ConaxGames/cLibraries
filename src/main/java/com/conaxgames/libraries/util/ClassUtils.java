@@ -35,13 +35,6 @@ public final class ClassUtils {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Gets all the classes in a the provided package.
-     *
-     * @param plugin      The plugin who owns the package
-     * @param packageName The package to scan classes in.
-     * @return The classes in the package packageName.
-     */
     public static Collection<Class<?>> getClassesInPackage(Plugin plugin, String packageName) {
         Collection<Class<?>> classes = new ArrayList<>();
         CodeSource codeSource = plugin.getClass().getProtectionDomain().getCodeSource();

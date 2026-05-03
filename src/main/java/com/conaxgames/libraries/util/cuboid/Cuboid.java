@@ -8,16 +8,12 @@ import org.bukkit.block.Block;
 
 import java.util.*;
 
-/**
- * Simple and efficient 3D cuboid region implementation.
- */
 public final class Cuboid implements Iterable<Location> {
     private final String worldName;
     private final int minX, minY, minZ;
     private final int maxX, maxY, maxZ;
     private final String name;
 
-    // Constructors
     public Cuboid(Location l1, Location l2) {
         if (l1 == null || l2 == null || l1.getWorld() == null || l2.getWorld() == null) {
             throw new IllegalArgumentException("Cuboid corners must have non-null worlds");
@@ -62,7 +58,6 @@ public final class Cuboid implements Iterable<Location> {
         this.name = (String) map.get("name");
     }
 
-    // Core methods
     public Location getMin() {
         return new Location(getWorld(), minX, minY, minZ);
     }
@@ -86,7 +81,6 @@ public final class Cuboid implements Iterable<Location> {
         return world;
     }
 
-    // Size and volume
     public int getSizeX() {
         return maxX - minX + 1;
     }
@@ -103,7 +97,6 @@ public final class Cuboid implements Iterable<Location> {
         return getSizeX() * getSizeY() * getSizeZ();
     }
 
-    // Containment checks
     public boolean contains(int x, int y, int z) {
         return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
     }
@@ -122,7 +115,6 @@ public final class Cuboid implements Iterable<Location> {
         return contains(block.getLocation());
     }
 
-    // Expansion and modification
     public Cuboid expand(RegionDirection direction, int amount) {
         switch (direction) {
             case NORTH:
@@ -168,7 +160,6 @@ public final class Cuboid implements Iterable<Location> {
         return outset(direction, -amount);
     }
 
-    // Face operations
     public Cuboid getFace(RegionDirection direction) {
         switch (direction) {
             case DOWN:
@@ -197,7 +188,6 @@ public final class Cuboid implements Iterable<Location> {
         };
     }
 
-    // Bounding operations
     public Cuboid getBoundingCuboid(Cuboid other) {
         if (other == null) return this;
 
@@ -206,7 +196,6 @@ public final class Cuboid implements Iterable<Location> {
                 Math.max(maxX, other.maxX), Math.max(maxY, other.maxY), Math.max(maxZ, other.maxZ));
     }
 
-    // Block access
     public Block getBlock(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z);
     }
@@ -215,7 +204,6 @@ public final class Cuboid implements Iterable<Location> {
         return getWorld().getBlockAt(minX + x, minY + y, minZ + z);
     }
 
-    // Chunk operations
     public List<Chunk> getChunks() {
         List<Chunk> chunks = new ArrayList<>();
         World world = getWorld();
@@ -234,7 +222,6 @@ public final class Cuboid implements Iterable<Location> {
         return chunks;
     }
 
-    // Random location
     public Location getRandomLocation() {
         return new Location(getWorld(),
                 minX + Math.random() * (maxX - minX + 1),
@@ -242,7 +229,6 @@ public final class Cuboid implements Iterable<Location> {
                 minZ + Math.random() * (maxZ - minZ + 1));
     }
 
-    // Serialization
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("worldName", worldName);
@@ -256,13 +242,11 @@ public final class Cuboid implements Iterable<Location> {
         return map;
     }
 
-    // Iterator implementation
     @Override
     public Iterator<Location> iterator() {
         return new CuboidIterator();
     }
 
-    // Object methods
     @Override
     public String toString() {
         return String.format("Cuboid[%s: (%d,%d,%d) to (%d,%d,%d)]",
@@ -292,7 +276,6 @@ public final class Cuboid implements Iterable<Location> {
         return result;
     }
 
-    // Getters
     public String getWorldName() {
         return worldName;
     }

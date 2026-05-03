@@ -17,12 +17,6 @@ public abstract class JedisListener {
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private Thread listenerThread;
 
-    /**
-     * Creates an instance with {@link JedisCredentials} and the targeted channel to listen to.
-     *
-     * @param jedisSettings
-     * @param channel
-     */
     public JedisListener(JedisCredentials jedisSettings, String channel, Object parameter) {
         this.jedisSettings = jedisSettings;
         this.channel = channel;
@@ -34,19 +28,8 @@ public abstract class JedisListener {
         this(jedisSettings, channel, null);
     }
 
-    /**
-     * After the {@link JedisListener} reads a message it will be parsed through this method and converts the message to
-     * some sort of object, but it'll only support JsonObject which is used by default, or Object which will need to be
-     * converted to a valid data type such as String.
-     *
-     * @param channel
-     * @param data
-     */
     public abstract void respond(String channel, Object data);
 
-    /**
-     * Starts listening to the channel.
-     */
     private void listen() {
         listenerThread = new Thread(() -> {
             while (isRunning.get()) {
@@ -70,7 +53,7 @@ public abstract class JedisListener {
                     if (isRunning.get()) {
                         JedisConnection.getInstance().toConsole("JedisListener: Error processing message: " + e.getMessage());
                         try {
-                            Thread.sleep(1000); // Wait before retrying
+                            Thread.sleep(1000); 
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
                             break;
@@ -92,7 +75,7 @@ public abstract class JedisListener {
         if (listenerThread != null) {
             listenerThread.interrupt();
             try {
-                listenerThread.join(5000); // Wait up to 5 seconds for the thread to finish
+                listenerThread.join(5000); 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

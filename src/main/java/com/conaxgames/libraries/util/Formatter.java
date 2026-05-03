@@ -48,16 +48,16 @@ public class Formatter {
     }
 
     public static String formatMoneyKMBT(double value) {
-        //Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
+
         if (value == Double.MIN_VALUE) return formatMoneyKMBT(Double.MIN_VALUE + 1);
         if (value < 0) return "-" + formatMoneyKMBT(-value);
-        if (value < 1000) return Integer.toString((int) value); //deal with easy case
+        if (value < 1000) return Integer.toString((int) value); 
 
         Map.Entry<Double, String> e = suffixes.floorEntry(value);
         Double divideBy = e.getKey();
         String suffix = e.getValue();
 
-        long truncated = (long) (value / (divideBy / 10)); //the number part of the output times 10
+        long truncated = (long) (value / (divideBy / 10)); 
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
@@ -66,18 +66,11 @@ public class Formatter {
         return formatTimeMMSS((int) TimeUnit.MILLISECONDS.toSeconds(secs));
     }
 
-    /**
-     * Formats the time into a format of HH:MM:SS. Example: 3600 (1 hour) displays as '01:00:00'
-     *
-     * @param secs The input time, in seconds.
-     * @return The HH:MM:SS formatted time.
-     */
     public static String formatTimeMMSS(int secs) {
-        // Calculate the seconds to display:
+
         int seconds = secs % 60;
         secs -= seconds;
 
-        // Calculate the minutes:
         long minutesCount = secs / 60;
         long minutes = minutesCount % 60;
         minutesCount -= minutes;

@@ -1,5 +1,3 @@
-<!--suppress HtmlDeprecatedAttribute -->
-
 <div align="center">
     <h2>cLibraries</h2>
     <h3>PaperMC helpers for Minecraft server plugins maintained by ConaxGames.</h3>

@@ -28,7 +28,6 @@ public class PublishObject {
         return jsonObject;
     }
 
-
     public JsonObject addTarget(UUID target) {
         if (target != null) object.addProperty("target", target.toString());
         return object;

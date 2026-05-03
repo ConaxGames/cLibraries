@@ -10,7 +10,6 @@ import lombok.Getter;
 @Getter
 public class SubscribeObject {
 
-    // Now using the interface
     public MessageTypeInterface messageType = MessageTypeEnum.UNKNOWN;
     public String message = null;
     public String permission = null;
@@ -28,7 +27,7 @@ public class SubscribeObject {
 
         String action = object.get("action").getAsString();
         try {
-            // Resolving the message type through the provided resolver
+
             messageType = resolver.resolve(action);
         } catch (IllegalArgumentException e) {
             JedisConnection.getInstance().toConsole("Invalid action type: " + action);

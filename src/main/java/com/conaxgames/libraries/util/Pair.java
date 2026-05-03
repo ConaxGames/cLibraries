@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * A class that is used as a way of representing a map's entry (which is not implemented).
- */
 @Getter
 @Setter
 @AllArgsConstructor

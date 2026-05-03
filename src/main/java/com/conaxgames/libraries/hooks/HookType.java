@@ -2,7 +2,6 @@ package com.conaxgames.libraries.hooks;
 
 public enum HookType {
 
-    /* PUBLIC */
     PLACEHOLDERAPI,
     VAULT,
     TITLE_MANAGER,
@@ -13,7 +12,6 @@ public enum HookType {
     LUCKPERMS,
     CITIZENS,
 
-    /* CONAX */
     CSUITE,
     CMIGRATION,
     ANTICRASH,

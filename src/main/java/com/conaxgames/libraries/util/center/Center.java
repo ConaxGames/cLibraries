@@ -12,7 +12,6 @@ public class Center {
             return message;
         }
 
-        // translate first so that the spacing can be accounted for
         message = CC.translate(message);
 
         int messagePxSize = 0;

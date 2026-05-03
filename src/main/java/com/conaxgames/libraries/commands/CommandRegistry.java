@@ -31,11 +31,6 @@ public class CommandRegistry {
         commandManager.registerCommand(new LibraryCommands());
     }
 
-    /**
-     * Registers the cLibraries command contexts.
-     *
-     * @param commandManager - paper command manager
-     */
     public void loadContexts(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandContexts().registerContext(Plugin.class, c -> {
             String argument = c.popFirstArg();
@@ -96,12 +91,6 @@ public class CommandRegistry {
         });
     }
 
-
-    /**
-     * Registers the cLibraries command completions.
-     *
-     * @param commandManager - paper command manager
-     */
     public void loadCompletions(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandCompletions().registerAsyncCompletion("plugins", c -> {
             List<String> values = new ArrayList<>();

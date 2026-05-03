@@ -4,17 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-/**
- * Efficient immutable location representation.
- * Use instead of Bukkit's Location for storage and calculations.
- */
 public final class CustomLocation {
     private final String world;
     private final double x, y, z;
     private final float yaw, pitch;
     private final long timestamp;
 
-    // Constructors
     public CustomLocation(double x, double y, double z) {
         this("world", x, y, z, 0.0f, 0.0f);
     }
@@ -37,7 +32,6 @@ public final class CustomLocation {
         this.timestamp = System.currentTimeMillis();
     }
 
-    // Static factory methods
     public static CustomLocation fromBukkitLocation(Location location) {
         if (location == null || location.getWorld() == null) {
             return null;
@@ -83,7 +77,6 @@ public final class CustomLocation {
         }
     }
 
-    // Conversion methods
     public Location toBukkitLocation() {
         World bukkitWorld = Bukkit.getWorld(world);
         return bukkitWorld != null ? new Location(bukkitWorld, x, y, z, yaw, pitch) : null;
@@ -97,7 +90,6 @@ public final class CustomLocation {
         return bukkitWorld;
     }
 
-    // Distance calculations
     public double distanceTo(CustomLocation other) {
         if (other == null) {
             throw new IllegalArgumentException("Location cannot be null");
@@ -117,7 +109,6 @@ public final class CustomLocation {
         return Math.sqrt(dx * dx + dz * dz);
     }
 
-    // String conversion
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%.2f, %.2f, %.2f", x, y, z));
@@ -133,7 +124,6 @@ public final class CustomLocation {
         return sb.toString();
     }
 
-    // Getters
     public String getWorld() {
         return world;
     }
@@ -162,7 +152,6 @@ public final class CustomLocation {
         return timestamp;
     }
 
-    // Object methods
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

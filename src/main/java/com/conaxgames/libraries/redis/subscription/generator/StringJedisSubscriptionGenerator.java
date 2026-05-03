@@ -1,6 +1,5 @@
 package com.conaxgames.libraries.redis.subscription.generator;
 
-
 import com.conaxgames.libraries.redis.subscription.model.JedisSubscriptionGenerator;
 
 public class StringJedisSubscriptionGenerator implements JedisSubscriptionGenerator<String> {

@@ -19,10 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 
-/**
- * Main library plugin class for cLibraries framework.
- * Provides scheduling, commands, modules, timers, and hooks.
- */
 @Getter
 public class LibraryPlugin {
 
@@ -38,12 +34,6 @@ public class LibraryPlugin {
     private ModuleManager moduleManager;
     private Scheduler scheduler;
 
-    /**
-     * Gets the library instance.
-     *
-     * @return LibraryPlugin instance
-     * @throws IllegalPluginAccessException if not initialized
-     */
     public static LibraryPlugin getInstance() {
         if (instance == null) {
             throw new IllegalPluginAccessException("cLibraries is not registered.");
@@ -51,16 +41,6 @@ public class LibraryPlugin {
         return instance;
     }
 
-    /**
-     * Initializes the library.
-     *
-     * @param plugin             Main plugin instance
-     * @param debugPrimary       Primary debug key
-     * @param debugSecondary     Secondary debug key
-     * @param moduleCommandAlias Module command alias
-     * @param moduleCommandPerm  Module command permission
-     * @return This instance for chaining
-     */
     public LibraryPlugin onEnable(JavaPlugin plugin, String debugPrimary, String debugSecondary,
                                   String moduleCommandAlias, String moduleCommandPerm) {
         if (this.setup) {
@@ -87,20 +67,10 @@ public class LibraryPlugin {
         return this;
     }
 
-    /**
-     * Shuts down the library.
-     *
-     * @return This instance for chaining
-     */
     public LibraryPlugin onDisable() {
         return this;
     }
 
-    /**
-     * Sets the board manager and starts its update task.
-     *
-     * @param boardManager Board manager instance
-     */
     public void setBoardManager(BoardManager boardManager) {
         this.boardManager = boardManager;
         long interval = this.boardManager.getAdapter().getInterval();

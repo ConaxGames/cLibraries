@@ -14,19 +14,8 @@ import java.util.*;
 
 public final class CommentedConfiguration extends YamlConfiguration {
 
-    // TODO: Fully test the state of CommentedConfiguration
-
-    /**
-     * Holds all comments for the config.
-     * Can be accessed by using the methods that are provided
-     * by the class.
-     */
     private final Map<String, String> configComments = new HashMap<>();
 
-    /**
-     * Flag to determine if the config failed to load.
-     * When this flag is true, syncWithConfig will not reset the config.
-     */
     private boolean creationFailure = false;
 
     public CommentedConfiguration() {
@@ -36,12 +25,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         }
     }
 
-    /**
-     * Load a config from a file.
-     *
-     * @param file The file to load the config from.
-     * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
-     */
     public static CommentedConfiguration loadConfiguration(@NonNull File file) {
         try {
             FileInputStream stream = new FileInputStream(file);
@@ -52,12 +35,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         }
     }
 
-    /**
-     * Load a config from an input-stream, which is used for resources that are obtained using JavaPlugin#getResource.
-     *
-     * @param inputStream The input-stream to load the config from.
-     * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
-     */
     public static CommentedConfiguration loadConfiguration(InputStream inputStream) {
         if (inputStream == null) {
             LibraryPlugin.getInstance().getLibraryLogger().toConsole("CommentedConfiguration", "InputStream cannot be null!");
@@ -67,12 +44,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         return loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 
-    /**
-     * Load a config from a reader (used for files and streams together).
-     *
-     * @param reader The reader to load the config from.
-     * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
-     */
     public static CommentedConfiguration loadConfiguration(Reader reader) {
         CommentedConfiguration config = new CommentedConfiguration();
 
@@ -93,26 +64,11 @@ public final class CommentedConfiguration extends YamlConfiguration {
         return config;
     }
 
-    /**
-     * Checks if a line is a new section or not.
-     * Sadly, that's not possible to use ":" as a spacer between key and value, and ": " must be used.
-     *
-     * @param line The line to check.
-     * @return True if the line is a new section, otherwise false.
-     */
     private static boolean isNewSection(String line) {
         String trimLine = line.trim();
         return trimLine.contains(": ") || trimLine.endsWith(":");
     }
 
-    /**
-     * Creates a full path of a line.
-     *
-     * @param commentedConfig The config to get the path from.
-     * @param line            The line to get the path of.
-     * @param currentSection  The last known section.
-     * @return The full path of the line.
-     */
     private static String getSectionPath(CommentedConfiguration commentedConfig, String line, String currentSection) {
         String newSection = line.trim().split(": ")[0];
 
@@ -128,9 +84,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         } else {
             String parentSection = currentSection;
 
-            /*Getting the parent of the new section. The loop will stop in one of the following situations:
-            1) The parent is empty - which means we have no where to go, as that's the root section.
-            2) The config contains a valid path that was built with <parent-section>.<new-section>.*/
             while (!parentSection.isEmpty() &&
                     !commentedConfig.contains((parentSection = getParentPath(parentSection)) + "." + newSection)) ;
 
@@ -140,33 +93,15 @@ public final class CommentedConfiguration extends YamlConfiguration {
         return newSection;
     }
 
-    /**
-     * Checks if a line represents a comment or not.
-     *
-     * @param line The line to check.
-     * @return True if the line is a comment (stars with # or it's empty), otherwise false.
-     */
     private static boolean isComment(String line) {
         String trimLine = line.trim();
         return trimLine.startsWith("#") || trimLine.isEmpty();
     }
 
-    /**
-     * Get the parent path of the provided path, by removing the last '.' from the path.
-     *
-     * @param path The path to check.
-     * @return The parent path of the provided path.
-     */
     private static String getParentPath(String path) {
         return path.contains(".") ? path.substring(0, path.lastIndexOf('.')) : "";
     }
 
-    /**
-     * Convert key-indexes of a section into the same key-indexes that another section has.
-     *
-     * @param section The section that will be used as a way to get the correct indexes.
-     * @param target  The target section that will be ordered again.
-     */
     private static void correctIndexes(ConfigurationSection section, ConfigurationSection target) {
         List<Pair<String, Object>> sectionMap = getSectionMap(section), correctOrder = new ArrayList<>();
 
@@ -174,21 +109,12 @@ public final class CommentedConfiguration extends YamlConfiguration {
             correctOrder.add(new Pair<>(entry.getKey(), target.get(entry.getKey())));
         }
 
-        /*The only way to change key-indexes is to add them one-by-one again, in the correct order.
-        In order to do so, the section needs to be cleared so the indexes will be reset.*/
-
         clearConfiguration(target);
 
         for (Pair<String, Object> entry : correctOrder)
             target.set(entry.getKey(), entry.getValue());
     }
 
-    /**
-     * Parsing a section into a list that contains all of it's keys and their values without changing their order.
-     *
-     * @param section The section to convert.
-     * @return A list that contains all the keys and their values.
-     */
     private static List<Pair<String, Object>> getSectionMap(ConfigurationSection section) {
         List<Pair<String, Object>> list = new ArrayList<>();
 
@@ -199,27 +125,11 @@ public final class CommentedConfiguration extends YamlConfiguration {
         return list;
     }
 
-    /**
-     * Clear a configuration section from all of its keys.
-     * This can be done by setting all the keys' values to null.
-     *
-     * @param section The section to clear.
-     */
     private static void clearConfiguration(ConfigurationSection section) {
         for (String key : section.getKeys(false))
             section.set(key, null);
     }
 
-    /**
-     * Sync the config with another resource.
-     * This method can be used as an auto updater for your config files.
-     *
-     * @param file            The file to save changes into if there are any.
-     * @param resource        The resource to sync with. Can be provided by JavaPlugin#getResource
-     * @param ignoredSections An array of sections that will be ignored, and won't get updated
-     *                        if they are already exist in the config. If they are not in the
-     *                        config, they will be synced with the resource's config.
-     */
     public void syncWithConfig(File file, InputStream resource, String... ignoredSections) throws IOException {
         if (creationFailure) return;
 
@@ -238,13 +148,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
             save(file);
     }
 
-    /**
-     * Set a new comment to a path.
-     * You can remove comments by providing a null as a comment argument.
-     *
-     * @param path    The path to set the comment to.
-     * @param comment The comment to set. Supports multiple lines (use \n as a spacer).
-     */
     public void setComment(String path, String comment) {
         if (comment == null)
             configComments.remove(path);
@@ -252,50 +155,22 @@ public final class CommentedConfiguration extends YamlConfiguration {
             configComments.put(path, comment);
     }
 
-    /**
-     * Get a comment of a path.
-     *
-     * @param path The path to get the comment of.
-     * @return Returns a string that contains the comment. If no comment exists, null will be returned.
-     */
     public String getComment(String path) {
         return getComment(path, null);
     }
 
-    /**
-     * Get a comment of a path with a default value if no comment exists.
-     *
-     * @param path The path to get the comment of.
-     * @param def  A default comment that will be returned if no comment exists for the path.
-     * @return Returns a string that contains the comment. If no comment exists, the def value will be returned.
-     */
     public String getComment(String path, String def) {
         return configComments.getOrDefault(path, def);
     }
 
-    /**
-     * Checks whether a path has a comment or not.
-     *
-     * @param path The path to check.
-     * @return Returns true if there's an existing comment, otherwise false.
-     */
     public boolean containsComment(String path) {
         return getComment(path) != null;
     }
 
-    /**
-     * Check if the config has failed to load.
-     */
     public boolean hasFailed() {
         return creationFailure;
     }
 
-    /**
-     * Load all data related to the config file - keys, values and comments.
-     *
-     * @param contents The contents of the file.
-     * @throws InvalidConfigurationException if the contents are invalid.
-     */
     @Override
     public void loadFromString(String contents) throws InvalidConfigurationException {
         super.loadFromString(contents);
@@ -322,11 +197,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         }
     }
 
-    /**
-     * Parsing all the data (keys, values and comments) into a valid string, that will be written into a file later.
-     *
-     * @return A string that contains all the data, ready to be written into a file.
-     */
     @Override
     public String saveToString() {
         this.options().header(null);
@@ -357,14 +227,6 @@ public final class CommentedConfiguration extends YamlConfiguration {
         return contents.length() == 0 ? "" : contents.substring(1);
     }
 
-    /**
-     * Sync a specific configuration section with another one, recursively.
-     *
-     * @param commentedConfig The config that contains the data we need to sync with.
-     * @param section         The current section that we sync.
-     * @param ignoredSections A list of ignored sections that won't be synced (unless not found in the file).
-     * @return Returns true if there were any changes, otherwise false.
-     */
     private boolean syncConfigurationSection(CommentedConfiguration commentedConfig, ConfigurationSection section, List<String> ignoredSections) {
         boolean changed = false;
 
@@ -389,19 +251,12 @@ public final class CommentedConfiguration extends YamlConfiguration {
 
         }
 
-        /*Keys cannot be ordered easily, so we need to do some tricks to make sure
-        all of them are ordered correctly (and the new config will look the same
-        as the resource that was provided).*/
-
         if (changed)
             correctIndexes(section, getConfigurationSection(section.getCurrentPath()));
 
         return changed;
     }
 
-    /**
-     * Flag this config as failed to load.
-     */
     private CommentedConfiguration flagAsFailed() {
         creationFailure = true;
         return this;

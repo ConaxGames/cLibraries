@@ -104,14 +104,6 @@ public final class CC {
     public static String TERTIARY = GRAY;
     public static String B_TERTIARY = TERTIARY + B;
 
-    /**
-     * Translates color codes in a string, including hex colors.
-     * Supports both standard Minecraft color codes (&) and hex colors (&#RRGGBB).
-     * Also supports custom color codes: &P/&p (PRIMARY), &S/&s (SECONDARY), &T/&t (TERTIARY).
-     *
-     * @param string The text to translate
-     * @return The translated text with all color codes applied
-     */
     public static String translate(String string) {
         if (string == null) return null;
         String result = string
@@ -125,13 +117,6 @@ public final class CC {
         return ChatColor.translateAlternateColorCodes('&', translatedHex);
     }
 
-    /**
-     * Translates hex color codes in the format &#RRGGBB to their corresponding color codes.
-     * This is a private helper method used by the public translate method.
-     *
-     * @param message The text containing hex color codes
-     * @return The text with hex colors translated
-     */
     private static String translateHex(String message) {
         Matcher hexMatcher = HEX_PATTERN.matcher(message);
         while (hexMatcher.find()) {
@@ -142,32 +127,14 @@ public final class CC {
         return message;
     }
 
-    /**
-     * Translates color codes in a list of strings.
-     *
-     * @param text List of strings to translate
-     * @return List of translated strings
-     */
     public static List<String> translate(List<String> text) {
         return text.stream().map(CC::translate).collect(Collectors.toList());
     }
 
-    /**
-     * Translates color codes in multiple strings.
-     *
-     * @param text Variable number of strings to translate
-     * @return List of translated strings
-     */
     public static List<String> translate(String... text) {
         return translate(Arrays.asList(text));
     }
 
-    /**
-     * Strips all color codes from a string, including hex colors.
-     *
-     * @param input The text to strip colors from
-     * @return The text with all color codes removed
-     */
     public static String stripAllColor(String input) {
         if (input == null) return null;
         input = input.replaceAll("(?i)&#[0-9a-f]{6}", "");

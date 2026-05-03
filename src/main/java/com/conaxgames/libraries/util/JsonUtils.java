@@ -2,9 +2,6 @@ package com.conaxgames.libraries.util;
 
 import org.json.JSONObject;
 
-/**
- * @deprecated This class is marked for removal.
- */
 @Deprecated(forRemoval = true)
 public class JsonUtils {
 

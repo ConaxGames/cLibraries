@@ -1,6 +1,5 @@
 package com.conaxgames.libraries.message;
 
-
 import com.conaxgames.libraries.util.DateTimeFormats;
 import com.conaxgames.libraries.util.Duration;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -63,7 +62,7 @@ public final class TimeUtil {
     }
 
     public static String millisToRoundedTime(long millis) {
-        millis += 1L; // for good shit men
+        millis += 1L; 
 
         long seconds = millis / 1000L;
         long minutes = seconds / 60L;

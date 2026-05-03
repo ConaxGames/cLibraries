@@ -11,9 +11,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Format utility
- */
 public enum FormatUtil {
     ;
     private static final Pattern FORMATTING = Pattern.compile("^.*(?<format>(\u00a7[0-9a-fklmor])+).*");
@@ -33,7 +30,7 @@ public enum FormatUtil {
         ROMAN_NUMERALS.put(5, "V");
         ROMAN_NUMERALS.put(4, "IV");
         ROMAN_NUMERALS.put(1, "I");
-        ROMAN_NUMERALS.put(0, ""); // Safety
+        ROMAN_NUMERALS.put(0, ""); 
     }
 
     public static String stripFormatting(String format) {
@@ -58,20 +55,6 @@ public enum FormatUtil {
         return wordWrap(s, lineSize, lineSize);
     }
 
-    /**
-     * Wraps the string rather lazyly around the linesize (over).
-     * <p>
-     * I.e.
-     * <pre>
-     *   this is a line of words
-     * </pre>
-     * Will break into the following with linesize of 11:
-     * <pre>
-     *   this is a line
-     *   of words
-     * </pre>
-     * Note that the first line is longer than 11 (14).
-     */
     public static List<String> wordWrap(String s, int firstSegment, int lineSize) {
         String format = getFormat(s);
         if (format == null || !s.startsWith(format)) {
@@ -86,7 +69,7 @@ public enum FormatUtil {
             if (ix != -1) {
                 String subString = s.substring(jx, ix).trim();
                 String f = getFormat(subString);
-                int chars = stripFormatting(subString).length() + 1; // remember the space
+                int chars = stripFormatting(subString).length() + 1; 
                 if (chars >= numChars) {
                     if (f != null && subString.startsWith(f)) {
                         format = f;
@@ -116,10 +99,10 @@ public enum FormatUtil {
         for (String word : words) {
             String test = stripFormatting(line + " " + word).trim();
             if (test.length() <= lineLength) {
-                // add word
+
                 line += (line.isEmpty() ? "" : " ") + word;
             } else if (line.isEmpty() || stripFormatting(word).length() > lineLength) {
-                // add word truncated
+
                 String f = getFormat(word);
                 String strip = stripFormatting(word);
                 do {
@@ -132,7 +115,7 @@ public enum FormatUtil {
                 } while (strip.length() > lineLength);
                 line = strip;
             } else {
-                // add line, then start a new
+
                 lines.add(withFormat(format, line));
                 String f = getFormat(line);
                 if (f != null) {
@@ -195,13 +178,6 @@ public enum FormatUtil {
         return sb.toString();
     }
 
-    /**
-     * Escapes formatting by "denormalizing" back to using &amp; instead of §.
-     *
-     * @param formatString A formatstring (formerly normalized).
-     * @return A non-format string using &amp; instead of §.
-     * @since 1.10
-     */
     public static String escape(String formatString) {
         String escaped = normalize(formatString);
         escaped = escaped
@@ -229,14 +205,6 @@ public enum FormatUtil {
         return ROMAN_NUMERALS.get(l) + toRoman(number - l);
     }
 
-    /**
-     * Returns the name of the item according to the creative inventory. If an item
-     * has a custom name, the custom name will be returned. This can be used in any place that
-     * resolves an item name.
-     *
-     * @param item the item to lookup
-     * @return name of the item
-     */
     public static String getItemName(ItemStack item) {
         return item.getType().toString().replace("_", "");
     }

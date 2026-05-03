@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DateTimeFormats {
 
-    // The format used to show one decimal without a trailing zero.
     public static final ThreadLocal<DecimalFormat> REMAINING_SECONDS = new ThreadLocal<DecimalFormat>() {
         @Override
         protected DecimalFormat initialValue() {
