@@ -12,11 +12,11 @@ public class JaroWinklerScore {
             return 1;
         }
 
-        int prefixMatch = 0; 
-        int matches = 0; 
-        int transpositions = 0; 
+        int prefixMatch = 0;
+        int matches = 0;
+        int transpositions = 0;
         int maxLength = Math.max(s1.length(), s2.length());
-        int maxMatchDistance = Math.max((int) Math.floor(maxLength / 2.0) - 1, 0); 
+        int maxMatchDistance = Math.max((int) Math.floor(maxLength / 2.0) - 1, 0);
 
         final String shorter = s1.length() < s2.length() ? s1 : s2;
         final String longer = s1.length() >= s2.length() ? s1 : s2;

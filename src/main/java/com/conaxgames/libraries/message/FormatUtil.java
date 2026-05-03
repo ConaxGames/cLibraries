@@ -30,7 +30,7 @@ public enum FormatUtil {
         ROMAN_NUMERALS.put(5, "V");
         ROMAN_NUMERALS.put(4, "IV");
         ROMAN_NUMERALS.put(1, "I");
-        ROMAN_NUMERALS.put(0, ""); 
+        ROMAN_NUMERALS.put(0, "");
     }
 
     public static String stripFormatting(String format) {
@@ -69,7 +69,7 @@ public enum FormatUtil {
             if (ix != -1) {
                 String subString = s.substring(jx, ix).trim();
                 String f = getFormat(subString);
-                int chars = stripFormatting(subString).length() + 1; 
+                int chars = stripFormatting(subString).length() + 1;
                 if (chars >= numChars) {
                     if (f != null && subString.startsWith(f)) {
                         format = f;

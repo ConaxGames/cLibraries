@@ -53,7 +53,7 @@ public abstract class JedisListener {
                     if (isRunning.get()) {
                         JedisConnection.getInstance().toConsole("JedisListener: Error processing message: " + e.getMessage());
                         try {
-                            Thread.sleep(1000); 
+                            Thread.sleep(1000);
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
                             break;
@@ -75,7 +75,7 @@ public abstract class JedisListener {
         if (listenerThread != null) {
             listenerThread.interrupt();
             try {
-                listenerThread.join(5000); 
+                listenerThread.join(5000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

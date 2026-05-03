@@ -33,10 +33,10 @@ public class JedisSubscriber<K> {
     private final Class<K> typeParameter;
     private final JedisCredentials jedisSettings;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private volatile Jedis jedis;
     @Getter
     private final JedisPubSub pubSub;
     private final JedisSubscriptionHandler<K> jedisSubscriptionHandler;
+    private volatile Jedis jedis;
     private volatile boolean isShutdown = false;
 
     public JedisSubscriber(JedisConnection connection, JedisCredentials jedisSettings, String channel, Class<K> typeParameter,
@@ -130,12 +130,12 @@ public class JedisSubscriber<K> {
                 if (this.jedisSettings.hasPassword()) {
 
                     try {
-                        jedis.clientId(); 
+                        jedis.clientId();
                     } catch (Exception authTest) {
 
                         this.connection.toConsole("JedisSubscriber: Re-authenticating connection for (" + this.channel + ")");
                         jedis.auth(this.jedisSettings.getPassword());
-                        jedis.ping(); 
+                        jedis.ping();
                     }
                 }
 
@@ -166,7 +166,7 @@ public class JedisSubscriber<K> {
 
                 try {
                     this.closeConnection();
-                    this.createNewConnection(); 
+                    this.createNewConnection();
 
                     Thread.sleep(1000);
 
@@ -178,7 +178,7 @@ public class JedisSubscriber<K> {
                                 jedis.ping();
                             } catch (Exception authError) {
                                 jedisConnection.toConsole("JedisSubscriber: Authentication failed during reconnect for (" + channel + "): " + authError.getMessage());
-                                return; 
+                                return;
                             }
                         }
 

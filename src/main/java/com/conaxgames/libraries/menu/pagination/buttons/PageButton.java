@@ -36,9 +36,9 @@ public class PageButton extends Button {
             return;
         }
 
-        if (this.mod == -1) { 
+        if (this.mod == -1) {
             new MenuButtonPreviousEvent(player, menu, this).call();
-        } else if (this.mod == 1) { 
+        } else if (this.mod == 1) {
             new MenuButtonNextEvent(player, menu, this).call();
         }
 

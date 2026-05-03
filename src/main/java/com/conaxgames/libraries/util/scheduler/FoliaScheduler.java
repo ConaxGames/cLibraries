@@ -12,6 +12,18 @@ public class FoliaScheduler implements Scheduler {
 
     private static final long MILLIS_PER_TICK = 50L;
 
+    private static GlobalRegionScheduler global(Plugin plugin) {
+        return plugin.getServer().getGlobalRegionScheduler();
+    }
+
+    private static AsyncScheduler async(Plugin plugin) {
+        return plugin.getServer().getAsyncScheduler();
+    }
+
+    private static Consumer<ScheduledTask> wrap(Runnable runnable) {
+        return task -> runnable.run();
+    }
+
     @Override
     public void runTask(Plugin plugin, Runnable runnable) {
         global(plugin).run(plugin, wrap(runnable));
@@ -60,18 +72,6 @@ public class FoliaScheduler implements Scheduler {
     @Override
     public CancellableTask runTaskTimerAsynchronouslyCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
         return new Task(async(plugin).runAtFixedRate(plugin, wrap(runnable), delay * MILLIS_PER_TICK, period * MILLIS_PER_TICK, TimeUnit.MILLISECONDS));
-    }
-
-    private static GlobalRegionScheduler global(Plugin plugin) {
-        return plugin.getServer().getGlobalRegionScheduler();
-    }
-
-    private static AsyncScheduler async(Plugin plugin) {
-        return plugin.getServer().getAsyncScheduler();
-    }
-
-    private static Consumer<ScheduledTask> wrap(Runnable runnable) {
-        return task -> runnable.run();
     }
 
     private record Task(ScheduledTask task) implements CancellableTask {

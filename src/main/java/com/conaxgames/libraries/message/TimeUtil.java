@@ -62,7 +62,7 @@ public final class TimeUtil {
     }
 
     public static String millisToRoundedTime(long millis) {
-        millis += 1L; 
+        millis += 1L;
 
         long seconds = millis / 1000L;
         long minutes = seconds / 60L;

@@ -51,13 +51,13 @@ public class Formatter {
 
         if (value == Double.MIN_VALUE) return formatMoneyKMBT(Double.MIN_VALUE + 1);
         if (value < 0) return "-" + formatMoneyKMBT(-value);
-        if (value < 1000) return Integer.toString((int) value); 
+        if (value < 1000) return Integer.toString((int) value);
 
         Map.Entry<Double, String> e = suffixes.floorEntry(value);
         Double divideBy = e.getKey();
         String suffix = e.getValue();
 
-        long truncated = (long) (value / (divideBy / 10)); 
+        long truncated = (long) (value / (divideBy / 10));
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }

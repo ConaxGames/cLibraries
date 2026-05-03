@@ -6,6 +6,10 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class PaperScheduler implements Scheduler {
 
+    private static BukkitScheduler backend(Plugin plugin) {
+        return plugin.getServer().getScheduler();
+    }
+
     @Override
     public void runTask(Plugin plugin, Runnable runnable) {
         backend(plugin).runTask(plugin, runnable);
@@ -54,10 +58,6 @@ public class PaperScheduler implements Scheduler {
     @Override
     public CancellableTask runTaskTimerAsynchronouslyCancellable(Plugin plugin, Runnable runnable, long delay, long period) {
         return new Task(backend(plugin).runTaskTimerAsynchronously(plugin, runnable, delay, period));
-    }
-
-    private static BukkitScheduler backend(Plugin plugin) {
-        return plugin.getServer().getScheduler();
     }
 
     private record Task(BukkitTask task) implements CancellableTask {

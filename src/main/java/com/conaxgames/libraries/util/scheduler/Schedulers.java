@@ -6,7 +6,8 @@ public final class Schedulers {
 
     private static final Class<?> REGIONIZED_SERVER = loadRegionizedServer();
 
-    private Schedulers() {}
+    private Schedulers() {
+    }
 
     public static Scheduler forServer(Server server) {
         if (REGIONIZED_SERVER != null && REGIONIZED_SERVER.isInstance(server)) {
