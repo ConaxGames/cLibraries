@@ -4,58 +4,31 @@ import com.conaxgames.libraries.timer.Timer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public class TimerPauseEvent extends Event implements Cancellable {
+public final class TimerPauseEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
-    private final boolean paused;
-    private final Optional<UUID> userUUID;
+
+    private final @Nullable UUID userUUID;
     private final Timer timer;
+    private final boolean paused;
     private boolean cancelled;
 
-    public TimerPauseEvent(Timer timer, boolean paused) {
-        this.userUUID = Optional.empty();
+    public TimerPauseEvent(@Nullable UUID userUUID, Timer timer, boolean paused) {
+        this.userUUID = userUUID;
         this.timer = timer;
         this.paused = paused;
     }
 
-    public TimerPauseEvent(UUID userUUID, Timer timer, boolean paused) {
-        this.userUUID = Optional.ofNullable(userUUID);
-        this.timer = timer;
-        this.paused = paused;
-    }
+    public @Nullable UUID getUserUUID()  { return userUUID; }
+    public Timer getTimer()              { return timer; }
+    public boolean isPaused()            { return paused; }
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
-    public Optional<UUID> getUserUUID() {
-        return this.userUUID;
-    }
-
-    public Timer getTimer() {
-        return this.timer;
-    }
-
-    public boolean isPaused() {
-        return this.paused;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
+    @Override public HandlerList getHandlers()     { return HANDLERS; }
+    public static HandlerList getHandlerList()     { return HANDLERS; }
+    @Override public boolean isCancelled()         { return cancelled; }
+    @Override public void setCancelled(boolean c)  { this.cancelled = c; }
 }

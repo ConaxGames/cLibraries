@@ -1,9 +1,6 @@
 package com.conaxgames.libraries.util;
 
-import com.conaxgames.libraries.message.FormatUtil;
-import com.conaxgames.libraries.message.ItemNameUtil;
-import com.conaxgames.libraries.message.TimeUtil;
-import com.cryptomorin.xseries.XMaterial;
+import com.conaxgames.libraries.message.CC;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -11,9 +8,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -38,27 +32,6 @@ public final class ItemUtil {
             }
         }
         return result;
-    }
-
-    public static ItemStack createPotion(String name, PotionType type, int level, int duration) {
-        ItemStack itemStack = new ItemStack(XMaterial.POTION.get());
-        PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
-
-        if (name != null) {
-            meta.setDisplayName(CC.translate(name));
-        }
-
-        meta.setLore(Arrays.asList(
-                "", CC.GRAY + ItemNameUtil.potionLookup(type.getEffectType()) + " " + FormatUtil.toRoman(level) + " Potion",
-                CC.GRAY + "    Duration: " + TimeUtil.millisToRoundedTime(duration * 1000L)));
-
-        meta.addCustomEffect(new PotionEffect(type.getEffectType(), duration * 20, level - 1), false);
-        itemStack.setItemMeta(meta);
-        return itemStack;
-    }
-
-    public static ItemStack createPotion(PotionType type, int level, int duration) {
-        return createPotion(null, type, level, duration);
     }
 
     public static ItemStack enchantItem(ItemStack itemStack, ItemEnchant... enchantments) {

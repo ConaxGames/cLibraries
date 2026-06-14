@@ -5,73 +5,62 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 public final class CustomLocation {
+
     private final String world;
-    private final double x, y, z;
-    private final float yaw, pitch;
-    private final long timestamp;
-
-    public CustomLocation(double x, double y, double z) {
-        this("world", x, y, z, 0.0f, 0.0f);
-    }
-
-    public CustomLocation(String world, double x, double y, double z) {
-        this(world, x, y, z, 0.0f, 0.0f);
-    }
-
-    public CustomLocation(double x, double y, double z, float yaw, float pitch) {
-        this("world", x, y, z, yaw, pitch);
-    }
+    private final double x;
+    private final double y;
+    private final double z;
+    private final float yaw;
+    private final float pitch;
 
     public CustomLocation(String world, double x, double y, double z, float yaw, float pitch) {
-        this.world = world != null ? world : "world";
+        if (world == null) {
+            throw new IllegalArgumentException("World cannot be null");
+        }
+        this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
-        this.timestamp = System.currentTimeMillis();
     }
 
     public static CustomLocation fromBukkitLocation(Location location) {
-        if (location == null || location.getWorld() == null) {
-            return null;
+        if (location == null) {
+            throw new IllegalArgumentException("Location cannot be null");
+        }
+        if (location.getWorld() == null) {
+            throw new IllegalArgumentException("Location world cannot be null");
         }
         return new CustomLocation(
                 location.getWorld().getName(),
-                location.getX(), location.getY(), location.getZ(),
-                location.getYaw(), location.getPitch()
+                location.getX(),
+                location.getY(),
+                location.getZ(),
+                location.getYaw(),
+                location.getPitch()
         );
     }
 
     public static CustomLocation fromString(String string) {
-        if (string == null || string.isEmpty()) {
+        if (string == null || string.isBlank()) {
             throw new IllegalArgumentException("Location string cannot be null or empty");
         }
 
-        String[] parts = string.split(", ");
-        if (parts.length < 3) {
-            throw new IllegalArgumentException("Location string must contain at least x, y, z coordinates");
+        String[] parts = string.split(",\\s*");
+        if (parts.length != 6) {
+            throw new IllegalArgumentException("Location string must be world, x, y, z, yaw, pitch");
         }
 
         try {
-            double x = Double.parseDouble(parts[0]);
-            double y = Double.parseDouble(parts[1]);
-            double z = Double.parseDouble(parts[2]);
-            float yaw = 0.0f;
-            float pitch = 0.0f;
-            String world = "world";
-
-            if (parts.length >= 4 && !parts[3].contains(".")) {
-                world = parts[3];
-            } else if (parts.length >= 5) {
-                yaw = Float.parseFloat(parts[3]);
-                pitch = Float.parseFloat(parts[4]);
-                if (parts.length >= 6) {
-                    world = parts[5];
-                }
-            }
-
-            return new CustomLocation(world, x, y, z, yaw, pitch);
+            return new CustomLocation(
+                    parts[0],
+                    Double.parseDouble(parts[1]),
+                    Double.parseDouble(parts[2]),
+                    Double.parseDouble(parts[3]),
+                    Float.parseFloat(parts[4]),
+                    Float.parseFloat(parts[5])
+            );
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format in location string", e);
         }
@@ -79,15 +68,10 @@ public final class CustomLocation {
 
     public Location toBukkitLocation() {
         World bukkitWorld = Bukkit.getWorld(world);
-        return bukkitWorld != null ? new Location(bukkitWorld, x, y, z, yaw, pitch) : null;
-    }
-
-    public World toBukkitWorld() {
-        World bukkitWorld = Bukkit.getWorld(world);
         if (bukkitWorld == null) {
             throw new IllegalStateException("World '" + world + "' is not loaded");
         }
-        return bukkitWorld;
+        return new Location(bukkitWorld, x, y, z, yaw, pitch);
     }
 
     public double distanceTo(CustomLocation other) {
@@ -107,21 +91,6 @@ public final class CustomLocation {
         double dx = x - other.x;
         double dz = z - other.z;
         return Math.sqrt(dx * dx + dz * dz);
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%.2f, %.2f, %.2f", x, y, z));
-
-        if (yaw != 0.0f || pitch != 0.0f) {
-            sb.append(String.format(", %.2f, %.2f", yaw, pitch));
-        }
-
-        if (!"world".equals(world)) {
-            sb.append(", ").append(world);
-        }
-
-        return sb.toString();
     }
 
     public String getWorld() {
@@ -148,27 +117,30 @@ public final class CustomLocation {
         return pitch;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    @Override
+    public String toString() {
+        return String.format("%s, %.2f, %.2f, %.2f, %.2f, %.2f", world, x, y, z, yaw, pitch);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof CustomLocation other)) return false;
-
-        return Double.compare(other.x, x) == 0 &&
-                Double.compare(other.y, y) == 0 &&
-                Double.compare(other.z, z) == 0 &&
-                Float.compare(other.yaw, yaw) == 0 &&
-                Float.compare(other.pitch, pitch) == 0 &&
-                world.equals(other.world);
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CustomLocation other)) {
+            return false;
+        }
+        return world.equals(other.world)
+                && Double.compare(x, other.x) == 0
+                && Double.compare(y, other.y) == 0
+                && Double.compare(z, other.z) == 0
+                && Float.compare(yaw, other.yaw) == 0
+                && Float.compare(pitch, other.pitch) == 0;
     }
 
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 31 * result + world.hashCode();
+        int result = world.hashCode();
         result = 31 * result + Double.hashCode(x);
         result = 31 * result + Double.hashCode(y);
         result = 31 * result + Double.hashCode(z);

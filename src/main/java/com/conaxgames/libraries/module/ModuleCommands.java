@@ -4,8 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import com.conaxgames.libraries.module.manage.ModuleMenu;
-import com.conaxgames.libraries.module.type.Module;
-import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.message.CC;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -23,8 +22,8 @@ public class ModuleCommands extends BaseCommand {
     @Description("Open the module management menu or lists the registered modules.")
     @CommandCompletion("@modules")
     public void onList(CommandSender sender) {
-        if (sender instanceof Player) {
-            new ModuleMenu(moduleManager).openMenu((Player) sender);
+        if (sender instanceof Player player) {
+            ModuleMenu.create(moduleManager).open(player);
         } else {
             moduleManager.getModules().keySet().forEach(sender::sendMessage);
         }
@@ -34,14 +33,14 @@ public class ModuleCommands extends BaseCommand {
     @Description("Enable individual modules")
     @CommandCompletion("@modules")
     public void onEnable(CommandSender sender, Module module, boolean persistent) {
-        sender.sendMessage(CC.PRIMARY + moduleManager.enableModule(module, persistent));
+        sender.sendMessage(CC.translate("&e" + moduleManager.enableModule(module, persistent)));
     }
 
     @Subcommand("disable")
     @Description("Disable individual modules")
     @CommandCompletion("@modules")
     public void onDisable(CommandSender sender, Module module, boolean persistent) {
-        sender.sendMessage(CC.PRIMARY + moduleManager.disableModule(module, persistent));
+        sender.sendMessage(CC.translate("&e" + moduleManager.disableModule(module, persistent)));
     }
 
     @Default

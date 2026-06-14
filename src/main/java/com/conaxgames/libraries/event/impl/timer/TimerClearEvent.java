@@ -5,59 +5,34 @@ import com.conaxgames.libraries.timer.Timer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
-public class TimerClearEvent extends Event {
+public final class TimerClearEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
-    private final Optional<UUID> userUUID;
+
+    private final @Nullable UUID userUUID;
     private final Timer timer;
-    private Optional<Player> player;
+    private @Nullable Player player;
 
-    public TimerClearEvent(Timer timer) {
-        this.userUUID = Optional.empty();
+    public TimerClearEvent(@Nullable Player player, @Nullable UUID userUUID, Timer timer) {
+        this.player = player;
+        this.userUUID = userUUID;
         this.timer = timer;
     }
 
-    public TimerClearEvent(UUID userUUID, Timer timer) {
-        this.userUUID = Optional.ofNullable(userUUID);
-        this.timer = timer;
-    }
-
-    public TimerClearEvent(Player player, Timer timer) {
-        Objects.requireNonNull(player);
-
-        this.player = Optional.of(player);
-        this.userUUID = Optional.of(player.getUniqueId());
-        this.timer = timer;
-    }
-
-    public static HandlerList getHandlerList() {
-        return TimerClearEvent.HANDLERS;
-    }
-
-    public Optional<Player> getPlayer() {
-        if (player == null) {
-            player = this.userUUID.isPresent() ?
-                    Optional.ofNullable(LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(this.userUUID.get())) : Optional.empty();
+    public @Nullable Player getPlayer() {
+        if (player == null && userUUID != null) {
+            player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(userUUID);
         }
-
         return player;
     }
 
-    public Optional<UUID> getUserUUID() {
-        return this.userUUID;
-    }
+    public @Nullable UUID getUserUUID()  { return userUUID; }
+    public Timer getTimer()              { return timer; }
 
-    public Timer getTimer() {
-        return this.timer;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return TimerClearEvent.HANDLERS;
-    }
+    @Override public HandlerList getHandlers()  { return HANDLERS; }
+    public static HandlerList getHandlerList()  { return HANDLERS; }
 }

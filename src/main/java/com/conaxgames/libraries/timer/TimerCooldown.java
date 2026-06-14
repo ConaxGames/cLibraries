@@ -3,87 +3,69 @@ package com.conaxgames.libraries.timer;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.event.impl.timer.TimerExpireEvent;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
-import lombok.Getter;
 
 import java.util.UUID;
 
-public class TimerCooldown {
+public final class TimerCooldown {
 
-    @Getter
     private final Timer timer;
     private final UUID owner;
-    private Scheduler.CancellableTask scheduledTask = null;
-    @Getter
-    private long expiryMillis;
 
+    private Scheduler.CancellableTask scheduledTask;
+    private long expiryMillis;
     private long pauseMillis;
 
-    protected TimerCooldown(Timer timer, UUID playerUUID, long duration) {
+    TimerCooldown(Timer timer, UUID owner, long duration) {
         this.timer = timer;
-        this.owner = playerUUID;
-        this.setRemaining(duration);
+        this.owner = owner;
+        setRemaining(duration);
     }
 
     public long getRemaining() {
-        return this.getRemaining(false);
+        return pauseMillis != 0L ? pauseMillis : expiryMillis - System.currentTimeMillis();
     }
 
-    protected void setRemaining(long milliseconds) throws IllegalStateException {
+    void setRemaining(long milliseconds) {
         if (milliseconds <= 0L) {
-            this.cancel();
+            cancel();
             return;
         }
-
-        long expiryMillis = System.currentTimeMillis() + milliseconds;
-        if (expiryMillis != this.expiryMillis) {
-            this.expiryMillis = expiryMillis;
-            this.cancel();
-
-            long ticks = milliseconds / 50L;
-            Scheduler scheduler = LibraryPlugin.getInstance().getScheduler();
-
-            this.scheduledTask = scheduler.runTaskLaterCancellable(LibraryPlugin.getInstance().getPlugin(), () -> {
-                if (TimerCooldown.this.timer instanceof PlayerTimer && owner != null) {
-                    ((PlayerTimer) timer).handleExpiry(
-                            LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(TimerCooldown.this.owner), TimerCooldown.this.owner);
-                }
-
-                LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager().callEvent(
-                        new TimerExpireEvent(TimerCooldown.this.owner, TimerCooldown.this.timer));
-
-                TimerCooldown.this.scheduledTask = null;
-            }, ticks);
-        }
+        expiryMillis = System.currentTimeMillis() + milliseconds;
+        cancel();
+        scheduledTask = LibraryPlugin.getInstance().getScheduler()
+                .runTaskLaterCancellable(
+                        LibraryPlugin.getInstance().getPlugin(), this::expire, milliseconds / 50L);
     }
 
-    protected long getRemaining(boolean ignorePaused) {
-        if (!ignorePaused && this.pauseMillis != 0L) {
-            return this.pauseMillis;
+    boolean isPaused() {
+        return pauseMillis != 0L;
+    }
+
+    void setPaused(boolean paused) {
+        if (paused == isPaused()) {
+            return;
+        }
+        if (paused) {
+            pauseMillis = expiryMillis - System.currentTimeMillis();
+            cancel();
         } else {
-            return this.expiryMillis - System.currentTimeMillis();
+            setRemaining(pauseMillis);
+            pauseMillis = 0L;
         }
     }
 
-    protected boolean isPaused() {
-        return this.pauseMillis != 0L;
-    }
-
-    public void setPaused(boolean paused) {
-        if (paused != this.isPaused()) {
-            if (paused) {
-                this.pauseMillis = this.getRemaining(true);
-                this.cancel();
-            } else {
-                this.setRemaining(this.pauseMillis);
-                this.pauseMillis = 0L;
-            }
+    void cancel() {
+        if (scheduledTask != null) {
+            scheduledTask.cancel();
+            scheduledTask = null;
         }
     }
 
-    protected void cancel() throws IllegalStateException {
-        if (this.scheduledTask != null) {
-            this.scheduledTask.cancel();
-            this.scheduledTask = null;
-        }
+    private void expire() {
+        scheduledTask = null;
+        timer.handleExpiry(
+                LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(owner), owner);
+        LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager()
+                .callEvent(new TimerExpireEvent(owner, timer));
     }
 }

@@ -1,89 +1,47 @@
 package com.conaxgames.libraries.hooks;
 
-import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
-public class HookManager implements Listener {
+public final class HookManager {
 
-    public LibraryPlugin plugin;
-    public Set<Hook> hooks = new HashSet<>();
-    public Set<Hook> disabledHooks = new HashSet<>();
+    private final Map<HookType, Hook> hooks;
 
-    public HookManager(LibraryPlugin plugin) {
-        this.plugin = plugin;
-
-        for (Plugin p : plugin.getPlugin().getServer().getPluginManager().getPlugins()) {
-            HookType type = Arrays.stream(HookType.values()).filter(t -> t.name().equalsIgnoreCase(p.getName())).findFirst().orElse(null);
-            if (type == null) {
-                continue;
-            }
-            registerHook(new HookWrapper(type, p));
+    public HookManager(JavaPlugin plugin) {
+        EnumMap<HookType, Hook> discovered = new EnumMap<>(HookType.class);
+        for (Plugin p : plugin.getServer().getPluginManager().getPlugins()) {
+            HookType.fromPluginName(p.getName())
+                    .ifPresent(type -> discovered.put(type, new Hook(type, p)));
         }
+        this.hooks = Collections.unmodifiableMap(discovered);
     }
 
-    @EventHandler
-    public void onPluginEnable(LibraryPluginEnableEvent event) {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            Iterator<Hook> iterator = disabledHooks.iterator();
-            while (iterator.hasNext()) {
-                Hook disabled = iterator.next();
-                if (plugin.isEnabled() && plugin.getName().equals(disabled.getPluginFromAnnotation())) {
-                    hooks.add(disabled);
-                    iterator.remove();
-                    break;
-                }
-            }
-        }
+    public Optional<Hook> getHook(HookType type) {
+        return Optional.ofNullable(hooks.get(type));
     }
 
-    public void registerHook(Hook hook) {
-        try {
-            hooks.add(hook);
-        } catch (Exception e) {
-            plugin.getPlugin().getLogger().info("[cLibraries] Unable to load hook " + hook.getHookType().name() + " because of exception: ");
-            e.printStackTrace();
-        }
-    }
-
-    public List<Plugin> getDepends() {
-        List<Plugin> libraryPluginList = new ArrayList<>();
-        Plugin[] bukkitPluginList = Bukkit.getPluginManager().getPlugins();
-        for (Plugin plugin : bukkitPluginList) {
-            if (plugin.getDescription().getDepend().contains("cLibraries")) {
-                libraryPluginList.add(plugin);
-            }
-        }
-
-        return libraryPluginList;
-    }
-
-    public Hook getHookByPluginName(String pluginName) {
-        return getHooks().stream().filter(hook -> hook.getPluginFromAnnotation().equals(pluginName)).findFirst().orElse(null);
-    }
-
-    public Hook getHookByType(HookType type) {
-        return getHooks().stream().filter(hook -> hook.getHookType().equals(type)).findFirst().orElse(null);
+    public Optional<Hook> getHook(String pluginName) {
+        return HookType.fromPluginName(pluginName).flatMap(this::getHook);
     }
 
     public boolean isHooked(HookType type) {
-        return (getHookByType(type) != null);
+        return hooks.containsKey(type);
     }
 
-    public LibraryPlugin getPlugin() {
-        return this.plugin;
+    public Set<HookType> hookedTypes() {
+        return hooks.keySet();
     }
 
-    public Set<Hook> getHooks() {
-        return this.hooks;
+    public Collection<Hook> hooks() {
+        return hooks.values();
     }
 
-    public Set<Hook> getDisabledHooks() {
-        return this.disabledHooks;
+    public List<Plugin> dependents() {
+        return Arrays.stream(Bukkit.getPluginManager().getPlugins())
+                .filter(p -> p.getDescription().getDepend().contains("cLibraries"))
+                .toList();
     }
 }

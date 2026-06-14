@@ -23,15 +23,15 @@
 - [Scheduler](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/scheduler/Scheduler.java) — Bukkit/Folia scheduling abstraction
 - [BoardManager](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/board/BoardManager.java) — Scoreboard management
 - [Timer](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/timer/Timer.java) — Cooldown timers with events
-- [ItemBuilderUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ItemBuilderUtil.java) — Item builder utility
+- [ItemBuilder](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ItemBuilder.java) — Fluent cross-version item builder
 - [PlayerInventoryUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/inventory/PlayerInventoryUtil.java) — Inventory snapshot and restore
 - [CommentedConfiguration](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/config/CommentedConfiguration.java) — YAML with preserved comments
-- [CC](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/CC.java) — Chat colors and translations (including hex)
-- [Center](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/center/Center.java) — Pixel-based chat message centering
+- [CC](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/message/CC.java) — Chat colors and translations (including hex)
+- [Center](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/message/center/Center.java) — Pixel-based chat message centering
 - [ClassUtils](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ClassUtils.java) — Package scanning and discovery
 - [XPUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/XPUtil.java) — Experience helpers
 - [ColorMaterialUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ColorMaterialUtil.java) — Chat colors to wool, terracotta, and carpet
-- [ProgressionBar](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ProgressionBar.java) — Progress bars for chat or scoreboards
+- [ProgressionBar](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/message/ProgressionBar.java) — Progress bars for chat or scoreboards
 
 <h3>Install</h3>
 

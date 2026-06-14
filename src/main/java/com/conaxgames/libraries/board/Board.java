@@ -1,106 +1,75 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.util.CC;
-import lombok.Getter;
+import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.util.VersioningChecker;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class Board {
+@SuppressWarnings("deprecation")
+final class Board {
 
-	private static final String OBJECTIVE_NAME = "sb";
-	private static final String[] ENTRY_KEY_BASES;
+    static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
+    static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.18") ? 32 : 1024;
 
-	static {
-		String codes = "0123456789abcdefklmor";
-		ENTRY_KEY_BASES = new String[codes.length()];
-		for (int i = 0; i < codes.length(); i++) {
-			ENTRY_KEY_BASES[i] = "\u00a7" + codes.charAt(i) + "\u00a7f";
-		}
-	}
+    private static final String[] ENTRY_KEYS;
 
-	@Getter
-	private final List<BoardEntry> entries = Collections.synchronizedList(new ArrayList<>());
-	private final Map<String, BoardTimer> timers = new ConcurrentHashMap<>();
-	@Getter
-	private final Map<String, String> usedKeys = new ConcurrentHashMap<>();
-	@Getter
-	private final Scoreboard scoreboard;
-	@Getter
-	private final Objective objective;
-	private volatile String lastAppliedTitle;
+    static {
+        var codes = "0123456789abcdefklmor";
+        ENTRY_KEYS = new String[codes.length()];
+        for (int i = 0; i < codes.length(); i++) {
+            ENTRY_KEYS[i] = "\u00a7" + codes.charAt(i) + "\u00a7f";
+        }
+    }
 
-	public Board(Player player, BoardAdapter adapter) {
-		BoardHandler.init();
-		this.scoreboard = resolveScoreboard(player);
-		String title = adapter.getTitle(player);
-		this.lastAppliedTitle = title;
-		this.objective = BoardHandler.createSidebarObjective(this.scoreboard, OBJECTIVE_NAME, title);
-	}
+    private final List<BoardEntry> entries = new ArrayList<>();
+    private final Scoreboard scoreboard;
+    private final Objective objective;
+    private String lastTitle;
 
-	private static Scoreboard resolveScoreboard(Player player) {
-		var sm = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
-		return player.getScoreboard().equals(sm.getMainScoreboard())
-				? sm.getNewScoreboard()
-				: player.getScoreboard();
-	}
+    Board(Player player, BoardManager manager) {
+        var scoreboardManager = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
+        this.scoreboard = player.getScoreboard().equals(scoreboardManager.getMainScoreboard())
+                ? scoreboardManager.getNewScoreboard()
+                : player.getScoreboard();
 
-	public String getNewKey(BoardEntry entry) {
-		String text = entry.getText();
-		int unit = BoardHandler.lineSplitUnit();
-		String suffix = text.length() > unit ? CC.getLastColors(text.substring(0, unit)) : "";
-		for (String base : ENTRY_KEY_BASES) {
-			String key = base + suffix;
-			if (usedKeys.putIfAbsent(key, text) == null) {
-				return key;
-			}
-		}
-		throw new IllegalStateException("No free board entry keys");
-	}
+        var existing = scoreboard.getObjective("sb");
+        if (existing != null) {
+            existing.unregister();
+        }
+        this.objective = scoreboard.registerNewObjective("sb", "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        updateTitle(manager.title(player));
+    }
 
-	public BoardTimer getTimer(String id) {
-		BoardTimer t = timers.get(id);
-		if (t == null) {
-			return null;
-		}
-		if (t.isExpired()) {
-			timers.remove(id, t);
-			return null;
-		}
-		return t;
-	}
+    static String entryKey(int index) {
+        return ENTRY_KEYS[index];
+    }
 
-	public void addTimer(BoardTimer timer) {
-		timers.put(timer.getId(), timer);
-	}
+    Scoreboard scoreboard() {
+        return scoreboard;
+    }
 
-	public void removeTimer(String id) {
-		timers.remove(id);
-	}
+    void updateTitle(String raw) {
+        var translated = CC.translate(raw != null ? raw : "");
+        var clipped = translated.length() <= TITLE_MAX ? translated : translated.substring(0, TITLE_MAX);
+        if (clipped.equals(lastTitle)) {
+            return;
+        }
+        lastTitle = clipped;
+        objective.setDisplayName(clipped);
+    }
 
-	public void clearAllEntries() {
-		synchronized (entries) {
-			for (BoardEntry e : entries) {
-				e.remove();
-			}
-			entries.clear();
-		}
-		usedKeys.clear();
-	}
+    Objective objective() {
+        return objective;
+    }
 
-	String getLastAppliedTitle() {
-		return lastAppliedTitle;
-	}
-
-	void setLastAppliedTitle(String title) {
-		this.lastAppliedTitle = title;
-	}
-
+    List<BoardEntry> entries() {
+        return entries;
+    }
 }

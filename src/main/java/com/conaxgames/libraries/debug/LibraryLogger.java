@@ -1,6 +1,6 @@
 package com.conaxgames.libraries.debug;
 
-import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.message.CC;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,9 +29,9 @@ public class LibraryLogger {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
 
         if (message.size() == 1) {
-            console.sendMessage(CC.translate(this.primary + "[" + pluginPrefix + "] " + CC.GRAY + action + ": " + CC.SECONDARY + message.get(0)));
+            console.sendMessage(CC.translate(this.primary + "[" + pluginPrefix + "] &7" + action + ": &6" + message.get(0)));
         } else {
-            console.sendMessage(CC.translate(this.primary + "[" + pluginPrefix + "] " + CC.GRAY + action + ": "));
+            console.sendMessage(CC.translate(this.primary + "[" + pluginPrefix + "] &7" + action + ": "));
             message.forEach(line -> console.sendMessage(CC.translate(this.primary + padding + "| " + this.secondary + line)));
         }
 
@@ -43,7 +43,7 @@ public class LibraryLogger {
             if (thr.getMessage() != null) {
                 thr.printStackTrace();
                 for (String stackLine : thr.getMessage().split("\n")) {
-                    console.sendMessage(CC.translate(this.primary + padding + "| " + CC.GRAY + stackLine));
+                    console.sendMessage(CC.translate(this.primary + padding + "| &7" + stackLine));
                 }
             } else {
                 thr.printStackTrace();

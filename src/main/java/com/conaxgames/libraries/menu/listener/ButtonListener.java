@@ -1,11 +1,8 @@
 package com.conaxgames.libraries.menu.listener;
 
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.event.impl.menu.MenuBackEvent;
-import com.conaxgames.libraries.event.impl.menu.MenuCloseEvent;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
-import com.conaxgames.libraries.menu.MenuInventoryHolder;
 import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,117 +11,86 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
-import java.util.UUID;
+public final class ButtonListener implements Listener {
 
-public class ButtonListener implements Listener {
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
-    public void onButtonPress(InventoryClickEvent event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof MenuInventoryHolder holder)) {
+        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
-        if (!holder.getViewerId().equals(player.getUniqueId())) {
+        // Shift-clicks and double-click collects have ambiguous destinations
+        // and can move items across non-editable slots, so they stay blocked.
+        boolean ambiguous = event.getClick().isShiftClick() || event.getClick() == ClickType.DOUBLE_CLICK;
+        if (event.getRawSlot() != event.getSlot()) {
+            event.setCancelled(!holder.hasEditable() || ambiguous);
             return;
         }
-        Menu menu = holder.getMenu();
-
-        if (!menu.isNoncancellingInventory()) {
-            if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() instanceof Player) {
-                event.setCancelled(true);
-            }
-        }
-
-        if (event.getSlot() != event.getRawSlot()) {
-            handleBottomInventoryClick(event, player, menu);
+        if (holder.editable(event.getSlot())) {
+            event.setCancelled(ambiguous);
             return;
         }
-
-        Button button = holder.getButton(event.getSlot());
-        if (button != null) {
-            boolean cancel = button.shouldCancel(player, event.getSlot(), event.getClick());
-            if (!(cancel || (event.getClick() != ClickType.SHIFT_LEFT && event.getClick() != ClickType.SHIFT_RIGHT))) {
-                event.setCancelled(true);
-                if (event.getCurrentItem() != null) {
-                    player.getInventory().addItem(event.getCurrentItem());
-                }
-            } else {
-                event.setCancelled(cancel);
-            }
-            button.clicked(player, event.getSlot(), event.getClick());
-
-            UUID id = player.getUniqueId();
-            if (Menu.currentlyOpenedMenus.get(id) == menu && menu.isUpdateAfterClick()) {
-                menu.buttonUpdate(player);
-                event.setCancelled(cancel);
-            }
-            if (event.isCancelled()) {
-                LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                        LibraryPlugin.getInstance().getPlugin(),
-                        player::updateInventory,
-                        1L
-                );
-            }
-        } else if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
-            handleShiftIntoTopWhenEmptySlot(event, player, menu);
+        event.setCancelled(true);
+        Button button = holder.button(event.getSlot());
+        if (button == null) {
+            return;
         }
+        button.click(player, event.getClick());
+        if (Menu.opened(player) == holder.menu && holder.menu.updateAfterClick()) {
+            holder.menu.update(player);
+        }
+        LibraryPlugin.getInstance().getScheduler().runTaskLater(
+                LibraryPlugin.getInstance().getPlugin(),
+                player::updateInventory,
+                1L
+        );
     }
 
-    private void handleBottomInventoryClick(InventoryClickEvent event, Player player, Menu menu) {
-        if (event.getClick() == ClickType.DOUBLE_CLICK || event.getClick() == ClickType.NUMBER_KEY) {
-            event.setCancelled(true);
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
         }
-        if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
-            event.setCancelled(true);
-            handleShiftIntoTopWhenEmptySlot(event, player, menu);
+        Inventory top = XInventoryView.of(event.getView()).getTopInventory();
+        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
+            return;
         }
-    }
-
-    private void handleShiftIntoTopWhenEmptySlot(InventoryClickEvent event, Player player, Menu menu) {
-        if (menu.isNoncancellingInventory() && event.getCurrentItem() != null) {
-            XInventoryView.of(player.getOpenInventory()).getTopInventory().addItem(event.getCurrentItem());
-            event.setCurrentItem(null);
-        } else if (event.getCurrentItem() != null) {
-            event.setCancelled(true);
+        for (int rawSlot : event.getRawSlots()) {
+            if (rawSlot < top.getSize() && !holder.editable(rawSlot)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void onClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player player)) {
             return;
         }
-        UUID id = player.getUniqueId();
-        Inventory inv = event.getInventory();
-        if (!(inv.getHolder() instanceof MenuInventoryHolder holder)) {
+        if (!(event.getInventory().getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
-        if (!holder.getViewerId().equals(id)) {
-            return;
+        Menu menu = holder.menu;
+        menu.closed(player);
+        Menu.endSession(player.getUniqueId());
+        Menu previous = menu.previous();
+        if (previous != null) {
+            LibraryPlugin.getInstance().getScheduler().runTaskLater(
+                    LibraryPlugin.getInstance().getPlugin(),
+                    () -> {
+                        if (Menu.opened(player) == null) {
+                            previous.open(player);
+                        }
+                    },
+                    2L
+            );
         }
-        Menu openMenu = holder.getMenu();
-
-        LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
-            Menu newMenu = Menu.currentlyOpenedMenus.get(id);
-
-            if (openMenu.getPrevious() != null) {
-                MenuBackEvent backEvent = new MenuBackEvent(player, openMenu, openMenu.getPrevious());
-                backEvent.call();
-                if (!backEvent.isCancelled() && newMenu == null) {
-                    openMenu.getPrevious().openMenu(player);
-                }
-            } else if (newMenu == null) {
-                new MenuCloseEvent(player, openMenu).call();
-            }
-        }, 2L);
-
-        openMenu.onClose(player);
-        Menu.cancelCheck(player);
-        Menu.currentlyOpenedMenus.remove(id);
     }
 }

@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.util.CC;
+import com.conaxgames.libraries.message.CC;
 import org.bukkit.command.CommandSender;
 
 @CommandAlias("library|lib|clibrary|clib")
@@ -14,8 +14,8 @@ public class LibraryCommands extends BaseCommand {
     @Default
     @Description("Prints basic information about the library command.")
     public void onLibrary(CommandSender sender) {
-        sender.sendMessage(CC.PRIMARY + "cLibraries is currently on version " + CC.SECONDARY +
-                LibraryPlugin.getInstance().getPlugin().getDescription().getVersion() + CC.PRIMARY + ".");
+        sender.sendMessage(CC.translate("&ecLibraries is currently on version &6" +
+                LibraryPlugin.getInstance().getPlugin().getDescription().getVersion() + "&e."));
     }
 
     @HelpCommand

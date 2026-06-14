@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.util;
 
 import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.ChatColor;
 
 import java.util.List;
 
@@ -9,22 +10,22 @@ public final class ColorMaterialUtil {
     private static final int DEFAULT_WOOL_DATA = 0;
 
     private static final List<String> COLOR_CCS = List.of(
-            CC.WHITE,
-            CC.GOLD,
-            CC.LIGHT_PURPLE,
-            CC.AQUA,
-            CC.YELLOW,
-            CC.GREEN,
-            CC.LIGHT_PURPLE,
-            CC.DARK_GRAY,
-            CC.GRAY,
-            CC.DARK_AQUA,
-            CC.DARK_PURPLE,
-            CC.BLUE,
-            CC.GOLD,
-            CC.DARK_GREEN,
-            CC.RED,
-            CC.BLACK
+            ChatColor.WHITE.toString(),
+            ChatColor.GOLD.toString(),
+            ChatColor.LIGHT_PURPLE.toString(),
+            ChatColor.AQUA.toString(),
+            ChatColor.YELLOW.toString(),
+            ChatColor.GREEN.toString(),
+            ChatColor.LIGHT_PURPLE.toString(),
+            ChatColor.DARK_GRAY.toString(),
+            ChatColor.GRAY.toString(),
+            ChatColor.DARK_AQUA.toString(),
+            ChatColor.DARK_PURPLE.toString(),
+            ChatColor.BLUE.toString(),
+            ChatColor.GOLD.toString(),
+            ChatColor.DARK_GREEN.toString(),
+            ChatColor.RED.toString(),
+            ChatColor.BLACK.toString()
     );
 
     public static int convertCCToWoolData(String color) {
@@ -34,20 +35,20 @@ public final class ColorMaterialUtil {
 
     public static String convertMaterialDataToCC(int data) {
         return switch (data) {
-            case 1, 12 -> CC.GOLD;
-            case 2, 6 -> CC.LIGHT_PURPLE;
-            case 3 -> CC.AQUA;
-            case 4 -> CC.YELLOW;
-            case 5 -> CC.GREEN;
-            case 7 -> CC.DARK_GRAY;
-            case 8 -> CC.GRAY;
-            case 9 -> CC.DARK_AQUA;
-            case 10 -> CC.DARK_PURPLE;
-            case 11 -> CC.BLUE;
-            case 13 -> CC.DARK_GREEN;
-            case 14 -> CC.RED;
-            case 15 -> CC.BLACK;
-            default -> CC.WHITE;
+            case 1, 12 -> ChatColor.GOLD.toString();
+            case 2, 6 -> ChatColor.LIGHT_PURPLE.toString();
+            case 3 -> ChatColor.AQUA.toString();
+            case 4 -> ChatColor.YELLOW.toString();
+            case 5 -> ChatColor.GREEN.toString();
+            case 7 -> ChatColor.DARK_GRAY.toString();
+            case 8 -> ChatColor.GRAY.toString();
+            case 9 -> ChatColor.DARK_AQUA.toString();
+            case 10 -> ChatColor.DARK_PURPLE.toString();
+            case 11 -> ChatColor.BLUE.toString();
+            case 13 -> ChatColor.DARK_GREEN.toString();
+            case 14 -> ChatColor.RED.toString();
+            case 15 -> ChatColor.BLACK.toString();
+            default -> ChatColor.WHITE.toString();
         };
     }
 
@@ -70,7 +71,7 @@ public final class ColorMaterialUtil {
 
     private static String normalize(String color) {
         if (color == null) {
-            return CC.WHITE;
+            return ChatColor.WHITE.toString();
         }
         for (int i = 0; i < color.length() - 1; i++) {
             if (color.charAt(i) != '§' && color.charAt(i) != '&') {
@@ -82,11 +83,11 @@ public final class ColorMaterialUtil {
                 break;
             }
         }
-        if (CC.DARK_RED.equals(color)) {
-            return CC.RED;
+        if (ChatColor.DARK_RED.toString().equals(color)) {
+            return ChatColor.RED.toString();
         }
-        if (CC.DARK_BLUE.equals(color)) {
-            return CC.BLUE;
+        if (ChatColor.DARK_BLUE.toString().equals(color)) {
+            return ChatColor.BLUE.toString();
         }
         return color;
     }

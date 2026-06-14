@@ -4,7 +4,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.commands.impl.LibraryCommands;
-import com.conaxgames.libraries.module.type.Module;
+import com.conaxgames.libraries.module.Module;
 import com.conaxgames.libraries.util.resolvers.EnchantmentProcessor;
 import com.conaxgames.libraries.util.resolvers.ItemTypeProcessor;
 import com.conaxgames.libraries.util.resolvers.PotionProcessor;

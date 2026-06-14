@@ -1,20 +1,20 @@
-package com.conaxgames.libraries.module.type;
+package com.conaxgames.libraries.module;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
 import com.conaxgames.libraries.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
-@Setter
 public abstract class Module {
 
     private final LibraryPlugin library = LibraryPlugin.getInstance();
@@ -33,7 +33,7 @@ public abstract class Module {
     public abstract String getName();
 
     public String getIdentifier() {
-        return getName().toLowerCase();
+        return getName().toLowerCase(Locale.ROOT);
     }
 
     public boolean isConfiguredToEnable() {
@@ -59,7 +59,7 @@ public abstract class Module {
         if (required == null || Bukkit.getPluginManager().isPluginEnabled(required)) {
             return true;
         }
-        library.getLibraryLogger().toConsole("ModuleManager",
+        library.getLibraryLogger().toConsole("Module",
                 "Required plugin " + required + " is missing. Module " + getIdentifier() + " cannot be registered.");
         return false;
     }
@@ -98,7 +98,6 @@ public abstract class Module {
 
     public void set(String path, Object value) {
         settings.set(path, value);
-        library.getLibraryLogger().toConsole("Module", "Saved " + path + " as " + value + " in " + getIdentifier());
     }
 
     public Config getResource() {
@@ -109,26 +108,16 @@ public abstract class Module {
         String dest = destination.replace(".yml", "");
         Config config = new Config("/modules/" + getIdentifier() + "/" + dest, javaPlugin);
 
-        if (config.getConfigFile() == null) {
-            library.getLibraryLogger().toConsole("Module", "Configuration was null when attempting to getResource. (" + getIdentifier() + ", " + javaPlugin.getName() + ")");
-            return config;
-        }
-
-        InputStream fileStream = javaPlugin.getResource("modules/" + getIdentifier() + "/" + dest + ".yml");
-        if (fileStream == null) {
-            library.getLibraryLogger().toConsole("Module", "Input stream was null when attempting to getResource. (Id: " + getIdentifier() + ", JavaPlugin: " + javaPlugin.getName() + ")");
-            return config;
-        }
-
-        if (forceSync || (config.isWasCreated() && syncOnCreation)) {
-            try {
-                String[] dontSync = (noSync() == null ? new String[0] : noSync().toArray(new String[0]));
-                CommentedConfiguration commentedConfiguration = CommentedConfiguration.loadConfiguration(config.getConfigFile());
-                commentedConfiguration.syncWithConfig(config.getConfigFile(), fileStream, dontSync);
-                library.getLibraryLogger().toConsole("Module", "Sync'd " + "/modules/" + getIdentifier() + "/" + dest + ".yml" + " with config.");
-            } catch (Exception exception) {
-                library.getLibraryLogger().toConsole("Module", "Unable to sync " + "/modules/" + getIdentifier() + "/" + dest + ".yml" + " with config.", exception);
+        try (InputStream fileStream = javaPlugin.getResource("modules/" + getIdentifier() + "/" + dest + ".yml")) {
+            if (fileStream != null && (forceSync || (config.isWasCreated() && syncOnCreation))) {
+                try {
+                    CommentedConfiguration commentedConfiguration = CommentedConfiguration.loadConfiguration(config.getConfigFile());
+                    commentedConfiguration.syncWithConfig(config.getConfigFile(), fileStream, noSync().toArray(new String[0]));
+                } catch (Exception exception) {
+                    library.getLibraryLogger().toConsole("Module", "Unable to sync /modules/" + getIdentifier() + "/" + dest + ".yml with config.", exception);
+                }
             }
+        } catch (IOException ignored) {
         }
 
         return config;

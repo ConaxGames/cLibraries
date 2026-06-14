@@ -1,61 +1,38 @@
 package com.conaxgames.libraries.event.impl.timer;
 
 import com.conaxgames.libraries.timer.Timer;
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public class TimerStartEvent extends Event implements Cancellable {
+public final class TimerStartEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    @Getter
-    private final Optional<Player> player;
-    @Getter
-    private final Optional<UUID> userUUID;
-    @Getter
+    private final @Nullable Player player;
+    private final @Nullable UUID userUUID;
     private final Timer timer;
-    @Getter
     private final long duration;
-
     private boolean cancelled;
 
-    public TimerStartEvent(Timer timer, final long duration) {
-        this.player = Optional.empty();
-        this.userUUID = Optional.empty();
+    public TimerStartEvent(@Nullable Player player, @Nullable UUID userUUID, Timer timer, long duration) {
+        this.player = player;
+        this.userUUID = userUUID;
         this.timer = timer;
         this.duration = duration;
     }
 
-    public TimerStartEvent(@NotNull Player player, UUID uniqueId, Timer timer, long duration) {
-        this.player = Optional.of(player);
-        this.userUUID = Optional.ofNullable(uniqueId);
-        this.timer = timer;
-        this.duration = duration;
-    }
+    public @Nullable Player getPlayer()  { return player; }
+    public @Nullable UUID getUserUUID()  { return userUUID; }
+    public Timer getTimer()              { return timer; }
+    public long getDuration()            { return duration; }
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
+    @Override public HandlerList getHandlers()     { return HANDLERS; }
+    public static HandlerList getHandlerList()     { return HANDLERS; }
+    @Override public boolean isCancelled()         { return cancelled; }
+    @Override public void setCancelled(boolean c)  { this.cancelled = c; }
 }

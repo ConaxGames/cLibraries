@@ -2,16 +2,14 @@ package com.conaxgames.libraries.module;
 
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.module.type.Module;
 import lombok.Getter;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 public class ModuleManager {
@@ -32,43 +30,40 @@ public class ModuleManager {
 
     public void registerModule(Module module) {
         if (!module.canRegister()) {
-            String message = module.getIdentifier() + " cannot be registered as one of its required plugins cannot be found.";
-            library.getLibraryLogger().toConsole("ModuleManager", message);
             return;
         }
 
-        String id = module.getIdentifier().toLowerCase();
-        if (!modules.containsKey(id)) {
-            modules.put(id, new ModuleState(module, false));
-            if (module.isConfiguredToEnable()) {
-                enableModule(module, false);
-            } else {
-                setupModule(module);
-            }
+        String id = module.getIdentifier();
+        if (modules.containsKey(id)) {
+            return;
         }
 
-        String message = "Registered " + module.getIdentifier() + "!";
-        library.getLibraryLogger().toConsole("ModuleManager", message);
+        modules.put(id, new ModuleState(module, false));
+        if (module.isConfiguredToEnable()) {
+            enableModule(module, false);
+        } else {
+            setupModule(module);
+        }
+
+        library.getLibraryLogger().toConsole("ModuleManager", "Registered " + module.getIdentifier() + "!");
     }
 
     public String enableModule(Module module, boolean save) {
-        Validate.notNull(module, "Module can not be null");
-        Validate.notNull(module.getIdentifier(), "Identifier can not be null");
-
-        String id = module.getIdentifier().toLowerCase();
+        String id = module.getIdentifier();
         if (!modules.containsKey(id)) {
             registerModule(module);
         }
 
         ModuleState state = modules.get(id);
+        if (state == null) {
+            return "Cannot enable " + module.getIdentifier() + " as it is not registered.";
+        }
         if (!state.enabled) {
             setupModule(module);
             if (setModuleEnabled(module)) {
                 state.enabled = true;
             } else {
-                String failMessage = "Failed to enable " + module.getIdentifier();
-                library.getLibraryLogger().toConsole("ModuleManager", failMessage);
-                return failMessage;
+                return "Failed to enable " + module.getIdentifier();
             }
         }
 
@@ -79,8 +74,7 @@ public class ModuleManager {
     }
 
     public String disableModule(Module module, boolean save) {
-        Validate.notNull(module, "Module cannot be null");
-        String id = module.getIdentifier().toLowerCase();
+        String id = module.getIdentifier();
         ModuleState state = modules.get(id);
         if (state == null) {
             String message = "Cannot disable " + module.getIdentifier() + " as it is not registered.";
@@ -93,9 +87,7 @@ public class ModuleManager {
             return message;
         }
         if (!setModuleDisabled(module)) {
-            String failMessage = "Failed to disable " + module.getIdentifier();
-            library.getLibraryLogger().toConsole("ModuleManager", failMessage);
-            return failMessage;
+            return "Failed to disable " + module.getIdentifier();
         }
         state.enabled = false;
         if (save) module.set("enabled", false);
@@ -105,17 +97,20 @@ public class ModuleManager {
     }
 
     public Map<String, Module> getModules() {
-        return modules.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().module));
+        Map<String, Module> result = HashMap.newHashMap(modules.size());
+        for (Map.Entry<String, ModuleState> entry : modules.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().module);
+        }
+        return result;
     }
 
     public Module getModuleByIdentifier(String identifier) {
-        ModuleState state = modules.get(identifier.toLowerCase());
+        ModuleState state = modules.get(identifier.toLowerCase(Locale.ROOT));
         return state != null ? state.module : null;
     }
 
     public boolean isModuleEnabled(Module module) {
-        ModuleState state = modules.get(module.getIdentifier().toLowerCase());
+        ModuleState state = modules.get(module.getIdentifier());
         return state != null && state.enabled;
     }
 
@@ -125,14 +120,13 @@ public class ModuleManager {
 
     private boolean setModuleEnabled(Module module) {
         try {
-            if (module instanceof Listener) {
-                Bukkit.getPluginManager().registerEvents((Listener) module, module.getJavaPlugin());
+            if (module instanceof Listener listener) {
+                Bukkit.getPluginManager().registerEvents(listener, module.getJavaPlugin());
             }
             module.onEnable();
             return true;
         } catch (Throwable t) {
-            library.getLibraryLogger().toConsole("ModuleManager", "Failed to enable module " + module.getName());
-            t.printStackTrace();
+            library.getLibraryLogger().toConsole("ModuleManager", "Failed to enable module " + module.getName(), t);
             return false;
         }
     }
@@ -140,13 +134,12 @@ public class ModuleManager {
     private boolean setModuleDisabled(Module module) {
         try {
             module.onDisable();
-            if (module instanceof Listener) {
-                HandlerList.unregisterAll((Listener) module);
+            if (module instanceof Listener listener) {
+                HandlerList.unregisterAll(listener);
             }
             return true;
         } catch (Throwable t) {
-            library.getLibraryLogger().toConsole("ModuleManager", "Failed to disable module " + module.getName());
-            t.printStackTrace();
+            library.getLibraryLogger().toConsole("ModuleManager", "Failed to disable module " + module.getName(), t);
             return false;
         }
     }

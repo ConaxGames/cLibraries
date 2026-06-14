@@ -6,14 +6,12 @@ import com.conaxgames.libraries.commands.CommandRegistry;
 import com.conaxgames.libraries.debug.LibraryLogger;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
-import com.conaxgames.libraries.listener.PlayerListener;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.conaxgames.libraries.util.scheduler.Schedulers;
 import com.google.common.base.Joiner;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -54,12 +52,11 @@ public class LibraryPlugin {
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.paperCommandManager = new PaperCommandManager(this.plugin);
         this.commandRegistry = new CommandRegistry(this, paperCommandManager);
-        this.hookManager = new HookManager(this);
+        this.hookManager = new HookManager(this.plugin);
         this.timerManager = new TimerManager();
         this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);
 
         initializeScheduler();
-        registerEventListeners();
 
         new LibraryPluginEnableEvent().call();
         this.setup = true;
@@ -73,21 +70,12 @@ public class LibraryPlugin {
 
     public void setBoardManager(BoardManager boardManager) {
         this.boardManager = boardManager;
-        long interval = this.boardManager.getAdapter().getInterval();
+        long interval = this.boardManager.getInterval();
         this.scheduler.runTaskTimer(this.plugin, this.boardManager, 0L, interval);
     }
 
     private void initializeScheduler() {
         this.scheduler = Schedulers.forServer(this.plugin.getServer());
-    }
-
-    private void registerEventListeners() {
-        Arrays.asList(
-                new PlayerListener(this),
-                this.hookManager
-        ).forEach(listener ->
-                Bukkit.getPluginManager().registerEvents(listener, this.plugin)
-        );
     }
 
     private void logMultipleInitializationWarning() {

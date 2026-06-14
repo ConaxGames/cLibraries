@@ -1,90 +1,87 @@
 package com.conaxgames.libraries.module.manage;
 
 import com.conaxgames.libraries.menu.Button;
+import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.menu.pagination.PaginatedMenu;
+import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.message.FormatUtil;
+import com.conaxgames.libraries.module.Module;
 import com.conaxgames.libraries.module.ModuleManager;
-import com.conaxgames.libraries.module.type.Module;
-import com.conaxgames.libraries.util.CC;
 import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ModuleMenu extends PaginatedMenu {
+public final class ModuleMenu {
 
-    private final ModuleManager moduleManager;
-
-    public ModuleMenu(ModuleManager moduleManager) {
-        this.moduleManager = moduleManager;
+    private ModuleMenu() {
     }
 
-    @Override
-    public String getPrePaginatedTitle(Player player) {
-        return "Modules";
+    public static Menu create(ModuleManager moduleManager) {
+        return PaginatedMenu.builder("Modules")
+                .rows(6)
+                .maxPerPage(45)
+                .previousSlot(48)
+                .nextSlot(50)
+                .set(49, statistics(moduleManager))
+                .entries(player -> moduleButtons(moduleManager))
+                .autoUpdate()
+                .build();
     }
 
-    @Override
-    public Map<Integer, Button> getAllPagesButtons(Player player) {
-        Map<Integer, Button> buttons = new HashMap<>();
-        int index = 0;
+    private static List<Button> moduleButtons(ModuleManager moduleManager) {
+        List<Button> buttons = new ArrayList<>();
         for (Module module : moduleManager.getModules().values()) {
-            buttons.put(index++, new ModuleButton(moduleManager, module));
+            buttons.add(moduleButton(moduleManager, module));
         }
         return buttons;
     }
 
-    @Override
-    public Map<Integer, Button> getGlobalButtons(Player player) {
-        Map<Integer, Button> buttons = new HashMap<>();
-        int total = moduleManager.getModules().size();
-        long enabled = moduleManager.getModules().values().stream()
-                .filter(moduleManager::isModuleEnabled)
-                .count();
-        int disabled = (int) (total - enabled);
+    private static Button moduleButton(ModuleManager moduleManager, Module module) {
+        boolean enabled = module.isEnabled();
 
-        Button infoButton = new Button() {
-            @Override
-            public String getName(Player player) {
-                return CC.GOLD + "Module Statistics";
-            }
+        List<String> lore = new ArrayList<>();
+        lore.add("&8" + module.getJavaPlugin().getName());
+        lore.add(" ");
+        lore.addAll(FormatUtil.wordWrap("&7" + module.getDescription()));
+        lore.add(" ");
+        lore.add("&7Author: &f" + module.getAuthor());
+        if (module.getRequiredPlugin() != null) {
+            lore.add("&7Requires: &f" + module.getRequiredPlugin());
+        }
+        lore.add(" ");
+        lore.add("&e" + (enabled ? "Click to disable." : "Click to enable."));
+        lore.addAll(FormatUtil.wordWrap("&7(Use a Shift-Click to not save this change over reboots)"));
 
-            @Override
-            public List<String> getDescription(Player player) {
-                List<String> lore = new ArrayList<>();
-                lore.add(CC.DARK_GRAY + "Module overview");
-                lore.add(" ");
-                lore.add(CC.GRAY + "Total Modules: " + CC.WHITE + total);
-                lore.add(CC.GRAY + "Enabled: " + CC.GREEN + enabled);
-                lore.add(CC.GRAY + "Disabled: " + CC.RED + disabled);
-                lore.add(" ");
-                return lore;
-            }
-
-            @Override
-            public Material getMaterial(Player player) {
-                return XMaterial.BOOK.get();
-            }
-        };
-        buttons.put(49, infoButton);
-        return buttons;
+        return Button.builder(enabled ? XMaterial.GREEN_WOOL : XMaterial.RED_WOOL)
+                .name((enabled ? "&a" : "&c") + module.getName())
+                .lore(lore)
+                .onClick((player, type) -> {
+                    boolean persistent = !type.isShiftClick();
+                    String result = enabled
+                            ? moduleManager.disableModule(module, persistent)
+                            : moduleManager.enableModule(module, persistent);
+                    player.sendMessage(CC.translate("&e" + result + "&7 (saved: " + persistent + ")"));
+                })
+                .build();
     }
 
-    @Override
-    public int previousPageSlot(Player player) {
-        return 48;
-    }
+    private static Button statistics(ModuleManager moduleManager) {
+        Map<String, Module> registered = moduleManager.getModules();
+        int total = registered.size();
+        long enabled = registered.values().stream().filter(moduleManager::isModuleEnabled).count();
 
-    @Override
-    public int nextPageSlot(Player player) {
-        return 50;
-    }
-
-    @Override
-    public int getMaxItemsPerPage(Player player) {
-        return 45;
+        return Button.builder(XMaterial.BOOK)
+                .name("&6Module Statistics")
+                .lore(
+                        "&8Module overview",
+                        " ",
+                        "&7Total Modules: &f" + total,
+                        "&7Enabled: &a" + enabled,
+                        "&7Disabled: &c" + (total - enabled),
+                        " "
+                )
+                .build();
     }
 }
