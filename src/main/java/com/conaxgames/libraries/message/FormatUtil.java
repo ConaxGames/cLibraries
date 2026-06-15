@@ -59,4 +59,9 @@ public final class FormatUtil {
         var m = FORMATTING.matcher(s);
         return m.matches() ? m.group("format") : null;
     }
+
+    public static String possessiveString(String str) {
+        if (str == null || str.isBlank()) return "";
+        return str + (str.endsWith("s") ? "'" : "'s");
+    }
 }
