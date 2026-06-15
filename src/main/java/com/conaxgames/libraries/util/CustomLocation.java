@@ -49,17 +49,17 @@ public final class CustomLocation {
 
         String[] parts = string.split(",\\s*");
         if (parts.length != 6) {
-            throw new IllegalArgumentException("Location string must be world, x, y, z, yaw, pitch");
+            throw new IllegalArgumentException("Location string must be x, y, z, yaw, pitch, world");
         }
 
         try {
             return new CustomLocation(
-                    parts[0],
+                    parts[5],
+                    Double.parseDouble(parts[0]),
                     Double.parseDouble(parts[1]),
                     Double.parseDouble(parts[2]),
-                    Double.parseDouble(parts[3]),
-                    Float.parseFloat(parts[4]),
-                    Float.parseFloat(parts[5])
+                    Float.parseFloat(parts[3]),
+                    Float.parseFloat(parts[4])
             );
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format in location string", e);
@@ -119,7 +119,7 @@ public final class CustomLocation {
 
     @Override
     public String toString() {
-        return String.format("%s, %.2f, %.2f, %.2f, %.2f, %.2f", world, x, y, z, yaw, pitch);
+        return String.format("%.2f, %.2f, %.2f, %.2f, %.2f, %s", x, y, z, yaw, pitch, world);
     }
 
     @Override
