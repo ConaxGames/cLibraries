@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 public final class FormatUtil {
 
     private static final char SECTION = '\u00a7';
-    private static final Pattern FORMATTING = Pattern.compile("^.*(?<format>(" + SECTION + "[0-9a-fklmor])+).*");
     private static final Pattern FORMAT_CODES = Pattern.compile("(" + SECTION + "|&)[0-9a-fklmor]");
     private static final TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
 
@@ -62,7 +61,7 @@ public final class FormatUtil {
             int visibleLen = stripFormatting(sub).length() + 1;
             if (visibleLen >= numChars && !sub.isEmpty()) {
                 var f = getFormatPrefix(sub);
-                if (f != null && sub.startsWith(f)) format = f;
+                if (!f.isEmpty()) format = f;
                 words.add(applyFormat(format, sub));
                 numChars = lineSize;
                 start = ix + 1;
@@ -73,13 +72,14 @@ public final class FormatUtil {
     }
 
     private static String applyFormat(String format, String text) {
-        return (format != null && !text.startsWith(String.valueOf(SECTION))) ? format + text : text;
+        if (format == null || format.isEmpty() || text.isEmpty()) return text;
+        if (text.charAt(0) == '&' || text.charAt(0) == SECTION) return text;
+        return format + text;
     }
 
     private static String getFormatPrefix(String s) {
-        if (s == null) return null;
-        var m = FORMATTING.matcher(s);
-        return m.matches() ? m.group("format") : null;
+        if (s == null || s.isBlank()) return "";
+        return ChatColor.getLastColors(ChatColor.translateAlternateColorCodes('&', s)).replace(SECTION, '&');
     }
 
     public static String possessiveString(String str) {
