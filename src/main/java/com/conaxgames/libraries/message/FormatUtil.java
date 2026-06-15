@@ -1,7 +1,11 @@
 package com.conaxgames.libraries.message;
 
+import org.bukkit.ChatColor;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public final class FormatUtil {
@@ -9,6 +13,24 @@ public final class FormatUtil {
     private static final char SECTION = '\u00a7';
     private static final Pattern FORMATTING = Pattern.compile("^.*(?<format>(" + SECTION + "[0-9a-fklmor])+).*");
     private static final Pattern FORMAT_CODES = Pattern.compile("(" + SECTION + "|&)[0-9a-fklmor]");
+    private static final TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
+
+    static {
+        ROMAN_NUMERALS.put(1000, "M");
+        ROMAN_NUMERALS.put(900, "CM");
+        ROMAN_NUMERALS.put(500, "D");
+        ROMAN_NUMERALS.put(400, "CD");
+        ROMAN_NUMERALS.put(100, "C");
+        ROMAN_NUMERALS.put(90, "XC");
+        ROMAN_NUMERALS.put(50, "L");
+        ROMAN_NUMERALS.put(40, "XL");
+        ROMAN_NUMERALS.put(10, "X");
+        ROMAN_NUMERALS.put(9, "IX");
+        ROMAN_NUMERALS.put(5, "V");
+        ROMAN_NUMERALS.put(4, "IV");
+        ROMAN_NUMERALS.put(1, "I");
+        ROMAN_NUMERALS.put(0, "");
+    }
 
     private FormatUtil() {}
 
@@ -63,5 +85,33 @@ public final class FormatUtil {
     public static String possessiveString(String str) {
         if (str == null || str.isBlank()) return "";
         return str + (str.endsWith("s") ? "'" : "'s");
+    }
+
+    public static String camelcase(String name) {
+        if (name == null || name.isEmpty()) return "";
+        var sb = new StringBuilder();
+        for (String part : name.split("[ _]")) {
+            if (part.isEmpty()) continue;
+            sb.append(Character.toUpperCase(part.charAt(0)));
+            sb.append(part.substring(1).toLowerCase());
+        }
+        return sb.toString();
+    }
+
+    public static String formatTps(double tps) {
+        double roundedTps = Math.min(tps, 20.0);
+        ChatColor color = tps > 18.0 ? ChatColor.GREEN : tps > 16.0 ? ChatColor.YELLOW : ChatColor.RED;
+        String asterisk = tps > 20.0 ? "*" : "";
+        return color + asterisk + String.format("%.2f", roundedTps);
+    }
+
+    public static String toRoman(int number) {
+        int l = ROMAN_NUMERALS.floorKey(number);
+        if (number == l) return ROMAN_NUMERALS.get(number);
+        return ROMAN_NUMERALS.get(l) + toRoman(number - l);
+    }
+
+    public static String getItemName(ItemStack item) {
+        return item.getType().toString().replace("_", "");
     }
 }
