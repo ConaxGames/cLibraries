@@ -68,10 +68,7 @@ public final class CustomLocation {
 
     public Location toBukkitLocation() {
         World bukkitWorld = Bukkit.getWorld(world);
-        if (bukkitWorld == null) {
-            throw new IllegalStateException("World '" + world + "' is not loaded");
-        }
-        return new Location(bukkitWorld, x, y, z, yaw, pitch);
+        return bukkitWorld == null ? null : new Location(bukkitWorld, x, y, z, yaw, pitch);
     }
 
     public double distanceTo(CustomLocation other) {
