@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public final class FormatUtil {
 
     private static final char SECTION = '\u00a7';
-    private static final Pattern FORMAT_CODES = Pattern.compile("(" + SECTION + "|&)[0-9a-fklmor]");
+    private static final Pattern FORMAT_CODES = Pattern.compile("(" + SECTION + "|&)[0-9a-fklmorpst]");
     private static final TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
 
     static {
@@ -79,7 +79,7 @@ public final class FormatUtil {
 
     private static String getFormatPrefix(String s) {
         if (s == null || s.isBlank()) return "";
-        return ChatColor.getLastColors(ChatColor.translateAlternateColorCodes('&', s)).replace(SECTION, '&');
+        return ChatColor.getLastColors(CC.translate(s)).replace(SECTION, '&');
     }
 
     public static String possessiveString(String str) {

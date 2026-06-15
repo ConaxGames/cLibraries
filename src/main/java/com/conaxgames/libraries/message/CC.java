@@ -15,18 +15,50 @@ public final class CC {
     private static final char SECTION = ChatColor.COLOR_CHAR;
     private static final Pattern HEX_PATTERN = Pattern.compile("(?i)[&" + SECTION + "]#([0-9a-f]{6})");
     private static final Pattern SECTION_HEX_STRIP = Pattern.compile("(?i)" + SECTION + "x(?:" + SECTION + "[0-9a-f]){6}");
-    private static final Pattern CODE_STRIP = Pattern.compile("(?i)[&" + SECTION + "][0-9a-fk-or]");
+    private static final Pattern CODE_STRIP = Pattern.compile("(?i)[&" + SECTION + "][0-9a-fk-orstp]");
 
     private static final int[] LEGACY_RGB = {
             0x000000, 0x0000AA, 0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xFFAA00, 0xAAAAAA,
             0x555555, 0x5555FF, 0x55FF55, 0x55FFFF, 0xFF5555, 0xFF55FF, 0xFFFF55, 0xFFFFFF
     };
 
+    private static String primary = "";
+    private static String secondary = "";
+    private static String tertiary = "";
+
     private static Boolean hexSupported;
+
+    public static void setPrimary(String color) {
+        primary = color == null ? "" : color;
+    }
+
+    public static void setSecondary(String color) {
+        secondary = color == null ? "" : color;
+    }
+
+    public static void setTertiary(String color) {
+        tertiary = color == null ? "" : color;
+    }
+
+    public static String getPrimary() {
+        return primary;
+    }
+
+    public static String getSecondary() {
+        return secondary;
+    }
+
+    public static String getTertiary() {
+        return tertiary;
+    }
 
     public static String translate(String input) {
         if (input == null) return null;
-        return ChatColor.translateAlternateColorCodes('&', translateHex(input));
+        String out = input;
+        if (!primary.isBlank()) out = out.replace("&p", primary);
+        if (!secondary.isBlank()) out = out.replace("&s", secondary);
+        if (!tertiary.isBlank()) out = out.replace("&t", tertiary);
+        return ChatColor.translateAlternateColorCodes('&', translateHex(out));
     }
 
     public static List<String> translate(List<String> input) {
@@ -39,14 +71,19 @@ public final class CC {
 
     public static String stripAllColor(String input) {
         if (input == null) return null;
-        String stripped = SECTION_HEX_STRIP.matcher(input).replaceAll("");
+        String out = input;
+        if (!primary.isBlank()) out = out.replace("&p", primary);
+        if (!secondary.isBlank()) out = out.replace("&s", secondary);
+        if (!tertiary.isBlank()) out = out.replace("&t", tertiary);
+        String stripped = SECTION_HEX_STRIP.matcher(out).replaceAll("");
         stripped = HEX_PATTERN.matcher(stripped).replaceAll("");
         stripped = CODE_STRIP.matcher(stripped).replaceAll("");
         return ChatColor.stripColor(stripped);
     }
 
     public static String getLastColors(String input) {
-        return ChatColor.getLastColors(input);
+        if (input == null) return "";
+        return ChatColor.getLastColors(translate(input));
     }
 
     private static String translateHex(String input) {
