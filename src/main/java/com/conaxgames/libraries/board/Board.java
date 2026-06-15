@@ -32,7 +32,7 @@ final class Board {
     private final Objective objective;
     private String lastTitle;
 
-    Board(Player player, BoardManager manager) {
+    Board(Player player) {
         var scoreboardManager = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
         this.scoreboard = player.getScoreboard().equals(scoreboardManager.getMainScoreboard())
                 ? scoreboardManager.getNewScoreboard()
@@ -44,7 +44,6 @@ final class Board {
         }
         this.objective = scoreboard.registerNewObjective("sb", "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        updateTitle(manager.title(player));
     }
 
     static String entryKey(int index) {

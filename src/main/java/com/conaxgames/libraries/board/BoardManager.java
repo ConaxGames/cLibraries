@@ -36,10 +36,6 @@ public final class BoardManager implements Runnable {
         return interval;
     }
 
-    String title(Player player) {
-        return title.apply(player);
-    }
-
     @Override
     public void run() {
         var server = LibraryPlugin.getInstance().getPlugin().getServer();
@@ -93,7 +89,7 @@ public final class BoardManager implements Runnable {
         if (player.hasMetadata(skipMetadata) || boards.containsKey(player.getUniqueId())) {
             return;
         }
-        boards.put(player.getUniqueId(), new Board(player, this));
+        boards.put(player.getUniqueId(), new Board(player));
     }
 
     public void removeBoard(Player player) {
