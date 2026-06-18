@@ -4,6 +4,7 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.cryptomorin.xseries.inventory.XInventoryView;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public final class ButtonListener implements Listener {
 
@@ -25,15 +27,68 @@ public final class ButtonListener implements Listener {
         if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
-        // Shift-clicks and double-click collects have ambiguous destinations
-        // and can move items across non-editable slots, so they stay blocked.
-        boolean ambiguous = event.getClick().isShiftClick() || event.getClick() == ClickType.DOUBLE_CLICK;
+        if (event.getClick() == ClickType.DOUBLE_CLICK) {
+            event.setCancelled(true);
+            return;
+        }
+        boolean shift = event.getClick().isShiftClick();
         if (event.getRawSlot() != event.getSlot()) {
-            event.setCancelled(!holder.hasEditable() || ambiguous);
+            if (shift && holder.hasEditable()) {
+                ItemStack moving = event.getCurrentItem();
+                if (moving != null && moving.getType() != Material.AIR && moving.getAmount() > 0) {
+                    event.setCancelled(true);
+                    int remaining = moving.getAmount();
+                    int max = moving.getMaxStackSize();
+
+                    for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
+                        if (!holder.editable(slot)) {
+                            continue;
+                        }
+                        ItemStack existing = top.getItem(slot);
+                        if (existing == null || existing.getType() == Material.AIR || existing.getAmount() <= 0
+                                || !existing.isSimilar(moving)) {
+                            continue;
+                        }
+                        int space = max - existing.getAmount();
+                        if (space <= 0) {
+                            continue;
+                        }
+                        int added = Math.min(space, remaining);
+                        existing.setAmount(existing.getAmount() + added);
+                        top.setItem(slot, existing);
+                        remaining -= added;
+                    }
+
+                    for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
+                        ItemStack existing = top.getItem(slot);
+                        if (!holder.editable(slot) || (existing != null && existing.getType() != Material.AIR && existing.getAmount() > 0)) {
+                            continue;
+                        }
+                        int added = Math.min(max, remaining);
+                        ItemStack copy = moving.clone();
+                        copy.setAmount(added);
+                        top.setItem(slot, copy);
+                        remaining -= added;
+                    }
+
+                    if (remaining <= 0) {
+                        event.setCurrentItem(null);
+                    } else {
+                        moving.setAmount(remaining);
+                        event.setCurrentItem(moving);
+                    }
+                    LibraryPlugin.getInstance().getScheduler().runTaskLater(
+                            LibraryPlugin.getInstance().getPlugin(),
+                            player::updateInventory,
+                            1L
+                    );
+                }
+                return;
+            }
+            event.setCancelled(!holder.hasEditable());
             return;
         }
         if (holder.editable(event.getSlot())) {
-            event.setCancelled(ambiguous);
             return;
         }
         event.setCancelled(true);
