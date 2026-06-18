@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Locale;
+
 public final class CustomLocation {
 
     private final String world;
@@ -48,19 +50,29 @@ public final class CustomLocation {
         }
 
         String[] parts = string.split(",\\s*");
-        if (parts.length != 6) {
-            throw new IllegalArgumentException("Location string must be x, y, z, yaw, pitch, world");
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Location string must contain at least x, y, z coordinates");
         }
 
         try {
-            return new CustomLocation(
-                    parts[5],
-                    Double.parseDouble(parts[0]),
-                    Double.parseDouble(parts[1]),
-                    Double.parseDouble(parts[2]),
-                    Float.parseFloat(parts[3]),
-                    Float.parseFloat(parts[4])
-            );
+            double x = Double.parseDouble(parts[0]);
+            double y = Double.parseDouble(parts[1]);
+            double z = Double.parseDouble(parts[2]);
+            float yaw = 0.0f;
+            float pitch = 0.0f;
+            String world = "world";
+
+            if (parts.length == 4) {
+                world = parts[3];
+            } else if (parts.length >= 5) {
+                yaw = Float.parseFloat(parts[3]);
+                pitch = Float.parseFloat(parts[4]);
+                if (parts.length >= 6) {
+                    world = parts[5];
+                }
+            }
+
+            return new CustomLocation(world, x, y, z, yaw, pitch);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format in location string", e);
         }
@@ -116,7 +128,7 @@ public final class CustomLocation {
 
     @Override
     public String toString() {
-        return String.format("%.2f, %.2f, %.2f, %.2f, %.2f, %s", x, y, z, yaw, pitch, world);
+        return String.format(Locale.ROOT, "%.2f, %.2f, %.2f, %.2f, %.2f, %s", x, y, z, yaw, pitch, world);
     }
 
     @Override
