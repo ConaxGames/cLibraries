@@ -17,7 +17,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public final class Menu {
 
@@ -43,8 +42,7 @@ public final class Menu {
     private final boolean refreshInPlace;
     private final Consumer<Player> onOpen;
     private final Consumer<Player> onClose;
-    private final Menu previous;
-    private final Predicate<Player> previousCondition;
+    private final Function<Player, Menu> previous;
 
     private Menu(Builder builder) {
         this.title = builder.title;
@@ -58,7 +56,6 @@ public final class Menu {
         this.onOpen = builder.onOpen;
         this.onClose = builder.onClose;
         this.previous = builder.previous;
-        this.previousCondition = builder.previousCondition;
     }
 
     public static Builder builder(String title) {
@@ -119,10 +116,7 @@ public final class Menu {
     }
 
     public Menu previous(Player player) {
-        if (previous != null && previousCondition != null && !previousCondition.test(player)) {
-            return null;
-        }
-        return previous;
+        return previous != null ? previous.apply(player) : null;
     }
 
     public Inventory inventory(Player player) {
@@ -301,8 +295,7 @@ public final class Menu {
         private boolean refreshInPlace = true;
         private Consumer<Player> onOpen;
         private Consumer<Player> onClose;
-        private Menu previous;
-        private Predicate<Player> previousCondition;
+        private Function<Player, Menu> previous;
 
         private Builder(Function<Player, String> title) {
             this.title = title;
@@ -373,12 +366,12 @@ public final class Menu {
         }
 
         public Builder previous(Menu previous) {
-            return previous(previous, null);
+            this.previous = player -> previous;
+            return this;
         }
 
-        public Builder previous(Menu previous, Predicate<Player> condition) {
+        public Builder previous(Function<Player, Menu> previous) {
             this.previous = previous;
-            this.previousCondition = condition;
             return this;
         }
 

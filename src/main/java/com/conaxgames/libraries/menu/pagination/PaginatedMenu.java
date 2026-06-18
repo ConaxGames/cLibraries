@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public final class PaginatedMenu {
 
@@ -36,8 +35,7 @@ public final class PaginatedMenu {
         private ItemStack nextIcon;
         private Button filler;
         private long updateTicks = 0L;
-        private Menu previousMenu;
-        private Predicate<Player> previousCondition;
+        private Function<Player, Menu> previousMenu;
 
         private Builder(String title) {
             this.title = title;
@@ -101,12 +99,12 @@ public final class PaginatedMenu {
         }
 
         public Builder previous(Menu previousMenu) {
-            return previous(previousMenu, null);
+            this.previousMenu = player -> previousMenu;
+            return this;
         }
 
-        public Builder previous(Menu previousMenu, Predicate<Player> condition) {
+        public Builder previous(Function<Player, Menu> previousMenu) {
             this.previousMenu = previousMenu;
-            this.previousCondition = condition;
             return this;
         }
 
@@ -140,7 +138,7 @@ public final class PaginatedMenu {
                     .rows(rows)
                     .refreshInPlace(false);
             if (previousMenu != null) {
-                builder.previous(previousMenu, previousCondition);
+                builder.previous(previousMenu);
             }
             if (updateTicks > 0L) {
                 builder.autoUpdate(updateTicks);
