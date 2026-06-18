@@ -80,7 +80,7 @@ public final class ButtonListener implements Listener {
         Menu menu = holder.menu;
         menu.closed(player);
         Menu.endSession(player.getUniqueId());
-        Menu previous = menu.previous();
+        Menu previous = menu.previous(player);
         if (previous != null) {
             LibraryPlugin.getInstance().getScheduler().runTaskLater(
                     LibraryPlugin.getInstance().getPlugin(),
