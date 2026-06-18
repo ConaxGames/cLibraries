@@ -12,6 +12,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 
@@ -24,7 +25,8 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              BukkitObjectOutputStream data = new BukkitObjectOutputStream(bytes)) {
-            writeItems(data, inv.getContents());
+            ItemStack[] storage = XReflection.supports(9) ? inv.getStorageContents() : inv.getContents();
+            writeItems(data, storage);
             writeItems(data, inv.getArmorContents());
             writeItems(data, XReflection.supports(9) ? inv.getExtraContents() : new ItemStack[0]);
             data.writeInt(player.getLevel());
@@ -50,7 +52,15 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         try (ByteArrayInputStream bytes = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
              BukkitObjectInputStream data = new BukkitObjectInputStream(bytes)) {
-            inv.setContents(readItems(data));
+            ItemStack[] storage = readItems(data);
+            if (storage.length > 36) {
+                storage = Arrays.copyOf(storage, 36);
+            }
+            if (XReflection.supports(9)) {
+                inv.setStorageContents(storage);
+            } else {
+                inv.setContents(storage);
+            }
             inv.setArmorContents(readItems(data));
             ItemStack[] extra = readItems(data);
             if (XReflection.supports(9)) {
