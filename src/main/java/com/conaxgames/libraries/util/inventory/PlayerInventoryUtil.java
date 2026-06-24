@@ -72,6 +72,8 @@ public final class PlayerInventoryUtil {
     public static void restore(Player player, String base64) {
         DecodedSnapshot snapshot = decode(base64);
         if (snapshot == null) {
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("PlayerInventoryUtil",
+                    "Failed to restore inventory for " + player.getName() + ": invalid or corrupt snapshot");
             return;
         }
         clear(player);
