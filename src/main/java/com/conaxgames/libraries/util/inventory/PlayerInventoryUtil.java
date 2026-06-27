@@ -28,10 +28,10 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              BukkitObjectOutputStream data = new BukkitObjectOutputStream(bytes)) {
-            ItemStack[] storage = XReflection.supports(9) ? inv.getStorageContents() : inv.getContents();
+            ItemStack[] storage = XReflection.supports(1, 9) ? inv.getStorageContents() : inv.getContents();
             writeItems(data, storage);
             writeItems(data, inv.getArmorContents());
-            writeItems(data, XReflection.supports(9) ? inv.getExtraContents() : new ItemStack[0]);
+            writeItems(data, XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]);
             data.writeInt(player.getLevel());
             data.writeFloat(player.getExp());
             Collection<PotionEffect> effects = player.getActivePotionEffects();
@@ -82,13 +82,13 @@ public final class PlayerInventoryUtil {
         if (storage.length > 36) {
             storage = Arrays.copyOf(storage, 36);
         }
-        if (XReflection.supports(9)) {
+        if (XReflection.supports(1, 9)) {
             inv.setStorageContents(storage);
         } else {
             inv.setContents(storage);
         }
         inv.setArmorContents(snapshot.armor());
-        if (XReflection.supports(9)) {
+        if (XReflection.supports(1, 9)) {
             inv.setExtraContents(snapshot.extra());
         }
         player.setLevel(snapshot.level());
@@ -103,7 +103,7 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         inv.clear();
         inv.setArmorContents(new ItemStack[4]);
-        if (XReflection.supports(9)) {
+        if (XReflection.supports(1, 9)) {
             inv.setExtraContents(new ItemStack[inv.getExtraContents().length]);
         }
         for (PotionEffect effect : player.getActivePotionEffects()) {
