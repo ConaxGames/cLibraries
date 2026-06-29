@@ -20,6 +20,9 @@ public final class ButtonListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onClick(InventoryClickEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
