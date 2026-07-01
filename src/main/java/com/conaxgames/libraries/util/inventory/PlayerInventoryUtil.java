@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.util.inventory;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.inventory.XInventoryView;
 import com.cryptomorin.xseries.reflection.XReflection;
 import org.bukkit.entity.Player;
@@ -96,6 +97,22 @@ public final class PlayerInventoryUtil {
         for (PotionEffect effect : snapshot.getEffects()) {
             player.addPotionEffect(effect);
         }
+    }
+
+    public static boolean hasItems(Player player) {
+        PlayerInventory inv = player.getInventory();
+        for (ItemStack[] stacks : new ItemStack[][]{
+                XReflection.supports(1, 9) ? inv.getStorageContents() : inv.getContents(),
+                inv.getArmorContents(),
+                XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]
+        }) {
+            for (ItemStack stack : stacks) {
+                if (XItemStack.notEmpty(stack)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void clear(Player player) {
