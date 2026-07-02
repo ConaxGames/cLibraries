@@ -98,22 +98,6 @@ public final class PlayerInventoryUtil {
         }
     }
 
-    public static boolean hasItems(Player player) {
-        PlayerInventory inv = player.getInventory();
-        for (ItemStack[] stacks : new ItemStack[][]{
-                XItemStack.getStorageContents(inv),
-                inv.getArmorContents(),
-                XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]
-        }) {
-            for (ItemStack stack : stacks) {
-                if (XItemStack.notEmpty(stack)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public static void clear(Player player) {
         XInventoryView.of(player.getOpenInventory()).setCursor(null);
         PlayerInventory inv = player.getInventory();
@@ -142,6 +126,22 @@ public final class PlayerInventoryUtil {
             items[i] = (ItemStack) data.readObject();
         }
         return items;
+    }
+
+    public static boolean hasItems(Player player) {
+        PlayerInventory inv = player.getInventory();
+        for (ItemStack[] stacks : new ItemStack[][]{
+                XItemStack.getStorageContents(inv),
+                inv.getArmorContents(),
+                XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]
+        }) {
+            for (ItemStack stack : stacks) {
+                if (XItemStack.notEmpty(stack)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public record DecodedSnapshot(
