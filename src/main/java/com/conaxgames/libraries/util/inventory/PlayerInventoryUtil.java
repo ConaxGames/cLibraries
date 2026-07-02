@@ -29,8 +29,7 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              BukkitObjectOutputStream data = new BukkitObjectOutputStream(bytes)) {
-            ItemStack[] storage = XReflection.supports(1, 9) ? inv.getStorageContents() : inv.getContents();
-            writeItems(data, storage);
+            writeItems(data, XItemStack.getStorageContents(inv));
             writeItems(data, inv.getArmorContents());
             writeItems(data, XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]);
             data.writeInt(player.getLevel());
@@ -102,7 +101,7 @@ public final class PlayerInventoryUtil {
     public static boolean hasItems(Player player) {
         PlayerInventory inv = player.getInventory();
         for (ItemStack[] stacks : new ItemStack[][]{
-                XReflection.supports(1, 9) ? inv.getStorageContents() : inv.getContents(),
+                XItemStack.getStorageContents(inv),
                 inv.getArmorContents(),
                 XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]
         }) {
