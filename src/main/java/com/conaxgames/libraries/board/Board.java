@@ -15,7 +15,7 @@ import java.util.List;
 final class Board {
 
     static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
-    static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.18") ? 32 : 1024;
+    static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
 
     private static final String[] ENTRY_KEYS;
 
@@ -48,6 +48,10 @@ final class Board {
 
     static String entryKey(int index) {
         return ENTRY_KEYS[index];
+    }
+
+    static int maxLines() {
+        return ENTRY_KEYS.length;
     }
 
     Scoreboard scoreboard() {

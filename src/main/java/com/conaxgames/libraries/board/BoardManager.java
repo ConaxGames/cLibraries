@@ -19,13 +19,11 @@ public final class BoardManager implements Runnable {
     private final Function<Player, String> title;
     private final Function<Player, List<String>> lines;
     private final long interval;
-    private final String skipMetadata;
 
     private BoardManager(Builder builder) {
         this.title = builder.title;
         this.lines = builder.lines;
         this.interval = builder.interval;
-        this.skipMetadata = builder.skipMetadata;
     }
 
     public static Builder builder() {
@@ -57,6 +55,9 @@ public final class BoardManager implements Runnable {
 
     private void updateBoard(Player player, Board board) {
         var lines = Objects.requireNonNullElse(this.lines.apply(player), List.<String>of());
+        if (lines.size() > Board.maxLines()) {
+            lines = lines.subList(0, Board.maxLines());
+        }
         board.updateTitle(title.apply(player));
 
         var entries = board.entries();
@@ -86,14 +87,14 @@ public final class BoardManager implements Runnable {
     }
 
     public void createBoard(Player player) {
-        if (player.hasMetadata(skipMetadata) || boards.containsKey(player.getUniqueId())) {
+        if (player.hasMetadata(SKIP_BOARD_METADATA) || boards.containsKey(player.getUniqueId())) {
             return;
         }
         boards.put(player.getUniqueId(), new Board(player));
     }
 
     public void removeBoard(Player player) {
-        if (player.hasMetadata(skipMetadata)) {
+        if (player.hasMetadata(SKIP_BOARD_METADATA)) {
             return;
         }
         if (boards.remove(player.getUniqueId()) != null && player.isOnline()) {
@@ -106,7 +107,6 @@ public final class BoardManager implements Runnable {
         private Function<Player, String> title = player -> "";
         private Function<Player, List<String>> lines = player -> List.of();
         private long interval = 20L;
-        private String skipMetadata = SKIP_BOARD_METADATA;
 
         private Builder() {
         }
@@ -123,11 +123,6 @@ public final class BoardManager implements Runnable {
 
         public Builder interval(long interval) {
             this.interval = interval;
-            return this;
-        }
-
-        public Builder skipMetadata(String skipMetadata) {
-            this.skipMetadata = Objects.requireNonNull(skipMetadata, "skipMetadata");
             return this;
         }
 
