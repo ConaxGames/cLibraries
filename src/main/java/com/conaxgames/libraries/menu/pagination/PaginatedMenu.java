@@ -118,7 +118,15 @@ public final class PaginatedMenu {
         }
 
         public Menu build() {
-            int[] slots = contentSlots != null ? contentSlots : defaultSlots(maxPerPage);
+            int[] slots;
+            if (contentSlots != null) {
+                slots = contentSlots;
+            } else {
+                slots = new int[maxPerPage];
+                for (int i = 0; i < maxPerPage; i++) {
+                    slots[i] = i;
+                }
+            }
             int perPage = slots.length;
             ItemStack previous = previousIcon != null ? previousIcon
                     : Button.builder(XMaterial.RED_DYE).name("&cPrevious Page").build().icon();
@@ -183,14 +191,6 @@ public final class PaginatedMenu {
 
         private static int totalPages(int size, int perPage) {
             return Math.max(1, (int) Math.ceil(size / (double) perPage));
-        }
-
-        private static int[] defaultSlots(int count) {
-            int[] slots = new int[count];
-            for (int i = 0; i < count; i++) {
-                slots[i] = i;
-            }
-            return slots;
         }
     }
 }

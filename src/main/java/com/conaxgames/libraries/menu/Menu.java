@@ -102,10 +102,11 @@ public final class Menu {
     }
 
     public void update(Player player) {
-        Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
-        if (!(top.getHolder() instanceof Holder holder) || holder.menu != this || !holder.viewerId.equals(player.getUniqueId())) {
+        Holder holder = holderFor(player);
+        if (holder == null) {
             return;
         }
+        Inventory top = holder.inventory;
         Map<Integer, Button> layout = render(player);
         int size = resolveSize(layout);
         if (top.getSize() != size) {
@@ -120,11 +121,16 @@ public final class Menu {
     }
 
     public Inventory inventory(Player player) {
+        Holder holder = holderFor(player);
+        return holder != null ? holder.inventory : null;
+    }
+
+    private Holder holderFor(Player player) {
         Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
-        if (!(top.getHolder() instanceof Holder holder) || holder.menu != this || !holder.viewerId.equals(player.getUniqueId())) {
-            return null;
+        if (top.getHolder() instanceof Holder holder && holder.menu == this && holder.viewerId.equals(player.getUniqueId())) {
+            return holder;
         }
-        return top;
+        return null;
     }
 
     public boolean updateAfterClick() {
@@ -151,23 +157,24 @@ public final class Menu {
     }
 
     private int resolveSize(Map<Integer, Button> layout) {
-        int size = rows > 0 ? rows * 9 : autoSize(layout);
+        int size;
+        if (rows > 0) {
+            size = rows * 9;
+        } else {
+            int highest = -1;
+            for (int slot : layout.keySet()) {
+                if (slot > highest) {
+                    highest = slot;
+                }
+            }
+            size = highest < 0 ? 9 : Math.min(54, ((highest + 9) / 9) * 9);
+        }
         if (filler != null) {
             for (int slot = 0; slot < size; slot++) {
                 layout.putIfAbsent(slot, filler);
             }
         }
         return size;
-    }
-
-    private static int autoSize(Map<Integer, Button> layout) {
-        int highest = -1;
-        for (int slot : layout.keySet()) {
-            if (slot > highest) {
-                highest = slot;
-            }
-        }
-        return highest < 0 ? 9 : Math.min(54, ((highest + 9) / 9) * 9);
     }
 
     private void fill(Holder holder, Map<Integer, Button> layout, int size) {
@@ -179,7 +186,6 @@ public final class Menu {
             Button button = layout.get(slot);
             if (button != null && button.editable()) {
                 holder.hasEditable = true;
-                // Only seed the initial stack once; player-placed items survive refreshes.
                 if (!seeded) {
                     holder.inventory.setItem(slot, button.icon());
                 }
