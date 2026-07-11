@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -164,23 +165,30 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder skull(String name) {
-        var offlinePlayer = Bukkit.getOfflinePlayer(name);
-        var profile = offlinePlayer.hasPlayedBefore()
-                ? Profileable.of(offlinePlayer)
-                : Profileable.username(name);
-        return skull(profile);
+        var online = Bukkit.getPlayerExact(name);
+        return skull(online != null ? profileOf(online) : Profileable.username(name));
     }
 
     public ItemBuilder skull(UUID uuid) {
-        return skull(Profileable.of(uuid));
+        var online = Bukkit.getPlayer(uuid);
+        return skull(online != null ? profileOf(online) : Profileable.of(uuid));
     }
 
     public ItemBuilder skull(OfflinePlayer offlinePlayer) {
-        return skull(Profileable.of(offlinePlayer));
+        var online = offlinePlayer.getPlayer();
+        return skull(online != null ? profileOf(online) : Profileable.of(offlinePlayer));
     }
 
     public ItemBuilder skullTexture(String texture) {
         return skull(Profileable.detect(texture));
+    }
+
+    private static Profileable profileOf(Player player) {
+        return player.getPlayerProfile().getProperties().stream()
+                .filter(property -> property.getName().equals("textures"))
+                .findFirst()
+                .map(property -> Profileable.detect(property.getValue()))
+                .orElseGet(() -> Profileable.of(player.getUniqueId()));
     }
 
     private ItemBuilder skull(Profileable profile) {
