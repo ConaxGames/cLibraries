@@ -80,6 +80,14 @@ public final class CustomLocation {
 
     public Location toBukkitLocation() {
         World bukkitWorld = Bukkit.getWorld(world);
+        if (bukkitWorld == null) {
+            for (World loaded : Bukkit.getWorlds()) {
+                if (loaded.getName().equalsIgnoreCase(world)) {
+                    bukkitWorld = loaded;
+                    break;
+                }
+            }
+        }
         return bukkitWorld == null ? null : new Location(bukkitWorld, x, y, z, yaw, pitch);
     }
 
