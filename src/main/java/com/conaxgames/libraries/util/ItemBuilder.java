@@ -14,6 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -222,6 +223,10 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder fireworkPower(int power) {
+        itemStack.editMeta(FireworkMeta.class, meta -> meta.setPower(power));
+        return this;
+    }
     public ItemBuilder unstackable(boolean unstackable) {
         itemStack.editMeta(meta -> {
             var key = new NamespacedKey("conaxgames", "unstackable");
