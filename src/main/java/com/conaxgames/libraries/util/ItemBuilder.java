@@ -227,6 +227,7 @@ public final class ItemBuilder {
         itemStack.editMeta(FireworkMeta.class, meta -> meta.setPower(power));
         return this;
     }
+    
     public ItemBuilder unstackable(boolean unstackable) {
         itemStack.editMeta(meta -> {
             var key = new NamespacedKey("conaxgames", "unstackable");
