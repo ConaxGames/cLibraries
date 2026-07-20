@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.util;
 
 import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.message.FormatUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XItemFlag;
 import com.cryptomorin.xseries.XMaterial;
@@ -71,7 +72,11 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder lore(List<String> lore) {
-        itemStack.editMeta(meta -> meta.setLore(CC.translate(lore)));
+        List<String> wrapped = new ArrayList<>(lore.size());
+        for (String line : lore) {
+            wrapped.addAll(FormatUtil.wordWrap(line == null ? "" : line));
+        }
+        itemStack.editMeta(meta -> meta.setLore(CC.translate(wrapped)));
         return this;
     }
 
@@ -82,7 +87,9 @@ public final class ItemBuilder {
     public ItemBuilder appendLore(List<String> lines) {
         itemStack.editMeta(meta -> {
             var lore = meta.getLore() != null ? new ArrayList<>(meta.getLore()) : new ArrayList<String>();
-            lore.addAll(CC.translate(lines));
+            for (String line : lines) {
+                lore.addAll(CC.translate(FormatUtil.wordWrap(line == null ? "" : line)));
+            }
             meta.setLore(lore);
         });
         return this;
