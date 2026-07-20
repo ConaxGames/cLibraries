@@ -41,14 +41,14 @@
 <dependency>
     <groupId>com.conaxgames</groupId>
     <artifactId>clibraries</artifactId>
-    <version>1.5.8</version>
+    <version>1.5.9</version>
 </dependency>
 ```
 
 **Gradle**
 
 ```groovy
-implementation 'com.conaxgames:clibraries:1.5.8'
+implementation 'com.conaxgames:clibraries:1.5.9'
 ```
 
 Shade this library inside your artifact to avoid clashes; relocate `com.conaxgames` as needed ([Maven Shade](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html) · [Shadow](https://gradleup.com/shadow/configuration/relocation/)).
