@@ -58,7 +58,7 @@ public final class FormatUtil {
             if (ix == -1) break;
 
             var sub = s.substring(start, ix).trim();
-            int visibleLen = stripFormatting(sub).length() + 1;
+            int visibleLen = CC.stripAllColor(CC.translate(sub)).length() + 1;
             if (visibleLen >= numChars && !sub.isEmpty()) {
                 var f = getFormatPrefix(sub);
                 if (!f.isEmpty()) format = f;
