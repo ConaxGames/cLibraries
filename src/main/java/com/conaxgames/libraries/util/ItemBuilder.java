@@ -174,7 +174,7 @@ public final class ItemBuilder {
 
     public ItemBuilder skull(String name) {
         var online = Bukkit.getPlayerExact(name);
-        return skull(online != null ? profileOf(online) : Profileable.username(name));
+        return skull(online != null ? profileOf(online) : Profileable.detect(name));
     }
 
     public ItemBuilder skull(UUID uuid) {
