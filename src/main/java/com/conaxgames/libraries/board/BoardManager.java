@@ -18,20 +18,14 @@ public final class BoardManager implements Runnable {
 
     private final Function<Player, String> title;
     private final Function<Player, List<String>> lines;
-    private final long interval;
 
     private BoardManager(Builder builder) {
         this.title = builder.title;
         this.lines = builder.lines;
-        this.interval = builder.interval;
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public long getInterval() {
-        return interval;
     }
 
     @Override
@@ -41,7 +35,7 @@ public final class BoardManager implements Runnable {
 
         boards.entrySet().removeIf(entry -> {
             var player = server.getPlayer(entry.getKey());
-            if (player == null || !player.isOnline()) {
+            if (player == null) {
                 return true;
             }
             try {
@@ -54,7 +48,7 @@ public final class BoardManager implements Runnable {
     }
 
     private void updateBoard(Player player, Board board) {
-        var lines = Objects.requireNonNullElse(this.lines.apply(player), List.<String>of());
+        var lines = this.lines.apply(player);
         if (lines.size() > Board.maxLines()) {
             lines = lines.subList(0, Board.maxLines());
         }
@@ -66,8 +60,7 @@ public final class BoardManager implements Runnable {
         }
 
         int i = 0;
-        for (var raw : lines.reversed()) {
-            var line = Objects.requireNonNullElse(raw, "");
+        for (var line : lines.reversed()) {
             BoardEntry entry;
             if (i < entries.size()) {
                 entry = entries.get(i);
@@ -94,9 +87,6 @@ public final class BoardManager implements Runnable {
     }
 
     public void removeBoard(Player player) {
-        if (player.hasMetadata(SKIP_BOARD_METADATA)) {
-            return;
-        }
         if (boards.remove(player.getUniqueId()) != null && player.isOnline()) {
             player.setScoreboard(player.getServer().getScoreboardManager().getMainScoreboard());
         }
@@ -106,7 +96,6 @@ public final class BoardManager implements Runnable {
 
         private Function<Player, String> title = player -> "";
         private Function<Player, List<String>> lines = player -> List.of();
-        private long interval = 20L;
 
         private Builder() {
         }
@@ -118,11 +107,6 @@ public final class BoardManager implements Runnable {
 
         public Builder lines(Function<Player, List<String>> lines) {
             this.lines = Objects.requireNonNull(lines, "lines");
-            return this;
-        }
-
-        public Builder interval(long interval) {
-            this.interval = interval;
             return this;
         }
 
