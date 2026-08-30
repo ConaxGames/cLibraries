@@ -4,12 +4,9 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.config.CommentedConfiguration;
 import com.conaxgames.libraries.config.Config;
 import lombok.Getter;
-import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
@@ -17,17 +14,28 @@ import java.util.Locale;
 @Getter
 public abstract class Module {
 
-    private final LibraryPlugin library = LibraryPlugin.getInstance();
     private final JavaPlugin javaPlugin;
     private Config settings;
+    boolean enabled;
 
     public Module(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
-        this.settings = getResource();
+        reloadConfig();
     }
 
     public void reloadConfig() {
-        this.settings = getResource();
+        String id = getIdentifier();
+        this.settings = new Config("/modules/" + id + "/settings", javaPlugin);
+
+        try (InputStream in = javaPlugin.getResource("modules/" + id + "/settings.yml")) {
+            if (in != null) {
+                CommentedConfiguration.loadConfiguration(settings.getConfigFile())
+                        .syncWithConfig(settings.getConfigFile(), in, noSync().toArray(new String[0]));
+            }
+        } catch (Exception exception) {
+            LibraryPlugin.getInstance().getLibraryLogger().toConsole("Module",
+                    "Unable to sync /modules/" + id + "/settings.yml with config.", exception);
+        }
     }
 
     public abstract String getName();
@@ -48,21 +56,13 @@ public abstract class Module {
 
     public abstract String getAuthor();
 
-    public abstract List<String> noSync();
+    public List<String> noSync() {
+        return List.of();
+    }
 
     public abstract void onEnable();
 
     public abstract void onDisable();
-
-    public boolean canRegister() {
-        String required = getRequiredPlugin();
-        if (required == null || Bukkit.getPluginManager().isPluginEnabled(required)) {
-            return true;
-        }
-        library.getLibraryLogger().toConsole("Module",
-                "Required plugin " + required + " is missing. Module " + getIdentifier() + " cannot be registered.");
-        return false;
-    }
 
     public String getString(String path, String def) {
         return settings.getConfig().getString(path, def);
@@ -84,10 +84,6 @@ public abstract class Module {
         return settings.getConfig().getBoolean(path, def);
     }
 
-    public Object get(String path, Object def) {
-        return settings.getConfig().get(path, def);
-    }
-
     public ConfigurationSection getConfigSection(String path) {
         return settings.getConfig().getConfigurationSection(path);
     }
@@ -98,34 +94,5 @@ public abstract class Module {
 
     public void set(String path, Object value) {
         settings.set(path, value);
-    }
-
-    public Config getResource() {
-        return getResource("settings", true, true);
-    }
-
-    public Config getResource(@NonNull String destination, boolean forceSync, boolean syncOnCreation) {
-        String dest = destination.replace(".yml", "");
-        Config config = new Config("/modules/" + getIdentifier() + "/" + dest, javaPlugin);
-
-        try (InputStream fileStream = javaPlugin.getResource("modules/" + getIdentifier() + "/" + dest + ".yml")) {
-            if (fileStream != null && (forceSync || (config.isWasCreated() && syncOnCreation))) {
-                try {
-                    CommentedConfiguration commentedConfiguration = CommentedConfiguration.loadConfiguration(config.getConfigFile());
-                    List<String> exclusions = noSync();
-                    commentedConfiguration.syncWithConfig(config.getConfigFile(), fileStream,
-                            (exclusions == null ? List.of() : exclusions).toArray(new String[0]));
-                } catch (Exception exception) {
-                    library.getLibraryLogger().toConsole("Module", "Unable to sync /modules/" + getIdentifier() + "/" + dest + ".yml with config.", exception);
-                }
-            }
-        } catch (IOException ignored) {
-        }
-
-        return config;
-    }
-
-    public boolean isEnabled() {
-        return library.getModuleManager().isModuleEnabled(this);
     }
 }

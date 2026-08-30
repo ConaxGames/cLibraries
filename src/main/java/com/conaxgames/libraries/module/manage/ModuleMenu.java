@@ -11,7 +11,6 @@ import com.cryptomorin.xseries.XMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public final class ModuleMenu {
 
@@ -20,18 +19,15 @@ public final class ModuleMenu {
 
     public static Menu create(ModuleManager moduleManager) {
         return PaginatedMenu.builder("Modules")
-                .set(49, statistics(moduleManager))
-                .entries(player -> moduleButtons(moduleManager))
+                .entries(player -> {
+                    List<Button> buttons = new ArrayList<>();
+                    for (Module module : moduleManager.getModules().values()) {
+                        buttons.add(moduleButton(moduleManager, module));
+                    }
+                    return buttons;
+                })
                 .autoUpdate()
                 .build();
-    }
-
-    private static List<Button> moduleButtons(ModuleManager moduleManager) {
-        List<Button> buttons = new ArrayList<>();
-        for (Module module : moduleManager.getModules().values()) {
-            buttons.add(moduleButton(moduleManager, module));
-        }
-        return buttons;
     }
 
     private static Button moduleButton(ModuleManager moduleManager, Module module) {
@@ -60,24 +56,6 @@ public final class ModuleMenu {
                             : moduleManager.enableModule(module, persistent);
                     player.sendMessage(CC.translate("&e" + result + "&7 (saved: " + persistent + ")"));
                 })
-                .build();
-    }
-
-    private static Button statistics(ModuleManager moduleManager) {
-        Map<String, Module> registered = moduleManager.getModules();
-        int total = registered.size();
-        long enabled = registered.values().stream().filter(moduleManager::isModuleEnabled).count();
-
-        return Button.builder(XMaterial.BOOK)
-                .name("&6Module Statistics")
-                .lore(
-                        "&8Module overview",
-                        " ",
-                        "&7Total Modules: &f" + total,
-                        "&7Enabled: &a" + enabled,
-                        "&7Disabled: &c" + (total - enabled),
-                        " "
-                )
                 .build();
     }
 }
