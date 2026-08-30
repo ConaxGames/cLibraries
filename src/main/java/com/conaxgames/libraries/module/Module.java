@@ -31,6 +31,7 @@ public abstract class Module {
             if (in != null) {
                 CommentedConfiguration.loadConfiguration(settings.getConfigFile())
                         .syncWithConfig(settings.getConfigFile(), in, noSync().toArray(new String[0]));
+                settings.getConfig().load(settings.getConfigFile());
             }
         } catch (Exception exception) {
             LibraryPlugin.getInstance().getLibraryLogger().toConsole("Module",
