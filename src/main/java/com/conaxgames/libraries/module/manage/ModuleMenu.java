@@ -20,10 +20,6 @@ public final class ModuleMenu {
 
     public static Menu create(ModuleManager moduleManager) {
         return PaginatedMenu.builder("Modules")
-                .rows(6)
-                .maxPerPage(45)
-                .previousSlot(48)
-                .nextSlot(50)
                 .set(49, statistics(moduleManager))
                 .entries(player -> moduleButtons(moduleManager))
                 .autoUpdate()

@@ -22,10 +22,6 @@ public final class Button {
     private final Click click;
     private final boolean editable;
 
-    private Button(ItemStack icon, Click click) {
-        this(icon, click, false);
-    }
-
     private Button(ItemStack icon, Click click, boolean editable) {
         this.icon = icon;
         this.click = click;
@@ -33,7 +29,7 @@ public final class Button {
     }
 
     public static Button of(ItemStack icon) {
-        return new Button(icon, null);
+        return new Button(icon, null, false);
     }
 
     public static Button editable(ItemStack initial) {
@@ -136,7 +132,7 @@ public final class Button {
         }
 
         public Button build() {
-            return new Button(item.build(), click);
+            return new Button(item.build(), click, false);
         }
     }
 }

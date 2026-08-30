@@ -3,8 +3,8 @@ package com.conaxgames.libraries.menu.listener;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
+import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.inventory.XInventoryView;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,61 +34,56 @@ public final class ButtonListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        boolean shift = event.getClick().isShiftClick();
-        if (event.getRawSlot() != event.getSlot()) {
-            if (shift && holder.hasEditable()) {
-                ItemStack moving = event.getCurrentItem();
-                if (moving != null && moving.getType() != Material.AIR && moving.getAmount() > 0) {
-                    event.setCancelled(true);
-                    int remaining = moving.getAmount();
-                    int max = moving.getMaxStackSize();
-
-                    for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
-                        if (!holder.editable(slot)) {
-                            continue;
-                        }
-                        ItemStack existing = top.getItem(slot);
-                        if (existing == null || existing.getType() == Material.AIR || existing.getAmount() <= 0
-                                || !existing.isSimilar(moving)) {
-                            continue;
-                        }
-                        int space = max - existing.getAmount();
-                        if (space <= 0) {
-                            continue;
-                        }
-                        int added = Math.min(space, remaining);
-                        existing.setAmount(existing.getAmount() + added);
-                        top.setItem(slot, existing);
-                        remaining -= added;
-                    }
-
-                    for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
-                        ItemStack existing = top.getItem(slot);
-                        if (!holder.editable(slot) || (existing != null && existing.getType() != Material.AIR && existing.getAmount() > 0)) {
-                            continue;
-                        }
-                        int added = Math.min(max, remaining);
-                        ItemStack copy = moving.clone();
-                        copy.setAmount(added);
-                        top.setItem(slot, copy);
-                        remaining -= added;
-                    }
-
-                    if (remaining <= 0) {
-                        event.setCurrentItem(null);
-                    } else {
-                        moving.setAmount(remaining);
-                        event.setCurrentItem(moving);
-                    }
-                    LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                            LibraryPlugin.getInstance().getPlugin(),
-                            player::updateInventory,
-                            1L
-                    );
-                }
+        if (event.getRawSlot() >= top.getSize()) {
+            if (!event.getClick().isShiftClick() || !holder.hasEditable()) {
+                event.setCancelled(!holder.hasEditable());
                 return;
             }
-            event.setCancelled(!holder.hasEditable());
+            ItemStack moving = event.getCurrentItem();
+            if (XItemStack.isEmpty(moving)) {
+                return;
+            }
+            event.setCancelled(true);
+            int remaining = moving.getAmount();
+            int max = moving.getMaxStackSize();
+
+            for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
+                if (!holder.editable(slot)) {
+                    continue;
+                }
+                ItemStack existing = top.getItem(slot);
+                if (XItemStack.isEmpty(existing) || !existing.isSimilar(moving)) {
+                    continue;
+                }
+                int space = max - existing.getAmount();
+                if (space <= 0) {
+                    continue;
+                }
+                int added = Math.min(space, remaining);
+                existing.setAmount(existing.getAmount() + added);
+                top.setItem(slot, existing);
+                remaining -= added;
+            }
+
+            for (int slot = 0; slot < top.getSize() && remaining > 0; slot++) {
+                if (!holder.editable(slot) || XItemStack.notEmpty(top.getItem(slot))) {
+                    continue;
+                }
+                int added = Math.min(max, remaining);
+                ItemStack copy = moving.clone();
+                copy.setAmount(added);
+                top.setItem(slot, copy);
+                remaining -= added;
+            }
+
+            if (remaining <= 0) {
+                event.setCurrentItem(null);
+            } else {
+                moving.setAmount(remaining);
+                event.setCurrentItem(moving);
+            }
+            LibraryPlugin lib = LibraryPlugin.getInstance();
+            lib.getScheduler().runTaskLater(lib.getPlugin(), player::updateInventory, 1L);
             return;
         }
         if (holder.editable(event.getSlot())) {
@@ -103,11 +98,8 @@ public final class ButtonListener implements Listener {
         if (Menu.opened(player) == holder.menu && holder.menu.updateAfterClick()) {
             holder.menu.update(player);
         }
-        LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                LibraryPlugin.getInstance().getPlugin(),
-                player::updateInventory,
-                1L
-        );
+        LibraryPlugin lib = LibraryPlugin.getInstance();
+        lib.getScheduler().runTaskLater(lib.getPlugin(), player::updateInventory, 1L);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -132,23 +124,22 @@ public final class ButtonListener implements Listener {
         if (!(event.getPlayer() instanceof Player player)) {
             return;
         }
-        if (!(event.getInventory().getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
+        Inventory top = XInventoryView.of(event.getView()).getTopInventory();
+        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
         Menu menu = holder.menu;
         menu.closed(player);
         Menu.endSession(player.getUniqueId());
         Menu previous = menu.previous(player);
-        if (previous != null) {
-            LibraryPlugin.getInstance().getScheduler().runTaskLater(
-                    LibraryPlugin.getInstance().getPlugin(),
-                    () -> {
-                        if (Menu.opened(player) == null) {
-                            previous.open(player);
-                        }
-                    },
-                    2L
-            );
+        if (previous == null) {
+            return;
         }
+        LibraryPlugin lib = LibraryPlugin.getInstance();
+        lib.getScheduler().runTaskLater(lib.getPlugin(), () -> {
+            if (Menu.opened(player) == null) {
+                previous.open(player);
+            }
+        }, 2L);
     }
 }
