@@ -57,7 +57,7 @@ public final class FormatUtil {
             ix = s.indexOf(' ', ix + 1);
             if (ix == -1) break;
 
-            var sub = s.substring(start, ix).trim();
+            var sub = s.substring(start, ix).stripTrailing();
             int visibleLen = CC.stripAllColor(CC.translate(sub)).length() + 1;
             if (visibleLen >= numChars && !sub.isEmpty()) {
                 var f = getFormatPrefix(sub);
@@ -67,7 +67,7 @@ public final class FormatUtil {
                 start = ix + 1;
             }
         }
-        words.add(applyFormat(format, s.substring(start).trim()));
+        words.add(applyFormat(format, s.substring(start).stripTrailing()));
         return words;
     }
 
