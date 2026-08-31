@@ -3,6 +3,7 @@ package com.conaxgames.libraries.board;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.message.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -16,6 +17,7 @@ final class Board {
 
     static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
+    private static final boolean HIDE_NUMBERS = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
 
     private static final String[] ENTRY_KEYS;
 
@@ -44,6 +46,9 @@ final class Board {
         }
         this.objective = scoreboard.registerNewObjective("sb", "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        if (HIDE_NUMBERS) {
+            objective.numberFormat(NumberFormat.blank());
+        }
     }
 
     static String entryKey(int index) {
