@@ -28,19 +28,16 @@ public final class BoardManager implements Runnable {
 
     @Override
     public void run() {
-        var plugin = LibraryPlugin.getInstance().getPlugin();
-        var server = plugin.getServer();
-        var logger = plugin.getLogger();
-
         boards.entrySet().removeIf(entry -> {
-            var player = server.getPlayer(entry.getKey());
+            var player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(entry.getKey());
             if (player == null) {
                 return true;
             }
             try {
                 updateBoard(player, entry.getValue());
             } catch (Exception ex) {
-                logger.severe("Scoreboard error for " + player.getName() + ": " + ex.getMessage());
+                LibraryPlugin.getInstance().getPlugin().getLogger()
+                        .severe("Scoreboard error for " + player.getName() + ": " + ex.getMessage());
             }
             return false;
         });
