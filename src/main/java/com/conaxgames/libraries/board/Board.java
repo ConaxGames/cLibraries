@@ -4,6 +4,8 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.message.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
+import net.kyori.adventure.text.format.ShadowColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -17,6 +19,7 @@ final class Board {
 
     static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
+    static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
     private static final boolean HIDE_NUMBERS = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
 
     private static final String[] ENTRY_KEYS;
@@ -70,7 +73,12 @@ final class Board {
             return;
         }
         lastTitle = clipped;
-        objective.setDisplayName(clipped);
+        if (TEXT_SHADOW) {
+            objective.displayName(LegacyComponentSerializer.legacySection().deserialize(clipped)
+                    .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
+        } else {
+            objective.setDisplayName(clipped);
+        }
     }
 
     Objective objective() {

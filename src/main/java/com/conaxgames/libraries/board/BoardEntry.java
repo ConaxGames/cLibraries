@@ -1,6 +1,8 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.message.CC;
+import net.kyori.adventure.text.format.ShadowColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.Team;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,10 +33,20 @@ final class BoardEntry {
         var suffix = split[1].length() <= max ? split[1] : split[1].substring(0, max);
 
         if (!prefix.equals(team.getPrefix())) {
-            team.setPrefix(prefix);
+            if (Board.TEXT_SHADOW) {
+                team.prefix(LegacyComponentSerializer.legacySection().deserialize(prefix)
+                        .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
+            } else {
+                team.setPrefix(prefix);
+            }
         }
         if (!suffix.equals(team.getSuffix())) {
-            team.setSuffix(suffix);
+            if (Board.TEXT_SHADOW) {
+                team.suffix(LegacyComponentSerializer.legacySection().deserialize(suffix)
+                        .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
+            } else {
+                team.setSuffix(suffix);
+            }
         }
 
         var score = board.objective().getScore(key);
