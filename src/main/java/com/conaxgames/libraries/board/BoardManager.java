@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -15,7 +14,6 @@ public final class BoardManager implements Runnable {
     public static final String SKIP_BOARD_METADATA = "cElement";
 
     private final Map<UUID, Board> boards = new HashMap<>();
-
     private final Function<Player, String> title;
     private final Function<Player, List<String>> lines;
 
@@ -30,8 +28,9 @@ public final class BoardManager implements Runnable {
 
     @Override
     public void run() {
-        var server = LibraryPlugin.getInstance().getPlugin().getServer();
-        var logger = LibraryPlugin.getInstance().getPlugin().getLogger();
+        var plugin = LibraryPlugin.getInstance().getPlugin();
+        var server = plugin.getServer();
+        var logger = plugin.getLogger();
 
         boards.entrySet().removeIf(entry -> {
             var player = server.getPlayer(entry.getKey());
@@ -49,12 +48,12 @@ public final class BoardManager implements Runnable {
 
     private void updateBoard(Player player, Board board) {
         var lines = this.lines.apply(player);
-        if (lines.size() > Board.maxLines()) {
-            lines = lines.subList(0, Board.maxLines());
+        if (lines.size() > Board.MAX_LINES) {
+            lines = lines.subList(0, Board.MAX_LINES);
         }
         board.updateTitle(title.apply(player));
 
-        var entries = board.entries();
+        var entries = board.entries;
         while (entries.size() > lines.size()) {
             entries.removeLast().remove();
         }
@@ -64,7 +63,7 @@ public final class BoardManager implements Runnable {
             BoardEntry entry;
             if (i < entries.size()) {
                 entry = entries.get(i);
-                entry.text(line);
+                entry.text = line;
             } else {
                 entry = new BoardEntry(board, i, line);
                 entries.add(entry);
@@ -73,9 +72,8 @@ public final class BoardManager implements Runnable {
             i++;
         }
 
-        var sb = board.scoreboard();
-        if (!player.getScoreboard().equals(sb)) {
-            player.setScoreboard(sb);
+        if (!player.getScoreboard().equals(board.scoreboard)) {
+            player.setScoreboard(board.scoreboard);
         }
     }
 
@@ -101,12 +99,12 @@ public final class BoardManager implements Runnable {
         }
 
         public Builder title(Function<Player, String> title) {
-            this.title = Objects.requireNonNull(title, "title");
+            this.title = title;
             return this;
         }
 
         public Builder lines(Function<Player, List<String>> lines) {
-            this.lines = Objects.requireNonNull(lines, "lines");
+            this.lines = lines;
             return this;
         }
 

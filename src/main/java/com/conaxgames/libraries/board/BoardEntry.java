@@ -3,52 +3,64 @@ package com.conaxgames.libraries.board;
 import com.conaxgames.libraries.message.CC;
 import org.bukkit.scoreboard.Team;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @SuppressWarnings("deprecation")
 final class BoardEntry {
-
-    private static final AtomicInteger TEAM_COUNTER = new AtomicInteger();
 
     private final Board board;
     private final String key;
     private final Team team;
-    private String text;
+    String text;
     private String lastSent;
-    private String[] splitCache;
 
     BoardEntry(Board board, int index, String text) {
         this.board = board;
-        this.text = text != null ? text : "";
-        this.key = Board.entryKey(index);
+        this.text = text;
+        this.key = Board.MODERN ? Integer.toString(index) : Board.ENTRY_KEYS[index];
         if (Board.MODERN) {
             this.team = null;
         } else {
-            this.team = board.scoreboard().registerNewTeam("board_" + TEAM_COUNTER.getAndIncrement());
+            this.team = board.scoreboard.registerNewTeam("board_" + index);
             team.addEntry(key);
         }
     }
 
     void send(int position) {
-        var score = board.objective().getScore(key);
+        var score = board.objective.getScore(key);
         if (score.getScore() != position) {
             score.setScore(position);
         }
+        if (text.equals(lastSent)) {
+            return;
+        }
+        lastSent = text;
 
+        var translated = CC.translate(text);
         if (Board.MODERN) {
-            if (text.equals(lastSent)) {
-                return;
-            }
-            lastSent = text;
-            var component = Board.Legacy.SERIALIZER.deserialize(CC.translate(text));
+            var component = Board.Legacy.SERIALIZER.deserialize(translated);
             score.customName(Board.TEXT_SHADOW ? component.shadowColor(Board.Legacy.SHADOW) : component);
             return;
         }
 
-        var split = split();
         int max = Board.SEGMENT_MAX;
-        var prefix = split[0].length() <= max ? split[0] : split[0].substring(0, max);
-        var suffix = split[1].length() <= max ? split[1] : split[1].substring(0, max);
+        String prefix;
+        String suffix;
+        if (translated.length() <= max) {
+            prefix = translated;
+            suffix = "";
+        } else {
+            prefix = translated.substring(0, max);
+            int lastColor = prefix.lastIndexOf('\u00a7');
+            if (lastColor >= max - 2) {
+                suffix = CC.getLastColors(translated.substring(0, Math.min(translated.length(), max + 1)))
+                        + translated.substring(lastColor + 2);
+                prefix = prefix.substring(0, lastColor);
+            } else {
+                suffix = CC.getLastColors(prefix) + translated.substring(max);
+            }
+            if (suffix.length() > max) {
+                suffix = suffix.substring(0, max);
+            }
+        }
 
         if (!prefix.equals(team.getPrefix())) {
             team.setPrefix(prefix);
@@ -59,46 +71,9 @@ final class BoardEntry {
     }
 
     void remove() {
-        board.scoreboard().resetScores(key);
+        board.scoreboard.resetScores(key);
         if (team != null) {
-            team.removeEntry(key);
             team.unregister();
         }
-    }
-
-    void text(String newText) {
-        if (newText != null && !text.equals(newText)) {
-            text = newText;
-            lastSent = null;
-            splitCache = null;
-        }
-    }
-
-    private String[] split() {
-        if (splitCache != null) {
-            return splitCache;
-        }
-        var translated = CC.translate(text);
-        int unit = Board.SEGMENT_MAX;
-
-        if (translated.length() <= unit) {
-            return splitCache = new String[]{translated, ""};
-        }
-
-        var prefix = translated.substring(0, unit);
-        int lastColor = prefix.lastIndexOf('\u00a7');
-        if (lastColor >= unit - 2) {
-            var trimmed = prefix.substring(0, lastColor);
-            int end = Math.min(translated.length(), unit + 1);
-            return splitCache = new String[]{
-                    trimmed,
-                    CC.getLastColors(translated.substring(0, end)) + translated.substring(lastColor + 2)
-            };
-        }
-
-        return splitCache = new String[]{
-                prefix,
-                CC.getLastColors(prefix) + translated.substring(unit)
-        };
     }
 }

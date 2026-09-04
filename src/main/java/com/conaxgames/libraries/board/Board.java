@@ -23,8 +23,8 @@ final class Board {
     static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
     static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
-
-    private static final String[] ENTRY_KEYS;
+    static final String[] ENTRY_KEYS;
+    static final int MAX_LINES;
 
     static {
         var codes = "0123456789abcdefklmor";
@@ -32,11 +32,12 @@ final class Board {
         for (int i = 0; i < codes.length(); i++) {
             ENTRY_KEYS[i] = "\u00a7" + codes.charAt(i) + "\u00a7f";
         }
+        MAX_LINES = ENTRY_KEYS.length;
     }
 
-    private final List<BoardEntry> entries = new ArrayList<>();
-    private final Scoreboard scoreboard;
-    private final Objective objective;
+    final List<BoardEntry> entries = new ArrayList<>();
+    final Scoreboard scoreboard;
+    final Objective objective;
     private String lastTitle;
 
     Board(Player player) {
@@ -58,39 +59,21 @@ final class Board {
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    static String entryKey(int index) {
-        return MODERN ? Integer.toString(index) : ENTRY_KEYS[index];
-    }
-
-    static int maxLines() {
-        return ENTRY_KEYS.length;
-    }
-
-    Scoreboard scoreboard() {
-        return scoreboard;
-    }
-
     void updateTitle(String raw) {
-        var translated = CC.translate(raw != null ? raw : "");
-        var clipped = translated.length() <= TITLE_MAX ? translated : translated.substring(0, TITLE_MAX);
-        if (clipped.equals(lastTitle)) {
+        var translated = CC.translate(raw);
+        if (translated.length() > TITLE_MAX) {
+            translated = translated.substring(0, TITLE_MAX);
+        }
+        if (translated.equals(lastTitle)) {
             return;
         }
-        lastTitle = clipped;
+        lastTitle = translated;
         if (MODERN) {
-            var component = Legacy.SERIALIZER.deserialize(clipped);
+            var component = Legacy.SERIALIZER.deserialize(translated);
             objective.displayName(TEXT_SHADOW ? component.shadowColor(Legacy.SHADOW) : component);
         } else {
-            objective.setDisplayName(clipped);
+            objective.setDisplayName(translated);
         }
-    }
-
-    Objective objective() {
-        return objective;
-    }
-
-    List<BoardEntry> entries() {
-        return entries;
     }
 
     static final class Legacy {
