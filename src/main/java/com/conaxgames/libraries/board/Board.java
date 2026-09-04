@@ -4,9 +4,11 @@ import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.message.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -17,10 +19,10 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 final class Board {
 
+    static final boolean MODERN = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
+    static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
     static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
-    static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
-    private static final boolean HIDE_NUMBERS = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
 
     private static final String[] ENTRY_KEYS;
 
@@ -47,15 +49,17 @@ final class Board {
         if (existing != null) {
             existing.unregister();
         }
-        this.objective = scoreboard.registerNewObjective("sb", "dummy");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        if (HIDE_NUMBERS) {
+        if (MODERN) {
+            this.objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, Component.empty());
             objective.numberFormat(NumberFormat.blank());
+        } else {
+            this.objective = scoreboard.registerNewObjective("sb", "dummy");
         }
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     static String entryKey(int index) {
-        return ENTRY_KEYS[index];
+        return MODERN ? Integer.toString(index) : ENTRY_KEYS[index];
     }
 
     static int maxLines() {
@@ -73,9 +77,9 @@ final class Board {
             return;
         }
         lastTitle = clipped;
-        if (TEXT_SHADOW) {
-            objective.displayName(LegacyComponentSerializer.legacySection().deserialize(clipped)
-                    .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
+        if (MODERN) {
+            var component = Legacy.SERIALIZER.deserialize(clipped);
+            objective.displayName(TEXT_SHADOW ? component.shadowColor(Legacy.SHADOW) : component);
         } else {
             objective.setDisplayName(clipped);
         }
@@ -87,5 +91,14 @@ final class Board {
 
     List<BoardEntry> entries() {
         return entries;
+    }
+
+    static final class Legacy {
+        static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
+                .character(LegacyComponentSerializer.SECTION_CHAR)
+                .hexColors()
+                .useUnusualXRepeatedCharacterHexFormat()
+                .build();
+        static final ShadowColor SHADOW = ShadowColor.shadowColor(0xFF000000);
     }
 }

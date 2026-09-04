@@ -1,8 +1,6 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.message.CC;
-import net.kyori.adventure.text.format.ShadowColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.Team;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,54 +14,62 @@ final class BoardEntry {
     private final String key;
     private final Team team;
     private String text;
+    private String lastSent;
     private String[] splitCache;
 
     BoardEntry(Board board, int index, String text) {
         this.board = board;
         this.text = text != null ? text : "";
         this.key = Board.entryKey(index);
-        this.team = board.scoreboard().registerNewTeam("board_" + TEAM_COUNTER.getAndIncrement());
-        team.addEntry(key);
+        if (Board.MODERN) {
+            this.team = null;
+        } else {
+            this.team = board.scoreboard().registerNewTeam("board_" + TEAM_COUNTER.getAndIncrement());
+            team.addEntry(key);
+        }
     }
 
     void send(int position) {
+        var score = board.objective().getScore(key);
+        if (score.getScore() != position) {
+            score.setScore(position);
+        }
+
+        if (Board.MODERN) {
+            if (text.equals(lastSent)) {
+                return;
+            }
+            lastSent = text;
+            var component = Board.Legacy.SERIALIZER.deserialize(CC.translate(text));
+            score.customName(Board.TEXT_SHADOW ? component.shadowColor(Board.Legacy.SHADOW) : component);
+            return;
+        }
+
         var split = split();
         int max = Board.SEGMENT_MAX;
         var prefix = split[0].length() <= max ? split[0] : split[0].substring(0, max);
         var suffix = split[1].length() <= max ? split[1] : split[1].substring(0, max);
 
         if (!prefix.equals(team.getPrefix())) {
-            if (Board.TEXT_SHADOW) {
-                team.prefix(LegacyComponentSerializer.legacySection().deserialize(prefix)
-                        .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
-            } else {
-                team.setPrefix(prefix);
-            }
+            team.setPrefix(prefix);
         }
         if (!suffix.equals(team.getSuffix())) {
-            if (Board.TEXT_SHADOW) {
-                team.suffix(LegacyComponentSerializer.legacySection().deserialize(suffix)
-                        .shadowColor(ShadowColor.shadowColor(0, 0, 0, 255)));
-            } else {
-                team.setSuffix(suffix);
-            }
-        }
-
-        var score = board.objective().getScore(key);
-        if (score.getScore() != position) {
-            score.setScore(position);
+            team.setSuffix(suffix);
         }
     }
 
     void remove() {
         board.scoreboard().resetScores(key);
-        team.removeEntry(key);
-        team.unregister();
+        if (team != null) {
+            team.removeEntry(key);
+            team.unregister();
+        }
     }
 
     void text(String newText) {
         if (newText != null && !text.equals(newText)) {
             text = newText;
+            lastSent = null;
             splitCache = null;
         }
     }
