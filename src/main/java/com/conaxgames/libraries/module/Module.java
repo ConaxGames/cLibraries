@@ -53,6 +53,10 @@ public abstract class Module {
         return null;
     }
 
+    public String getSupportedVersion() {
+        return null;
+    }
+
     public abstract String getDescription();
 
     public abstract String getAuthor();

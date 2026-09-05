@@ -2,6 +2,7 @@ package com.conaxgames.libraries.module;
 
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.VersioningChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -33,6 +34,13 @@ public class ModuleManager {
         if (required != null && !Bukkit.getPluginManager().isPluginEnabled(required)) {
             library.getLibraryLogger().toConsole("Module",
                     "Required plugin " + required + " is missing. Module " + module.getIdentifier() + " cannot be registered.");
+            return;
+        }
+
+        String version = module.getSupportedVersion();
+        if (version != null && VersioningChecker.getInstance().isServerVersionBefore(version)) {
+            library.getLibraryLogger().toConsole("Module",
+                    "Supported version " + version + " is not met. Module " + module.getIdentifier() + " cannot be registered.");
             return;
         }
 

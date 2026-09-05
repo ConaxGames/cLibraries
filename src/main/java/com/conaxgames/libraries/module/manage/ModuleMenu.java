@@ -42,6 +42,9 @@ public final class ModuleMenu {
         if (module.getRequiredPlugin() != null) {
             lore.add("&7Requires: &f" + module.getRequiredPlugin());
         }
+        if (module.getSupportedVersion() != null) {
+            lore.add("&7Version: &f" + module.getSupportedVersion());
+        }
         lore.add(" ");
         lore.add("&e" + (enabled ? "Click to disable." : "Click to enable."));
         lore.addAll(FormatUtil.wordWrap("&7(Use a Shift-Click to not save this change over reboots)"));
