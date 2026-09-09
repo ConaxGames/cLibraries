@@ -1,21 +1,12 @@
 package com.conaxgames.libraries.board;
 
-import com.conaxgames.libraries.LibraryPlugin;
-import com.conaxgames.libraries.message.CC;
 import com.conaxgames.libraries.util.VersioningChecker;
-import io.papermc.paper.scoreboard.numbers.NumberFormat;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.ShadowColor;
-import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 final class Board {
 
     static final boolean MODERN = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
@@ -35,43 +26,7 @@ final class Board {
     }
 
     final List<BoardEntry> entries = new ArrayList<>();
-    final Scoreboard scoreboard;
-    final Objective objective;
-    private String lastTitle;
-
-    Board(Player player) {
-        var scoreboardManager = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
-        this.scoreboard = player.getScoreboard().equals(scoreboardManager.getMainScoreboard())
-                ? scoreboardManager.getNewScoreboard()
-                : player.getScoreboard();
-
-        var existing = scoreboard.getObjective("sb");
-        if (existing != null) {
-            existing.unregister();
-        }
-        if (MODERN) {
-            this.objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, Component.empty());
-            objective.numberFormat(NumberFormat.blank());
-        } else {
-            this.objective = scoreboard.registerNewObjective("sb", "dummy");
-        }
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-    }
-
-    void updateTitle(String raw) {
-        var translated = CC.translate(raw);
-        if (translated.length() > TITLE_MAX) {
-            translated = translated.substring(0, TITLE_MAX);
-        }
-        if (translated.equals(lastTitle)) {
-            return;
-        }
-        lastTitle = translated;
-        if (MODERN) {
-            var component = CC.LEGACY.deserialize(translated);
-            objective.displayName(TEXT_SHADOW ? component.shadowColor(ShadowColor.shadowColor(0xFF000000)) : component);
-        } else {
-            objective.setDisplayName(translated);
-        }
-    }
+    Scoreboard scoreboard;
+    Objective objective;
+    String lastTitle;
 }
