@@ -6,7 +6,6 @@ import com.conaxgames.libraries.util.VersioningChecker;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -69,19 +68,10 @@ final class Board {
         }
         lastTitle = translated;
         if (MODERN) {
-            var component = Legacy.SERIALIZER.deserialize(translated);
-            objective.displayName(TEXT_SHADOW ? component.shadowColor(Legacy.SHADOW) : component);
+            var component = CC.LEGACY.deserialize(translated);
+            objective.displayName(TEXT_SHADOW ? component.shadowColor(ShadowColor.shadowColor(0xFF000000)) : component);
         } else {
             objective.setDisplayName(translated);
         }
-    }
-
-    static final class Legacy {
-        static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
-                .character(LegacyComponentSerializer.SECTION_CHAR)
-                .hexColors()
-                .useUnusualXRepeatedCharacterHexFormat()
-                .build();
-        static final ShadowColor SHADOW = ShadowColor.shadowColor(0xFF000000);
     }
 }

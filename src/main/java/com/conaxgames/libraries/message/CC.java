@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.message;
 
 import com.conaxgames.libraries.util.VersioningChecker;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 
 import java.util.List;
@@ -10,6 +11,12 @@ import java.util.regex.Pattern;
 public final class CC {
 
     private CC() {}
+
+    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character(LegacyComponentSerializer.SECTION_CHAR)
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build();
 
     private static final char SECTION = ChatColor.COLOR_CHAR;
     private static final Pattern HEX = Pattern.compile("(?i)[&" + SECTION + "]#([0-9a-f]{6})");

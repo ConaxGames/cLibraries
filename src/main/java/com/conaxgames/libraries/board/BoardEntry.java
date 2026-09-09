@@ -1,6 +1,7 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.message.CC;
+import net.kyori.adventure.text.format.ShadowColor;
 import org.bukkit.scoreboard.Team;
 
 @SuppressWarnings("deprecation")
@@ -36,8 +37,8 @@ final class BoardEntry {
 
         var translated = CC.translate(text);
         if (Board.MODERN) {
-            var component = Board.Legacy.SERIALIZER.deserialize(translated);
-            score.customName(Board.TEXT_SHADOW ? component.shadowColor(Board.Legacy.SHADOW) : component);
+            var component = CC.LEGACY.deserialize(translated);
+            score.customName(Board.TEXT_SHADOW ? component.shadowColor(ShadowColor.shadowColor(0xFF000000)) : component);
             return;
         }
 
