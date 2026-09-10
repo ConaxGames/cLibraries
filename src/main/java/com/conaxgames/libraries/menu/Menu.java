@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -117,8 +118,12 @@ public final class Menu {
 
     private Holder holderFor(Player player) {
         Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
-        if (top.getHolder() instanceof Holder holder && holder.menu == this && holder.viewerId.equals(player.getUniqueId())) {
-            return holder;
+        InventoryHolder inventoryHolder = top.getHolder();
+        if (inventoryHolder instanceof Holder) {
+            Holder holder = (Holder) inventoryHolder;
+            if (holder.menu == this && holder.viewerId.equals(player.getUniqueId())) {
+                return holder;
+            }
         }
         return null;
     }
@@ -212,7 +217,7 @@ public final class Menu {
 
         public final Menu menu;
         public final UUID viewerId;
-        private Map<Integer, Button> slotButtons = Map.of();
+        private Map<Integer, Button> slotButtons = Collections.emptyMap();
         private boolean hasEditable;
         private boolean filled;
         Inventory inventory;

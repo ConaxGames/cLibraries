@@ -74,7 +74,13 @@ public class FoliaScheduler implements Scheduler {
         return new Task(async(plugin).runAtFixedRate(plugin, wrap(runnable), delay * MILLIS_PER_TICK, period * MILLIS_PER_TICK, TimeUnit.MILLISECONDS));
     }
 
-    private record Task(ScheduledTask task) implements CancellableTask {
+    private static final class Task implements CancellableTask {
+
+        private final ScheduledTask task;
+
+        private Task(ScheduledTask task) {
+            this.task = task;
+        }
 
         @Override
         public void cancel() {

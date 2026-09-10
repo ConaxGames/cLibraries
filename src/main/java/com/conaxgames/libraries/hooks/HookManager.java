@@ -5,6 +5,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class HookManager {
 
@@ -42,6 +43,6 @@ public final class HookManager {
     public List<Plugin> dependents() {
         return Arrays.stream(Bukkit.getPluginManager().getPlugins())
                 .filter(p -> p.getDescription().getDepend().contains("cLibraries"))
-                .toList();
+                .collect(Collectors.toList());
     }
 }

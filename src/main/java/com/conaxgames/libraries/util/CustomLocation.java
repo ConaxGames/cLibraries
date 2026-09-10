@@ -45,7 +45,7 @@ public final class CustomLocation {
     }
 
     public static CustomLocation fromString(String string) {
-        if (string == null || string.isBlank()) {
+        if (string == null || string.trim().isEmpty()) {
             throw new IllegalArgumentException("Location string cannot be null or empty");
         }
 
@@ -144,9 +144,10 @@ public final class CustomLocation {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof CustomLocation other)) {
+        if (!(obj instanceof CustomLocation)) {
             return false;
         }
+        CustomLocation other = (CustomLocation) obj;
         return world.equals(other.world)
                 && Double.compare(x, other.x) == 0
                 && Double.compare(y, other.y) == 0

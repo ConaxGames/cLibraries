@@ -65,14 +65,14 @@ public class ModuleManager {
         if (!module.enabled) {
             module.reloadConfig();
             try {
-                if (module instanceof Listener listener) {
-                    Bukkit.getPluginManager().registerEvents(listener, module.getJavaPlugin());
+                if (module instanceof Listener) {
+                    Bukkit.getPluginManager().registerEvents((Listener) module, module.getJavaPlugin());
                 }
                 module.onEnable();
                 module.enabled = true;
             } catch (Throwable t) {
-                if (module instanceof Listener listener) {
-                    HandlerList.unregisterAll(listener);
+                if (module instanceof Listener) {
+                    HandlerList.unregisterAll((Listener) module);
                 }
                 library.getLibraryLogger().toConsole("ModuleManager", "Failed to enable module " + module.getName(), t);
                 return "Failed to enable " + id;
@@ -98,8 +98,8 @@ public class ModuleManager {
 
         try {
             module.onDisable();
-            if (module instanceof Listener listener) {
-                HandlerList.unregisterAll(listener);
+            if (module instanceof Listener) {
+                HandlerList.unregisterAll((Listener) module);
             }
             module.enabled = false;
         } catch (Throwable t) {

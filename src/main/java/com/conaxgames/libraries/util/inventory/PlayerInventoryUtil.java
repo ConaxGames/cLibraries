@@ -48,7 +48,7 @@ public final class PlayerInventoryUtil {
     }
 
     public static DecodedSnapshot decode(String base64) {
-        if (base64 == null || base64.isBlank()) {
+        if (base64 == null || base64.trim().isEmpty()) {
             return null;
         }
         try (ByteArrayInputStream bytes = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
@@ -144,14 +144,49 @@ public final class PlayerInventoryUtil {
         return false;
     }
 
-    public record DecodedSnapshot(
-            ItemStack[] contents,
-            ItemStack[] armor,
-            ItemStack[] extra,
-            int level,
-            float exp,
-            List<PotionEffect> effects
-    ) {
+    public static final class DecodedSnapshot {
+
+        private final ItemStack[] contents;
+        private final ItemStack[] armor;
+        private final ItemStack[] extra;
+        private final int level;
+        private final float exp;
+        private final List<PotionEffect> effects;
+
+        public DecodedSnapshot(ItemStack[] contents, ItemStack[] armor, ItemStack[] extra,
+                               int level, float exp, List<PotionEffect> effects) {
+            this.contents = contents;
+            this.armor = armor;
+            this.extra = extra;
+            this.level = level;
+            this.exp = exp;
+            this.effects = effects;
+        }
+
+        public ItemStack[] contents() {
+            return contents;
+        }
+
+        public ItemStack[] armor() {
+            return armor;
+        }
+
+        public ItemStack[] extra() {
+            return extra;
+        }
+
+        public int level() {
+            return level;
+        }
+
+        public float exp() {
+            return exp;
+        }
+
+        public List<PotionEffect> effects() {
+            return effects;
+        }
+
         public List<PotionEffect> getEffects() {
             return effects == null ? Collections.emptyList() : effects;
         }

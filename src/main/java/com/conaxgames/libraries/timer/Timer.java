@@ -47,7 +47,7 @@ public abstract class Timer {
     }
 
     public TimerCooldown clearCooldown(@Nullable Player player, UUID playerUUID) {
-        var cooldown = cooldowns.remove(playerUUID);
+        TimerCooldown cooldown = cooldowns.remove(playerUUID);
         if (cooldown != null) {
             cooldown.cancel();
             dispatch(new TimerClearEvent(player, playerUUID, this));
@@ -60,7 +60,7 @@ public abstract class Timer {
     }
 
     public boolean isPaused(UUID playerUUID) {
-        var cooldown = cooldowns.get(playerUUID);
+        TimerCooldown cooldown = cooldowns.get(playerUUID);
         return cooldown != null && cooldown.isPaused();
     }
 
@@ -69,9 +69,9 @@ public abstract class Timer {
     }
 
     public void setPaused(UUID playerUUID, boolean paused) {
-        var cooldown = cooldowns.get(playerUUID);
+        TimerCooldown cooldown = cooldowns.get(playerUUID);
         if (cooldown != null && cooldown.isPaused() != paused) {
-            var event = new TimerPauseEvent(playerUUID, this, paused);
+            TimerPauseEvent event = new TimerPauseEvent(playerUUID, this, paused);
             dispatch(event);
             if (!event.isCancelled()) {
                 cooldown.setPaused(paused);
@@ -84,7 +84,7 @@ public abstract class Timer {
     }
 
     public long getRemaining(UUID playerUUID) {
-        var cooldown = cooldowns.get(playerUUID);
+        TimerCooldown cooldown = cooldowns.get(playerUUID);
         return cooldown == null ? 0L : cooldown.getRemaining();
     }
 
@@ -107,14 +107,14 @@ public abstract class Timer {
             return false;
         }
 
-        var existing = cooldowns.get(playerUUID);
+        TimerCooldown existing = cooldowns.get(playerUUID);
         if (existing != null) {
             long remaining = existing.getRemaining();
             if (!overwrite && remaining > 0L && duration <= remaining) {
                 return false;
             }
 
-            var event = new TimerExtendEvent(player, playerUUID, this, remaining, duration);
+            TimerExtendEvent event = new TimerExtendEvent(player, playerUUID, this, remaining, duration);
             dispatch(event);
             if (event.isCancelled()) {
                 return false;
@@ -128,7 +128,7 @@ public abstract class Timer {
             return true;
         }
 
-        var event = new TimerStartEvent(player, playerUUID, this, duration);
+        TimerStartEvent event = new TimerStartEvent(player, playerUUID, this, duration);
         dispatch(event);
         if (event.isCancelled()) {
             return false;

@@ -41,16 +41,29 @@ public final class TimeUtil {
             Long value = Long.parseLong(s.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)")[0]);
             String type = s.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)")[1];
             switch (type) {
-                case "s" -> totalTime += value;
-                case "m" -> totalTime += value * 60;
-                case "h" -> totalTime += value * 60 * 60;
-                case "d" -> totalTime += value * 60 * 60 * 24;
-                case "w" -> totalTime += value * 60 * 60 * 24 * 7;
-                case "M" -> totalTime += value * 60 * 60 * 24 * 30;
-                case "y" -> totalTime += value * 60 * 60 * 24 * 365;
-                default -> {
+                case "s":
+                    totalTime += value;
+                    break;
+                case "m":
+                    totalTime += value * 60;
+                    break;
+                case "h":
+                    totalTime += value * 60 * 60;
+                    break;
+                case "d":
+                    totalTime += value * 60 * 60 * 24;
+                    break;
+                case "w":
+                    totalTime += value * 60 * 60 * 24 * 7;
+                    break;
+                case "M":
+                    totalTime += value * 60 * 60 * 24 * 30;
+                    break;
+                case "y":
+                    totalTime += value * 60 * 60 * 24 * 365;
+                    break;
+                default:
                     continue;
-                }
             }
             found = true;
         }
@@ -82,7 +95,7 @@ public final class TimeUtil {
         if (seconds > 1) output.append(seconds).append("s");
         else if (seconds == 1) output.append(seconds).append("s");
 
-        if (output.isEmpty()) {
+        if (output.length() == 0) {
             output.append("0s");
         }
 

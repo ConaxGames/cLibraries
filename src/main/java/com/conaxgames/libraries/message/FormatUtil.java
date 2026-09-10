@@ -34,7 +34,7 @@ public final class FormatUtil {
     private FormatUtil() {}
 
     public static String stripFormatting(String format) {
-        if (format == null || format.isBlank()) return "";
+        if (format == null || format.trim().isEmpty()) return "";
         return FORMAT_CODES.matcher(format).replaceAll("");
     }
 
@@ -47,8 +47,8 @@ public final class FormatUtil {
     }
 
     public static List<String> wordWrap(String s, int firstSegment, int lineSize) {
-        var format = getFormatPrefix(s);
-        var words = new ArrayList<String>();
+        String format = getFormatPrefix(s);
+        List<String> words = new ArrayList<>();
         int numChars = firstSegment;
         int start = 0;
         int ix = 0;
@@ -57,17 +57,17 @@ public final class FormatUtil {
             ix = s.indexOf(' ', ix + 1);
             if (ix == -1) break;
 
-            var sub = s.substring(start, ix).stripTrailing();
+            String sub = stripTrailing(s.substring(start, ix));
             int visibleLen = CC.stripAllColor(CC.translate(sub)).length() + 1;
             if (visibleLen >= numChars && !sub.isEmpty()) {
-                var f = getFormatPrefix(sub);
+                String f = getFormatPrefix(sub);
                 if (!f.isEmpty()) format = f;
                 words.add(applyFormat(format, sub));
                 numChars = lineSize;
                 start = ix + 1;
             }
         }
-        words.add(applyFormat(format, s.substring(start).stripTrailing()));
+        words.add(applyFormat(format, stripTrailing(s.substring(start))));
         return words;
     }
 
@@ -78,18 +78,27 @@ public final class FormatUtil {
     }
 
     private static String getFormatPrefix(String s) {
-        if (s == null || s.isBlank()) return "";
+        if (s == null || s.trim().isEmpty()) return "";
         return ChatColor.getLastColors(CC.translate(s)).replace(SECTION, '&');
     }
 
+    // Trailing-only trim so leading indentation survives the wrap.
+    private static String stripTrailing(String s) {
+        int end = s.length();
+        while (end > 0 && Character.isWhitespace(s.charAt(end - 1))) {
+            end--;
+        }
+        return s.substring(0, end);
+    }
+
     public static String possessiveString(String str) {
-        if (str == null || str.isBlank()) return "";
+        if (str == null || str.trim().isEmpty()) return "";
         return str + (str.endsWith("s") ? "'" : "'s");
     }
 
     public static String camelcase(String name) {
         if (name == null || name.isEmpty()) return "";
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (String part : name.split("[ _]")) {
             if (part.isEmpty()) continue;
             sb.append(Character.toUpperCase(part.charAt(0)));

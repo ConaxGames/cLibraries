@@ -37,7 +37,7 @@ public class Clickable {
         if (message == null) {
             return;
         }
-        for (var part : TextComponent.fromLegacyText(CC.translate(message))) {
+        for (BaseComponent part : TextComponent.fromLegacyText(CC.translate(message))) {
             components.add((TextComponent) part);
         }
     }
@@ -47,12 +47,12 @@ public class Clickable {
     }
 
     public TextComponent[] asComponents() {
-        return components.toArray(TextComponent[]::new);
+        return components.toArray(new TextComponent[0]);
     }
 
     private TextComponent append(String msg, String hoverMsg, ClickEvent clickEvent) {
-        var parts = TextComponent.fromLegacyText(CC.translate(msg));
-        var root = (TextComponent) parts[0];
+        BaseComponent[] parts = TextComponent.fromLegacyText(CC.translate(msg));
+        TextComponent root = (TextComponent) parts[0];
         for (int i = 1; i < parts.length; i++) {
             root.addExtra(parts[i]);
         }

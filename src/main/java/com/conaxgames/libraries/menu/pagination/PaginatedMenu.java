@@ -5,6 +5,7 @@ import com.conaxgames.libraries.menu.Menu;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public final class PaginatedMenu {
         private int rows = 6;
         private int maxPerPage = 45;
         private int[] contentSlots;
-        private Function<Player, List<Button>> entries = player -> List.of();
+        private Function<Player, List<Button>> entries = player -> Collections.emptyList();
         private int previousSlot = 48;
         private int nextSlot = 50;
         private Button filler;

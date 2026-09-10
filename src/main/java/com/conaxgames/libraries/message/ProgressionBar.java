@@ -1,5 +1,7 @@
 package com.conaxgames.libraries.message;
 
+import java.util.Collections;
+
 public final class ProgressionBar {
 
     private int current;
@@ -87,18 +89,22 @@ public final class ProgressionBar {
     public String build() {
         int len = Math.max(length, 0);
         int safeMax = Math.max(max, 0);
-        float ratio = safeMax > 0 ? (float) Math.clamp(current, 0, safeMax) / safeMax : 0f;
+        float ratio = safeMax > 0 ? (float) Math.max(0, Math.min(current, safeMax)) / safeMax : 0f;
         int filled = (int) (len * ratio);
         int empty = len - filled;
 
         String sym = String.valueOf(symbol);
         StringBuilder out = new StringBuilder();
         if (brackets) out.append(bracketColor).append(openBracket);
-        out.append((completedColor + sym).repeat(filled)).append((remainingColor + sym).repeat(empty));
+        out.append(repeat(completedColor + sym, filled)).append(repeat(remainingColor + sym, empty));
         if (brackets) out.append(bracketColor).append(closeBracket);
         if (percent) out.append(' ').append(percentColor).append(Math.round(ratio * 100)).append('%');
         if (suffix != null) out.append(suffix);
         return CC.translate(out.toString());
+    }
+
+    private static String repeat(String s, int count) {
+        return String.join("", Collections.nCopies(count, s));
     }
 
     @Override

@@ -23,9 +23,10 @@ public class Pair<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Pair<?, ?> objPair))
+        if (!(obj instanceof Pair<?, ?>))
             return false;
 
+        Pair<?, ?> objPair = (Pair<?, ?>) obj;
         return this.key.equals(objPair.key) && this.value.equals(objPair.value);
     }
 

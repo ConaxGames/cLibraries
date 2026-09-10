@@ -3,6 +3,8 @@ package com.conaxgames.libraries.message.center;
 import com.conaxgames.libraries.message.CC;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+
 public final class Center {
 
     private static final int CENTER_PX = 154;
@@ -13,7 +15,7 @@ public final class Center {
     public static String getCentered(String message) {
         if (message == null || message.isEmpty()) return message;
 
-        var translated = CC.translate(message);
+        String translated = CC.translate(message);
         int messagePx = 0;
         boolean previousCode = false;
         boolean isBold = false;
@@ -26,14 +28,14 @@ public final class Center {
                 previousCode = false;
                 isBold = c == 'l' || c == 'L';
             } else {
-                var font = DefaultFontInfo.getDefaultFontInfo(c);
+                DefaultFontInfo font = DefaultFontInfo.getDefaultFontInfo(c);
                 messagePx += isBold ? font.getBoldLength() : font.getLength();
                 messagePx++;
             }
         }
 
         int padding = (CENTER_PX - messagePx / 2) / SPACE_WIDTH;
-        return " ".repeat(Math.max(0, padding)) + translated;
+        return String.join("", Collections.nCopies(Math.max(0, padding), " ")) + translated;
     }
 
     public static void sendCenteredMessage(Player player, String message) {

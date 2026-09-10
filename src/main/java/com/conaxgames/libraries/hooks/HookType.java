@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.hooks;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -36,7 +37,7 @@ public enum HookType {
         for (HookType type : values()) {
             map.put(type.name().toLowerCase(Locale.ROOT), type);
         }
-        BY_NAME = Map.copyOf(map);
+        BY_NAME = Collections.unmodifiableMap(map);
     }
 
     public static Optional<HookType> fromPluginName(String name) {

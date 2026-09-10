@@ -12,13 +12,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +53,7 @@ public final class ItemBuilder {
     }
 
     public static ItemBuilder of(XMaterial material, int amount) {
-        var parsed = material.parseItem();
+        ItemStack parsed = material.parseItem();
         if (parsed == null) {
             throw new IllegalArgumentException("Unsupported material: " + material);
         }
@@ -86,7 +89,7 @@ public final class ItemBuilder {
 
     public ItemBuilder appendLore(List<String> lines) {
         itemStack.editMeta(meta -> {
-            var lore = meta.getLore() != null ? new ArrayList<>(meta.getLore()) : new ArrayList<String>();
+            List<String> lore = meta.getLore() != null ? new ArrayList<>(meta.getLore()) : new ArrayList<String>();
             for (String line : lines) {
                 lore.addAll(CC.translate(FormatUtil.wordWrap(line == null ? "" : line)));
             }
@@ -109,7 +112,7 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder enchant(XEnchantment enchantment, int level) {
-        var resolved = enchantment.get();
+        Enchantment resolved = enchantment.get();
         if (resolved != null) {
             itemStack.editMeta(meta -> meta.addEnchant(resolved, level, true));
         }
@@ -117,7 +120,7 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder removeEnchant(XEnchantment enchantment) {
-        var resolved = enchantment.get();
+        Enchantment resolved = enchantment.get();
         if (resolved != null) {
             itemStack.removeEnchantment(resolved);
         }
@@ -126,7 +129,7 @@ public final class ItemBuilder {
 
     public ItemBuilder flags(XItemFlag... flags) {
         itemStack.editMeta(meta -> {
-            for (var flag : flags) {
+            for (XItemFlag flag : flags) {
                 flag.set(meta);
             }
         });
@@ -135,7 +138,7 @@ public final class ItemBuilder {
 
     public ItemBuilder removeFlags(XItemFlag... flags) {
         itemStack.editMeta(meta -> {
-            for (var flag : flags) {
+            for (XItemFlag flag : flags) {
                 flag.removeFrom(meta);
             }
         });
@@ -144,7 +147,7 @@ public final class ItemBuilder {
 
     public ItemBuilder glow(boolean glow) {
         itemStack.editMeta(meta -> {
-            var unbreaking = XEnchantment.UNBREAKING.get();
+            Enchantment unbreaking = XEnchantment.UNBREAKING.get();
             if (glow) {
                 if (unbreaking != null) {
                     meta.addEnchant(unbreaking, 1, true);
@@ -173,17 +176,17 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder skull(String name) {
-        var online = Bukkit.getPlayerExact(name);
+        Player online = Bukkit.getPlayerExact(name);
         return skull(online != null ? profileOf(online) : Profileable.detect(name));
     }
 
     public ItemBuilder skull(UUID uuid) {
-        var online = Bukkit.getPlayer(uuid);
+        Player online = Bukkit.getPlayer(uuid);
         return skull(online != null ? profileOf(online) : Profileable.of(uuid));
     }
 
     public ItemBuilder skull(OfflinePlayer offlinePlayer) {
-        var online = offlinePlayer.getPlayer();
+        Player online = offlinePlayer.getPlayer();
         return skull(online != null ? profileOf(online) : Profileable.of(offlinePlayer));
     }
 
@@ -208,8 +211,8 @@ public final class ItemBuilder {
 
     public ItemBuilder leatherColor(Color color) {
         itemStack.editMeta(meta -> {
-            if (meta instanceof LeatherArmorMeta leather) {
-                leather.setColor(color);
+            if (meta instanceof LeatherArmorMeta) {
+                ((LeatherArmorMeta) meta).setColor(color);
             }
         });
         return this;
@@ -217,7 +220,7 @@ public final class ItemBuilder {
 
     public ItemBuilder potionEffect(XPotion type, int durationTicks, int level) {
         itemStack.editMeta(PotionMeta.class, meta -> {
-            var effect = type.buildPotionEffect(durationTicks, level);
+            PotionEffect effect = type.buildPotionEffect(durationTicks, level);
             if (effect != null) {
                 meta.addCustomEffect(effect, true);
             }
@@ -237,8 +240,8 @@ public final class ItemBuilder {
     
     public ItemBuilder unstackable(boolean unstackable) {
         itemStack.editMeta(meta -> {
-            var key = new NamespacedKey("conaxgames", "unstackable");
-            var container = meta.getPersistentDataContainer();
+            NamespacedKey key = new NamespacedKey("conaxgames", "unstackable");
+            PersistentDataContainer container = meta.getPersistentDataContainer();
             if (unstackable) {
                 container.set(key, PersistentDataType.STRING, UUID.randomUUID().toString());
                 return;

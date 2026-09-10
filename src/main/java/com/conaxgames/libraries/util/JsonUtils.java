@@ -2,7 +2,7 @@ package com.conaxgames.libraries.util;
 
 import org.json.JSONObject;
 
-@Deprecated(forRemoval = true)
+@Deprecated
 public class JsonUtils {
 
     public static int getJSONInteger(JSONObject jsonObject, String key) {

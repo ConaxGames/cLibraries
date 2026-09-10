@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class CC {
 
@@ -41,7 +42,8 @@ public final class CC {
         String out = vars(input);
         Matcher matcher = HEX.matcher(out);
         if (matcher.find()) {
-            StringBuilder sb = new StringBuilder(out.length() + 16);
+            // Matcher only accepts StringBuffer for appendReplacement/appendTail on Java 8.
+            StringBuffer sb = new StringBuffer(out.length() + 16);
             do {
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(hex(matcher.group(1))));
             } while (matcher.find());
@@ -51,7 +53,7 @@ public final class CC {
     }
 
     public static List<String> translate(List<String> input) {
-        return input == null ? null : input.stream().map(CC::translate).toList();
+        return input == null ? null : input.stream().map(CC::translate).collect(Collectors.toList());
     }
 
     public static String stripAllColor(String input) {

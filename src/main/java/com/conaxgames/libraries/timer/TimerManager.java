@@ -17,9 +17,9 @@ public final class TimerManager {
 
     public void registerTimer(Timer timer) {
         timers.add(timer);
-        if (timer instanceof Listener listener) {
+        if (timer instanceof Listener) {
             LibraryPlugin.getInstance().getPlugin().getServer().getPluginManager()
-                    .registerEvents(listener, LibraryPlugin.getInstance().getPlugin());
+                    .registerEvents((Listener) timer, LibraryPlugin.getInstance().getPlugin());
         }
     }
 
@@ -28,7 +28,7 @@ public final class TimerManager {
     }
 
     public <T extends Timer> T getTimer(Class<T> timerClass) {
-        for (var timer : timers) {
+        for (Timer timer : timers) {
             if (timerClass.isInstance(timer)) {
                 return timerClass.cast(timer);
             }
@@ -45,7 +45,7 @@ public final class TimerManager {
     }
 
     public void setCooldown(UUID uuid, String key, long duration) {
-        cooldowns.computeIfAbsent(uuid, _ -> new ConcurrentHashMap<>())
+        cooldowns.computeIfAbsent(uuid, ignored -> new ConcurrentHashMap<>())
                 .put(key, System.currentTimeMillis() + duration);
     }
 
@@ -62,11 +62,11 @@ public final class TimerManager {
     }
 
     public long getRemaining(UUID uuid, String key) {
-        var keys = cooldowns.get(uuid);
+        ConcurrentHashMap<String, Long> keys = cooldowns.get(uuid);
         if (keys == null) {
             return 0L;
         }
-        var expiry = keys.get(key);
+        Long expiry = keys.get(key);
         if (expiry == null) {
             return 0L;
         }
@@ -83,14 +83,14 @@ public final class TimerManager {
     }
 
     public void removeCooldown(UUID uuid, String key) {
-        var keys = cooldowns.get(uuid);
+        ConcurrentHashMap<String, Long> keys = cooldowns.get(uuid);
         if (keys != null) {
             keys.remove(key);
         }
     }
 
     public void clearExpiredCooldowns() {
-        cooldowns.forEach((_, keys) ->
+        cooldowns.forEach((uuid, keys) ->
                 keys.values().removeIf(expiry -> System.currentTimeMillis() >= expiry));
         cooldowns.entrySet().removeIf(e -> e.getValue().isEmpty());
     }

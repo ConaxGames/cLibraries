@@ -60,7 +60,13 @@ public class PaperScheduler implements Scheduler {
         return new Task(backend(plugin).runTaskTimerAsynchronously(plugin, runnable, delay, period));
     }
 
-    private record Task(BukkitTask task) implements CancellableTask {
+    private static final class Task implements CancellableTask {
+
+        private final BukkitTask task;
+
+        private Task(BukkitTask task) {
+            this.task = task;
+        }
 
         @Override
         public void cancel() {

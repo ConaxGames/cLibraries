@@ -23,11 +23,16 @@ public final class ButtonListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (!(event.getWhoClicked() instanceof Player player)) {
+        if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getWhoClicked();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
+        if (!(top.getHolder() instanceof Menu.Holder)) {
+            return;
+        }
+        Menu.Holder holder = (Menu.Holder) top.getHolder();
+        if (!holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
@@ -104,11 +109,16 @@ public final class ButtonListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) {
+        if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getWhoClicked();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
+        if (!(top.getHolder() instanceof Menu.Holder)) {
+            return;
+        }
+        Menu.Holder holder = (Menu.Holder) top.getHolder();
+        if (!holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
         for (int rawSlot : event.getRawSlots()) {
@@ -121,11 +131,16 @@ public final class ButtonListener implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player player)) {
+        if (!(event.getPlayer() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getPlayer();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder holder) || !holder.viewerId.equals(player.getUniqueId())) {
+        if (!(top.getHolder() instanceof Menu.Holder)) {
+            return;
+        }
+        Menu.Holder holder = (Menu.Holder) top.getHolder();
+        if (!holder.viewerId.equals(player.getUniqueId())) {
             return;
         }
         Menu menu = holder.menu;

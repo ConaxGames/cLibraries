@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.message.center;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -73,10 +74,10 @@ public enum DefaultFontInfo {
     DEFAULT('a', 4);
 
     private static final Map<Character, DefaultFontInfo> LOOKUP =
-            Stream.of(values())
+            Collections.unmodifiableMap(Stream.of(values())
                     .filter(v -> v != DEFAULT)
-                    .collect(Collectors.toUnmodifiableMap(
-                            DefaultFontInfo::getCharacter, Function.identity()));
+                    .collect(Collectors.toMap(
+                            DefaultFontInfo::getCharacter, Function.identity())));
 
     private final char character;
     private final int length;

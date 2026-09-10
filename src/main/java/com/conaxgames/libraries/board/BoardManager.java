@@ -55,7 +55,7 @@ public final class BoardManager implements Runnable {
     @Override
     public void run() {
         boards.entrySet().removeIf(entry -> {
-            var player = Bukkit.getPlayer(entry.getKey());
+            Player player = Bukkit.getPlayer(entry.getKey());
             if (player == null) {
                 return true;
             }
@@ -65,15 +65,15 @@ public final class BoardManager implements Runnable {
     }
 
     private void update(Player player, Board board) {
-        var lines = this.lines.apply(player);
+        List<String> lines = this.lines.apply(player);
         int count = Math.min(lines.size(), KEYS.length);
 
-        var title = CC.translate(this.title.apply(player));
+        String title = CC.translate(this.title.apply(player));
         title = title.substring(0, Math.min(title.length(), TITLE_MAX));
         if (!title.equals(board.title)) {
             board.title = title;
             if (MODERN) {
-                var name = CC.LEGACY.deserialize(title);
+                Component name = CC.LEGACY.deserialize(title);
                 board.objective.displayName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
             } else {
                 board.objective.setDisplayName(title);
@@ -82,7 +82,7 @@ public final class BoardManager implements Runnable {
 
         // A dropped line keeps its team, which is picked back up below if the board grows again.
         while (board.entries.size() > count) {
-            board.entries.removeLast();
+            board.entries.remove(board.entries.size() - 1);
             board.scoreboard.resetScores(KEYS[board.entries.size()]);
         }
 
@@ -94,27 +94,27 @@ public final class BoardManager implements Runnable {
                 board.objective.getScore(KEYS[i]).setScore(i + 1);
             }
 
-            var entry = board.entries.get(i);
+            Entry entry = board.entries.get(i);
             if (!MODERN && entry.team == null) {
-                var team = board.scoreboard.getTeam("board_" + i);
+                Team team = board.scoreboard.getTeam("board_" + i);
                 entry.team = team != null ? team : board.scoreboard.registerNewTeam("board_" + i);
                 entry.team.addEntry(KEYS[i]);
             }
 
-            var line = lines.get(count - 1 - i);
+            String line = lines.get(count - 1 - i);
             if (line.equals(entry.text)) {
                 continue;
             }
             entry.text = line;
 
-            var text = CC.translate(line);
+            String text = CC.translate(line);
             if (MODERN) {
-                var name = CC.LEGACY.deserialize(text);
+                Component name = CC.LEGACY.deserialize(text);
                 board.objective.getScore(KEYS[i])
                         .customName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
             } else {
-                var prefix = text;
-                var suffix = "";
+                String prefix = text;
+                String suffix = "";
                 if (text.length() > SEGMENT_MAX) {
                     // Cut before the colour code rather than through it.
                     int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
@@ -141,13 +141,13 @@ public final class BoardManager implements Runnable {
             return;
         }
 
-        var board = new Board();
+        Board board = new Board();
         // Keep whatever another plugin already put on the player, only the main scoreboard is shared.
         board.scoreboard = player.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard())
                 ? Bukkit.getScoreboardManager().getNewScoreboard()
                 : player.getScoreboard();
 
-        var existing = board.scoreboard.getObjective("sb");
+        Objective existing = board.scoreboard.getObjective("sb");
         if (existing != null) {
             existing.unregister();
         }

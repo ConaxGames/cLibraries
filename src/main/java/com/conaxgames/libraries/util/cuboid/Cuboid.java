@@ -256,8 +256,9 @@ public final class Cuboid implements Iterable<Location> {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Cuboid other)) return false;
+        if (!(obj instanceof Cuboid)) return false;
 
+        Cuboid other = (Cuboid) obj;
         return worldName.equals(other.worldName) &&
                 minX == other.minX && maxX == other.maxX &&
                 minY == other.minY && maxY == other.maxY &&
