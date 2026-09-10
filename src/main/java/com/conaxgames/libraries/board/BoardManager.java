@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -74,7 +73,7 @@ public final class BoardManager implements Runnable {
         if (!title.equals(board.title)) {
             board.title = title;
             if (MODERN) {
-                Modern.title(board.objective, title);
+                board.objective.displayName(Modern.component(title));
             } else {
                 board.objective.setDisplayName(title);
             }
@@ -109,7 +108,7 @@ public final class BoardManager implements Runnable {
 
             String text = CC.translate(line);
             if (MODERN) {
-                Modern.line(board.objective.getScore(KEYS[i]), text);
+                board.objective.getScore(KEYS[i]).customName(Modern.component(text));
             } else {
                 String prefix = text;
                 String suffix = "";
@@ -177,7 +176,8 @@ public final class BoardManager implements Runnable {
         String text;
     }
 
-    // Kept apart so the verifier never has to resolve Adventure or Criteria on servers below the gate.
+    // Both calls hand a TextComponent to a Component parameter, which makes the verifier load Adventure, so they are
+    // kept apart from the class that has to link on servers below the gate.
     private static final class Modern {
 
         static Objective objective(Scoreboard scoreboard) {
@@ -186,15 +186,7 @@ public final class BoardManager implements Runnable {
             return objective;
         }
 
-        static void title(Objective objective, String legacy) {
-            objective.displayName(component(legacy));
-        }
-
-        static void line(Score score, String legacy) {
-            score.customName(component(legacy));
-        }
-
-        private static Component component(String legacy) {
+        static Component component(String legacy) {
             Component name = CC.legacy().deserialize(legacy);
             return TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name;
         }

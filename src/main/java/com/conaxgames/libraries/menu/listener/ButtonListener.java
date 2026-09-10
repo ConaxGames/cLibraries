@@ -5,6 +5,7 @@ import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
 import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.inventory.XInventoryView;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public final class ButtonListener implements Listener {
@@ -28,11 +30,8 @@ public final class ButtonListener implements Listener {
         }
         Player player = (Player) event.getWhoClicked();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder)) {
-            return;
-        }
-        Menu.Holder holder = (Menu.Holder) top.getHolder();
-        if (!holder.viewerId.equals(player.getUniqueId())) {
+        Menu.Holder holder = holderFor(top, player);
+        if (holder == null) {
             return;
         }
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
@@ -109,16 +108,9 @@ public final class ButtonListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
-        Player player = (Player) event.getWhoClicked();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder)) {
-            return;
-        }
-        Menu.Holder holder = (Menu.Holder) top.getHolder();
-        if (!holder.viewerId.equals(player.getUniqueId())) {
+        Menu.Holder holder = holderFor(top, event.getWhoClicked());
+        if (holder == null) {
             return;
         }
         for (int rawSlot : event.getRawSlots()) {
@@ -136,11 +128,8 @@ public final class ButtonListener implements Listener {
         }
         Player player = (Player) event.getPlayer();
         Inventory top = XInventoryView.of(event.getView()).getTopInventory();
-        if (!(top.getHolder() instanceof Menu.Holder)) {
-            return;
-        }
-        Menu.Holder holder = (Menu.Holder) top.getHolder();
-        if (!holder.viewerId.equals(player.getUniqueId())) {
+        Menu.Holder holder = holderFor(top, player);
+        if (holder == null) {
             return;
         }
         Menu menu = holder.menu;
@@ -156,5 +145,13 @@ public final class ButtonListener implements Listener {
                 previous.open(player);
             }
         }, 2L);
+    }
+
+    // A menu inventory only belongs to the viewer it was opened for.
+    private static Menu.Holder holderFor(Inventory top, HumanEntity viewer) {
+        InventoryHolder holder = top.getHolder();
+        return holder instanceof Menu.Holder && ((Menu.Holder) holder).viewerId.equals(viewer.getUniqueId())
+                ? (Menu.Holder) holder
+                : null;
     }
 }

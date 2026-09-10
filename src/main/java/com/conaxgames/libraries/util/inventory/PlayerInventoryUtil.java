@@ -93,7 +93,7 @@ public final class PlayerInventoryUtil {
         }
         player.setLevel(snapshot.level());
         player.setExp(snapshot.exp());
-        for (PotionEffect effect : snapshot.getEffects()) {
+        for (PotionEffect effect : snapshot.effects()) {
             player.addPotionEffect(effect);
         }
     }
@@ -184,10 +184,6 @@ public final class PlayerInventoryUtil {
         }
 
         public List<PotionEffect> effects() {
-            return effects;
-        }
-
-        public List<PotionEffect> getEffects() {
             return effects == null ? Collections.emptyList() : effects;
         }
     }
