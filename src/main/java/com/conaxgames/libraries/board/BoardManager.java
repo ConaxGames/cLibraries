@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.message.CC;
-import com.cryptomorin.xseries.reflection.XReflection;
+import com.conaxgames.libraries.util.VersioningChecker;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
@@ -26,10 +26,10 @@ public final class BoardManager implements Runnable {
 
     public static final String SKIP_BOARD_METADATA = "cElement";
 
-    private static final boolean MODERN = XReflection.supports(1, 20, 4);
-    private static final boolean TEXT_SHADOW = XReflection.supports(1, 21, 4);
-    private static final int SEGMENT_MAX = XReflection.supports(1, 13) ? 64 : 16;
-    private static final int TITLE_MAX = XReflection.supports(1, 13) ? 128 : 32;
+    private static final boolean MODERN = VersioningChecker.supports("1.20.4");
+    private static final boolean TEXT_SHADOW = VersioningChecker.supports("1.21.4");
+    private static final int SEGMENT_MAX = VersioningChecker.supports("1.13") ? 64 : 16;
+    private static final int TITLE_MAX = VersioningChecker.supports("1.13") ? 128 : 32;
     // Legacy entries have to render as nothing; a unique colour pair per line is the height cap.
     private static final String CODES = "0123456789abcdefklmor";
     private static final String[] KEYS = new String[CODES.length()];

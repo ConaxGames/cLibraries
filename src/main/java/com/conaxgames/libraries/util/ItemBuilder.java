@@ -8,7 +8,6 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
-import com.cryptomorin.xseries.reflection.XReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
@@ -106,7 +105,7 @@ public final class ItemBuilder {
     @SuppressWarnings("deprecation")
     public ItemBuilder durability(int damage) {
         // Damageable only exists from 1.13, older servers keep damage on the stack itself.
-        if (XReflection.supports(1, 13)) {
+        if (VersioningChecker.supports("1.13")) {
             return meta(Damageable.class, meta -> meta.setDamage(damage));
         }
         itemStack.setDurability((short) damage);
@@ -163,12 +162,12 @@ public final class ItemBuilder {
 
     public ItemBuilder unbreakable(boolean unbreakable) {
         // ItemMeta#setUnbreakable only exists from 1.11.
-        return XReflection.supports(1, 11) ? meta(meta -> meta.setUnbreakable(unbreakable)) : this;
+        return VersioningChecker.supports("1.11") ? meta(meta -> meta.setUnbreakable(unbreakable)) : this;
     }
 
     public ItemBuilder modelData(int modelData) {
         // Custom model data only exists from 1.14.
-        return XReflection.supports(1, 14) ? meta(meta -> meta.setCustomModelData(modelData)) : this;
+        return VersioningChecker.supports("1.14") ? meta(meta -> meta.setCustomModelData(modelData)) : this;
     }
 
     public ItemBuilder skull(String name) {
@@ -192,7 +191,7 @@ public final class ItemBuilder {
 
     private static Profileable profileOf(Player player) {
         // Paper exposes the live profile (so custom skins are kept) from 1.12.2, older servers look the player up.
-        if (!XReflection.supports(1, 12, 2)) {
+        if (!VersioningChecker.supports("1.12.2")) {
             return Profileable.of(player);
         }
         return player.getPlayerProfile().getProperties().stream()
@@ -224,7 +223,7 @@ public final class ItemBuilder {
 
     public ItemBuilder potionColor(Color color) {
         // PotionMeta#setColor only exists from 1.11.
-        return XReflection.supports(1, 11) ? meta(PotionMeta.class, meta -> meta.setColor(color)) : this;
+        return VersioningChecker.supports("1.11") ? meta(PotionMeta.class, meta -> meta.setColor(color)) : this;
     }
 
     public ItemBuilder fireworkPower(int power) {
@@ -233,7 +232,7 @@ public final class ItemBuilder {
 
     public ItemBuilder unstackable(boolean unstackable) {
         // Persistent data containers only exist from 1.14.
-        if (!XReflection.supports(1, 14)) {
+        if (!VersioningChecker.supports("1.14")) {
             return this;
         }
         return meta(meta -> {

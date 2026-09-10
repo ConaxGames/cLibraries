@@ -38,7 +38,7 @@ public class ModuleManager {
         }
 
         String version = module.getSupportedVersion();
-        if (version != null && VersioningChecker.getInstance().isServerVersionBefore(version)) {
+        if (version != null && !VersioningChecker.supports(version)) {
             library.getLibraryLogger().toConsole("Module",
                     "Supported version " + version + " is not met. Module " + module.getIdentifier() + " cannot be registered.");
             return;

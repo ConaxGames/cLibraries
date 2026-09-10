@@ -1,9 +1,9 @@
 package com.conaxgames.libraries.util.inventory;
 
 import com.conaxgames.libraries.LibraryPlugin;
+import com.conaxgames.libraries.util.VersioningChecker;
 import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.inventory.XInventoryView;
-import com.cryptomorin.xseries.reflection.XReflection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -31,7 +31,7 @@ public final class PlayerInventoryUtil {
              BukkitObjectOutputStream data = new BukkitObjectOutputStream(bytes)) {
             writeItems(data, XItemStack.getStorageContents(inv));
             writeItems(data, inv.getArmorContents());
-            writeItems(data, XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]);
+            writeItems(data, VersioningChecker.supports("1.9") ? inv.getExtraContents() : new ItemStack[0]);
             data.writeInt(player.getLevel());
             data.writeFloat(player.getExp());
             Collection<PotionEffect> effects = player.getActivePotionEffects();
@@ -82,13 +82,13 @@ public final class PlayerInventoryUtil {
         if (storage.length > 36) {
             storage = Arrays.copyOf(storage, 36);
         }
-        if (XReflection.supports(1, 9)) {
+        if (VersioningChecker.supports("1.9")) {
             inv.setStorageContents(storage);
         } else {
             inv.setContents(storage);
         }
         inv.setArmorContents(snapshot.armor());
-        if (XReflection.supports(1, 9)) {
+        if (VersioningChecker.supports("1.9")) {
             inv.setExtraContents(snapshot.extra());
         }
         player.setLevel(snapshot.level());
@@ -103,7 +103,7 @@ public final class PlayerInventoryUtil {
         PlayerInventory inv = player.getInventory();
         inv.clear();
         inv.setArmorContents(new ItemStack[4]);
-        if (XReflection.supports(1, 9)) {
+        if (VersioningChecker.supports("1.9")) {
             inv.setExtraContents(new ItemStack[inv.getExtraContents().length]);
         }
         for (PotionEffect effect : player.getActivePotionEffects()) {
@@ -133,7 +133,7 @@ public final class PlayerInventoryUtil {
         for (ItemStack[] stacks : new ItemStack[][]{
                 XItemStack.getStorageContents(inv),
                 inv.getArmorContents(),
-                XReflection.supports(1, 9) ? inv.getExtraContents() : new ItemStack[0]
+                VersioningChecker.supports("1.9") ? inv.getExtraContents() : new ItemStack[0]
         }) {
             for (ItemStack stack : stacks) {
                 if (XItemStack.notEmpty(stack)) {

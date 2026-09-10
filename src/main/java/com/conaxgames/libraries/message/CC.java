@@ -1,6 +1,6 @@
 package com.conaxgames.libraries.message;
 
-import com.cryptomorin.xseries.reflection.XReflection;
+import com.conaxgames.libraries.util.VersioningChecker;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 
@@ -73,7 +73,7 @@ public final class CC {
     }
 
     private static String hex(String rgb) {
-        if (XReflection.supports(1, 16)) {
+        if (VersioningChecker.supports("1.16")) {
             StringBuilder sb = new StringBuilder(14).append(SECTION).append('x');
             for (int i = 0; i < 6; i++) sb.append(SECTION).append(rgb.charAt(i));
             return sb.toString();
