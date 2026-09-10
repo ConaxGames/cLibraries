@@ -11,7 +11,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 final class ButtonListener implements Listener {
@@ -19,11 +18,10 @@ final class ButtonListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onClick(InventoryClickEvent event) {
         Inventory top = event.getInventory();
-        InventoryHolder owner = top.getHolder();
-        if (!(owner instanceof Menu.Holder) || !(event.getWhoClicked() instanceof Player)) {
+        if (!(top.getHolder() instanceof Menu.Holder) || !(event.getWhoClicked() instanceof Player)) {
             return;
         }
-        Menu.Holder holder = (Menu.Holder) owner;
+        Menu.Holder holder = (Menu.Holder) top.getHolder();
         Player player = (Player) event.getWhoClicked();
         int slot = event.getRawSlot();
         if (event.getClick() == ClickType.DOUBLE_CLICK) {
@@ -78,18 +76,16 @@ final class ButtonListener implements Listener {
             }
         }
         // The client already predicted the vanilla outcome, resync once the server state has settled.
-        LibraryPlugin lib = LibraryPlugin.getInstance();
-        lib.getScheduler().runTaskLater(lib.getPlugin(), player::updateInventory, 1L);
+        LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), player::updateInventory, 1L);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDrag(InventoryDragEvent event) {
         Inventory top = event.getInventory();
-        InventoryHolder owner = top.getHolder();
-        if (!(owner instanceof Menu.Holder)) {
+        if (!(top.getHolder() instanceof Menu.Holder)) {
             return;
         }
-        Menu.Holder holder = (Menu.Holder) owner;
+        Menu.Holder holder = (Menu.Holder) top.getHolder();
         for (int slot : event.getRawSlots()) {
             if (slot < top.getSize() && !holder.editable(slot)) {
                 event.setCancelled(true);
@@ -100,26 +96,23 @@ final class ButtonListener implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        InventoryHolder owner = event.getInventory().getHolder();
-        if (!(owner instanceof Menu.Holder) || !(event.getPlayer() instanceof Player)) {
+        if (!(event.getInventory().getHolder() instanceof Menu.Holder) || !(event.getPlayer() instanceof Player)) {
             return;
         }
-        Menu.Holder holder = (Menu.Holder) owner;
+        Menu.Holder holder = (Menu.Holder) event.getInventory().getHolder();
         Player player = (Player) event.getPlayer();
         if (holder.updater != null) {
             holder.updater.cancel();
         }
-        Menu menu = holder.menu;
-        if (menu.onClose != null) {
-            menu.onClose.accept(player);
+        if (holder.menu.onClose != null) {
+            holder.menu.onClose.accept(player);
         }
-        Menu previous = menu.previous != null ? menu.previous.apply(player) : null;
+        Menu previous = holder.menu.previous != null ? holder.menu.previous.apply(player) : null;
         if (previous == null) {
             return;
         }
         // The client ignores an open sent while it is still closing, and a click may already be opening the next menu.
-        LibraryPlugin lib = LibraryPlugin.getInstance();
-        lib.getScheduler().runTaskLater(lib.getPlugin(), () -> {
+        LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
             if (player.isOnline() && Menu.opened(player) == null) {
                 previous.open(player);
             }

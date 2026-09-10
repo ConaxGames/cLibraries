@@ -75,8 +75,7 @@ public final class Menu {
 
     public void open(Player player) {
         if (!Bukkit.isPrimaryThread()) {
-            LibraryPlugin lib = LibraryPlugin.getInstance();
-            lib.getScheduler().runTask(lib.getPlugin(), () -> open(player));
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
             return;
         }
         Map<Integer, Button> layout = render(player);
@@ -97,8 +96,8 @@ public final class Menu {
                 return;
             }
             if (updateTicks > 0L) {
-                LibraryPlugin lib = LibraryPlugin.getInstance();
-                holder.updater = lib.getScheduler().runTaskTimerCancellable(lib.getPlugin(), () -> update(player), updateTicks, updateTicks);
+                holder.updater = LibraryPlugin.getInstance().getScheduler()
+                        .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> update(player), updateTicks, updateTicks);
             }
         }
         if (onOpen != null) {
