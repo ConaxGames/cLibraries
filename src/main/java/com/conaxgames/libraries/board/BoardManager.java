@@ -101,38 +101,38 @@ public final class BoardManager implements Runnable {
                     entry.team.addEntry(KEYS[i]);
                 }
                 board.entries.add(entry);
-            }
-
-            var score = board.objective.getScore(KEYS[i]);
-            if (score.getScore() != i + 1) {
-                score.setScore(i + 1);
+                // The score is the line's slot, which holds for as long as the entry does.
+                board.objective.getScore(KEYS[i]).setScore(i + 1);
             }
 
             var line = lines.get(count - 1 - i);
-            if (!line.equals(entry.text)) {
-                entry.text = line;
-                var text = CC.translate(line);
-                if (MODERN) {
-                    var name = CC.LEGACY.deserialize(text);
-                    score.customName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
-                } else {
-                    var prefix = text;
-                    var suffix = "";
-                    if (text.length() > SEGMENT_MAX) {
-                        // Cut before the colour code rather than through it.
-                        int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
-                        prefix = text.substring(0, cut);
-                        suffix = CC.getLastColors(prefix) + text.substring(cut);
-                        if (suffix.length() > SEGMENT_MAX) {
-                            suffix = suffix.substring(0, SEGMENT_MAX);
-                        }
+            if (line.equals(entry.text)) {
+                continue;
+            }
+            entry.text = line;
+
+            var text = CC.translate(line);
+            if (MODERN) {
+                var name = CC.LEGACY.deserialize(text);
+                board.objective.getScore(KEYS[i])
+                        .customName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
+            } else {
+                var prefix = text;
+                var suffix = "";
+                if (text.length() > SEGMENT_MAX) {
+                    // Cut before the colour code rather than through it.
+                    int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
+                    prefix = text.substring(0, cut);
+                    suffix = CC.getLastColors(prefix) + text.substring(cut);
+                    if (suffix.length() > SEGMENT_MAX) {
+                        suffix = suffix.substring(0, SEGMENT_MAX);
                     }
-                    if (!prefix.equals(entry.team.getPrefix())) {
-                        entry.team.setPrefix(prefix);
-                    }
-                    if (!suffix.equals(entry.team.getSuffix())) {
-                        entry.team.setSuffix(suffix);
-                    }
+                }
+                if (!prefix.equals(entry.team.getPrefix())) {
+                    entry.team.setPrefix(prefix);
+                }
+                if (!suffix.equals(entry.team.getSuffix())) {
+                    entry.team.setSuffix(suffix);
                 }
             }
         }
