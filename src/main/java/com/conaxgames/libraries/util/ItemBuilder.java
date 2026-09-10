@@ -142,6 +142,10 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder glow(boolean glow) {
+        // The glint override only exists from 1.20.5, older servers fake it with a hidden enchant.
+        if (VersioningChecker.supports("1.20.5")) {
+            return meta(meta -> meta.setEnchantmentGlintOverride(glow ? Boolean.TRUE : null));
+        }
         return meta(meta -> {
             Enchantment unbreaking = XEnchantment.UNBREAKING.get();
             if (glow) {
