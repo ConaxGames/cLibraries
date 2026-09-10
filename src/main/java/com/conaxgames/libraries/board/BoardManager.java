@@ -1,14 +1,20 @@
 package com.conaxgames.libraries.board;
 
-import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.util.VersioningChecker;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,23 +26,38 @@ public final class BoardManager implements Runnable {
 
     public static final String SKIP_BOARD_METADATA = "cElement";
 
+    // Criteria, NumberFormat and ShadowColor only ship with servers new enough for their gate below,
+    // so a use of them can never be hoisted out of the branch that guards it.
+    private static final boolean MODERN = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
+    private static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
+    private static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
+    private static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
+    private static final String[] KEYS;
+
+    static {
+        // Legacy lines are told apart by a unique colour pair, which is what caps the board height.
+        var codes = "0123456789abcdefklmor";
+        KEYS = new String[codes.length()];
+        for (int i = 0; i < KEYS.length; i++) {
+            KEYS[i] = MODERN
+                    ? Integer.toString(i)
+                    : String.valueOf(ChatColor.COLOR_CHAR) + codes.charAt(i) + ChatColor.COLOR_CHAR + 'f';
+        }
+    }
+
     private final Map<UUID, Board> boards = new HashMap<>();
     private final Function<Player, String> title;
     private final Function<Player, List<String>> lines;
 
-    private BoardManager(Builder builder) {
-        this.title = builder.title;
-        this.lines = builder.lines;
-    }
-
-    public static Builder builder() {
-        return new Builder();
+    public BoardManager(Function<Player, String> title, Function<Player, List<String>> lines) {
+        this.title = title;
+        this.lines = lines;
     }
 
     @Override
     public void run() {
         boards.entrySet().removeIf(entry -> {
-            var player = LibraryPlugin.getInstance().getPlugin().getServer().getPlayer(entry.getKey());
+            var player = Bukkit.getPlayer(entry.getKey());
             if (player == null) {
                 return true;
             }
@@ -46,102 +67,78 @@ public final class BoardManager implements Runnable {
     }
 
     private void update(Player player, Board board) {
-        try {
-            var lines = this.lines.apply(player);
-            if (lines.size() > Board.MAX_LINES) {
-                lines = lines.subList(0, Board.MAX_LINES);
+        var lines = this.lines.apply(player);
+        int count = Math.min(lines.size(), KEYS.length);
+
+        var title = CC.translate(this.title.apply(player));
+        title = title.substring(0, Math.min(title.length(), TITLE_MAX));
+        if (!title.equals(board.title)) {
+            board.title = title;
+            if (MODERN) {
+                var name = CC.LEGACY.deserialize(title);
+                board.objective.displayName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
+            } else {
+                board.objective.setDisplayName(title);
+            }
+        }
+
+        // A dropped line keeps its team, which is picked back up below if the board grows again.
+        while (board.entries.size() > count) {
+            board.entries.removeLast();
+            board.scoreboard.resetScores(KEYS[board.entries.size()]);
+        }
+
+        // The sidebar puts the highest score on top, so the board is filled from the last line up.
+        for (int i = 0; i < count; i++) {
+            Entry entry;
+            if (i < board.entries.size()) {
+                entry = board.entries.get(i);
+            } else {
+                entry = new Entry();
+                if (!MODERN) {
+                    var team = board.scoreboard.getTeam("board_" + i);
+                    entry.team = team != null ? team : board.scoreboard.registerNewTeam("board_" + i);
+                    entry.team.addEntry(KEYS[i]);
+                }
+                board.entries.add(entry);
             }
 
-            var translatedTitle = CC.translate(title.apply(player));
-            if (translatedTitle.length() > Board.TITLE_MAX) {
-                translatedTitle = translatedTitle.substring(0, Board.TITLE_MAX);
+            var score = board.objective.getScore(KEYS[i]);
+            if (score.getScore() != i + 1) {
+                score.setScore(i + 1);
             }
-            if (!translatedTitle.equals(board.lastTitle)) {
-                board.lastTitle = translatedTitle;
-                if (Board.MODERN) {
-                    var component = CC.LEGACY.deserialize(translatedTitle);
-                    board.objective.displayName(Board.TEXT_SHADOW
-                            ? component.shadowColor(ShadowColor.shadowColor(0xFF000000))
-                            : component);
+
+            var line = lines.get(count - 1 - i);
+            if (!line.equals(entry.text)) {
+                entry.text = line;
+                var text = CC.translate(line);
+                if (MODERN) {
+                    var name = CC.LEGACY.deserialize(text);
+                    score.customName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
                 } else {
-                    board.objective.setDisplayName(translatedTitle);
-                }
-            }
-
-            var entries = board.entries;
-            while (entries.size() > lines.size()) {
-                var removed = entries.removeLast();
-                board.scoreboard.resetScores(removed.key);
-                if (removed.team != null) {
-                    removed.team.unregister();
-                }
-            }
-
-            int i = 0;
-            for (var line : lines.reversed()) {
-                BoardEntry boardEntry;
-                if (i < entries.size()) {
-                    boardEntry = entries.get(i);
-                } else {
-                    boardEntry = new BoardEntry();
-                    boardEntry.key = Board.MODERN ? Integer.toString(i) : Board.ENTRY_KEYS[i];
-                    if (!Board.MODERN) {
-                        boardEntry.team = board.scoreboard.registerNewTeam("board_" + i);
-                        boardEntry.team.addEntry(boardEntry.key);
-                    }
-                    entries.add(boardEntry);
-                }
-
-                var score = board.objective.getScore(boardEntry.key);
-                if (score.getScore() != i + 1) {
-                    score.setScore(i + 1);
-                }
-                if (!line.equals(boardEntry.lastSent)) {
-                    boardEntry.lastSent = line;
-                    var translated = CC.translate(line);
-                    if (Board.MODERN) {
-                        var component = CC.LEGACY.deserialize(translated);
-                        score.customName(Board.TEXT_SHADOW
-                                ? component.shadowColor(ShadowColor.shadowColor(0xFF000000))
-                                : component);
-                    } else {
-                        int max = Board.SEGMENT_MAX;
-                        String prefix;
-                        String suffix;
-                        if (translated.length() <= max) {
-                            prefix = translated;
-                            suffix = "";
-                        } else {
-                            prefix = translated.substring(0, max);
-                            int lastColor = prefix.lastIndexOf('\u00a7');
-                            if (lastColor >= max - 2) {
-                                suffix = CC.getLastColors(translated.substring(0, Math.min(translated.length(), max + 1)))
-                                        + translated.substring(lastColor + 2);
-                                prefix = prefix.substring(0, lastColor);
-                            } else {
-                                suffix = CC.getLastColors(prefix) + translated.substring(max);
-                            }
-                            if (suffix.length() > max) {
-                                suffix = suffix.substring(0, max);
-                            }
-                        }
-                        if (!prefix.equals(boardEntry.team.getPrefix())) {
-                            boardEntry.team.setPrefix(prefix);
-                        }
-                        if (!suffix.equals(boardEntry.team.getSuffix())) {
-                            boardEntry.team.setSuffix(suffix);
+                    var prefix = text;
+                    var suffix = "";
+                    if (text.length() > SEGMENT_MAX) {
+                        // Cut before the colour code rather than through it.
+                        int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
+                        prefix = text.substring(0, cut);
+                        suffix = CC.getLastColors(prefix) + text.substring(cut);
+                        if (suffix.length() > SEGMENT_MAX) {
+                            suffix = suffix.substring(0, SEGMENT_MAX);
                         }
                     }
+                    if (!prefix.equals(entry.team.getPrefix())) {
+                        entry.team.setPrefix(prefix);
+                    }
+                    if (!suffix.equals(entry.team.getSuffix())) {
+                        entry.team.setSuffix(suffix);
+                    }
                 }
-                i++;
             }
+        }
 
-            if (!player.getScoreboard().equals(board.scoreboard)) {
-                player.setScoreboard(board.scoreboard);
-            }
-        } catch (Exception ex) {
-            LibraryPlugin.getInstance().getPlugin().getLogger()
-                    .severe("Scoreboard error for " + player.getName() + ": " + ex.getMessage());
+        if (!player.getScoreboard().equals(board.scoreboard)) {
+            player.setScoreboard(board.scoreboard);
         }
     }
 
@@ -151,21 +148,23 @@ public final class BoardManager implements Runnable {
         }
 
         var board = new Board();
-        var scoreboardManager = LibraryPlugin.getInstance().getPlugin().getServer().getScoreboardManager();
-        board.scoreboard = player.getScoreboard().equals(scoreboardManager.getMainScoreboard())
-                ? scoreboardManager.getNewScoreboard()
+        // Keep whatever another plugin already put on the player, only the main scoreboard is shared.
+        board.scoreboard = player.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard())
+                ? Bukkit.getScoreboardManager().getNewScoreboard()
                 : player.getScoreboard();
+
         var existing = board.scoreboard.getObjective("sb");
         if (existing != null) {
             existing.unregister();
         }
-        if (Board.MODERN) {
+        if (MODERN) {
             board.objective = board.scoreboard.registerNewObjective("sb", Criteria.DUMMY, Component.empty());
             board.objective.numberFormat(NumberFormat.blank());
         } else {
             board.objective = board.scoreboard.registerNewObjective("sb", "dummy");
         }
         board.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
         boards.put(player.getUniqueId(), board);
         // The board is empty and unassigned until it is filled, so do it here instead of waiting for the next update.
         update(player, board);
@@ -173,30 +172,19 @@ public final class BoardManager implements Runnable {
 
     public void removeBoard(Player player) {
         if (boards.remove(player.getUniqueId()) != null && player.isOnline()) {
-            player.setScoreboard(player.getServer().getScoreboardManager().getMainScoreboard());
+            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
     }
 
-    public static final class Builder {
+    private static final class Board {
+        final List<Entry> entries = new ArrayList<>();
+        Scoreboard scoreboard;
+        Objective objective;
+        String title;
+    }
 
-        private Function<Player, String> title = player -> "";
-        private Function<Player, List<String>> lines = player -> List.of();
-
-        private Builder() {
-        }
-
-        public Builder title(Function<Player, String> title) {
-            this.title = title;
-            return this;
-        }
-
-        public Builder lines(Function<Player, List<String>> lines) {
-            this.lines = lines;
-            return this;
-        }
-
-        public BoardManager build() {
-            return new BoardManager(this);
-        }
+    private static final class Entry {
+        Team team;
+        String text;
     }
 }
