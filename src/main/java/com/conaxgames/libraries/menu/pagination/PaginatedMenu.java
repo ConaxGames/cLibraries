@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public final class PaginatedMenu {
 
@@ -31,7 +32,7 @@ public final class PaginatedMenu {
         private int previousSlot = 48;
         private int nextSlot = 50;
         private Button filler;
-        private long updateTicks = 0L;
+        private long updateTicks;
         private Function<Player, Menu> previousMenu;
 
         private Builder(String title) {
@@ -74,9 +75,7 @@ public final class PaginatedMenu {
         }
 
         public Builder set(int slot, Button button) {
-            if (button != null) {
-                globals.put(slot, button);
-            }
+            globals.put(slot, button);
             return this;
         }
 
@@ -105,64 +104,44 @@ public final class PaginatedMenu {
         }
 
         public Menu build() {
-            int[] slots;
-            if (contentSlots != null) {
-                slots = contentSlots;
-            } else {
-                slots = new int[maxPerPage];
-                for (int i = 0; i < maxPerPage; i++) {
-                    slots[i] = i;
-                }
-            }
-            int perPage = slots.length;
-
+            int[] slots = contentSlots != null ? contentSlots : IntStream.range(0, maxPerPage).toArray();
             Menu[] self = new Menu[1];
             int[] page = {0};
+            int[] total = {1};
+            Button back = Button.builder(XMaterial.RED_DYE).name("&cPrevious Page").onClick((player, type) -> {
+                page[0]--;
+                self[0].open(player);
+            }).build();
+            Button next = Button.builder(XMaterial.GREEN_DYE).name("&aNext Page").onClick((player, type) -> {
+                page[0]++;
+                self[0].open(player);
+            }).build();
 
-            Menu.Builder builder = Menu.builder(player -> {
-                        int total = Math.max(1, (int) Math.ceil(entries.apply(player).size() / (double) perPage));
-                        return title + " (" + (Math.min(page[0], total - 1) + 1) + "/" + total + ")";
-                    })
+            // Menu renders before resolving the title, so the counters are already current when it is built.
+            Menu.Builder builder = Menu.builder(player -> title + " (" + (page[0] + 1) + "/" + total[0] + ")")
                     .rows(rows)
                     .refreshInPlace(false)
                     .previous(previousMenu)
                     .autoUpdate(updateTicks)
-                    .fill(filler);
+                    .fill(filler)
+                    .render((player, layout) -> {
+                        List<Button> all = entries.apply(player);
+                        total[0] = Math.max(1, (all.size() + slots.length - 1) / slots.length);
+                        page[0] = Math.min(page[0], total[0] - 1);
+                        int start = page[0] * slots.length;
+                        for (int i = 0; i < slots.length && start + i < all.size(); i++) {
+                            layout.set(slots[i], all.get(start + i));
+                        }
+                        if (page[0] > 0) {
+                            layout.set(previousSlot, back);
+                        }
+                        if (page[0] < total[0] - 1) {
+                            layout.set(nextSlot, next);
+                        }
+                    });
             globals.forEach(builder::set);
-
-            builder.render((player, layout) -> {
-                List<Button> all = entries.apply(player);
-                int total = Math.max(1, (int) Math.ceil(all.size() / (double) perPage));
-                page[0] = Math.max(0, Math.min(page[0], total - 1));
-
-                int start = page[0] * perPage;
-                for (int i = 0; i < perPage && start + i < all.size(); i++) {
-                    layout.set(slots[i], all.get(start + i));
-                }
-
-                if (page[0] > 0) {
-                    layout.set(previousSlot, Button.builder(XMaterial.RED_DYE)
-                            .name("&cPrevious Page")
-                            .onClick((ignored, type) -> {
-                                page[0]--;
-                                self[0].open(player);
-                            })
-                            .build());
-                }
-                if (page[0] < total - 1) {
-                    layout.set(nextSlot, Button.builder(XMaterial.GREEN_DYE)
-                            .name("&aNext Page")
-                            .onClick((ignored, type) -> {
-                                page[0]++;
-                                self[0].open(player);
-                            })
-                            .build());
-                }
-            });
-
-            Menu menu = builder.build();
-            self[0] = menu;
-            return menu;
+            self[0] = builder.build();
+            return self[0];
         }
     }
 }
