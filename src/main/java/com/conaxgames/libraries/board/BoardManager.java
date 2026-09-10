@@ -12,9 +12,9 @@ import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +26,11 @@ public final class BoardManager implements Runnable {
 
     public static final String SKIP_BOARD_METADATA = "cElement";
 
-    // Criteria, NumberFormat and Adventure only exist above their gate, so their uses live in Modern below.
     private static final boolean MODERN = XReflection.supports(1, 20, 4);
     private static final boolean TEXT_SHADOW = XReflection.supports(1, 21, 4);
     private static final int SEGMENT_MAX = XReflection.supports(1, 13) ? 64 : 16;
     private static final int TITLE_MAX = XReflection.supports(1, 13) ? 128 : 32;
-    // A legacy entry has to render as nothing, so a unique colour pair per line is what caps the height.
+    // Legacy entries have to render as nothing; a unique colour pair per line is the height cap.
     private static final String CODES = "0123456789abcdefklmor";
     private static final String[] KEYS = new String[CODES.length()];
 
@@ -69,63 +68,62 @@ public final class BoardManager implements Runnable {
         int count = Math.min(lines.size(), KEYS.length);
 
         String title = CC.translate(this.title.apply(player));
-        title = title.substring(0, Math.min(title.length(), TITLE_MAX));
+        if (!MODERN && title.length() > TITLE_MAX) {
+            title = title.substring(0, TITLE_MAX);
+        }
         if (!title.equals(board.title)) {
             board.title = title;
             if (MODERN) {
-                board.objective.displayName(Modern.component(title));
+                Modern.title(board.objective, title);
             } else {
                 board.objective.setDisplayName(title);
             }
         }
 
-        // A dropped line keeps its team, which is picked back up below if the board grows again.
-        while (board.entries.size() > count) {
-            board.entries.remove(board.entries.size() - 1);
-            board.scoreboard.resetScores(KEYS[board.entries.size()]);
+        while (board.size > count) {
+            board.scoreboard.resetScores(KEYS[--board.size]);
         }
 
-        // The sidebar puts the highest score on top, so the board is filled from the last line up.
+        // Highest score sits at the top, so the list is written from the bottom up.
         for (int i = 0; i < count; i++) {
-            if (i == board.entries.size()) {
-                board.entries.add(new Entry());
-                // The score is the line's slot, which holds for as long as the entry does.
+            if (i == board.size) {
+                if (!MODERN && board.teams[i] == null) {
+                    String name = "board_" + i;
+                    Team team = board.scoreboard.getTeam(name);
+                    if (team == null) {
+                        team = board.scoreboard.registerNewTeam(name);
+                    }
+                    team.addEntry(KEYS[i]);
+                    board.teams[i] = team;
+                }
                 board.objective.getScore(KEYS[i]).setScore(i + 1);
-            }
-
-            Entry entry = board.entries.get(i);
-            if (!MODERN && entry.team == null) {
-                Team team = board.scoreboard.getTeam("board_" + i);
-                entry.team = team != null ? team : board.scoreboard.registerNewTeam("board_" + i);
-                entry.team.addEntry(KEYS[i]);
+                board.size++;
             }
 
             String line = lines.get(count - 1 - i);
-            if (line.equals(entry.text)) {
+            if (line.equals(board.texts[i])) {
                 continue;
             }
-            entry.text = line;
+            board.texts[i] = line;
 
             String text = CC.translate(line);
             if (MODERN) {
-                board.objective.getScore(KEYS[i]).customName(Modern.component(text));
-            } else {
-                String prefix = text;
-                String suffix = "";
-                if (text.length() > SEGMENT_MAX) {
-                    // Cut before the colour code rather than through it.
-                    int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
-                    prefix = text.substring(0, cut);
-                    suffix = CC.getLastColors(prefix) + text.substring(cut);
-                    suffix = suffix.substring(0, Math.min(suffix.length(), SEGMENT_MAX));
-                }
-                if (!prefix.equals(entry.team.getPrefix())) {
-                    entry.team.setPrefix(prefix);
-                }
-                if (!suffix.equals(entry.team.getSuffix())) {
-                    entry.team.setSuffix(suffix);
+                Modern.line(board.objective, KEYS[i], text);
+                continue;
+            }
+
+            String prefix = text;
+            String suffix = "";
+            if (text.length() > SEGMENT_MAX) {
+                int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
+                prefix = text.substring(0, cut);
+                suffix = ChatColor.getLastColors(prefix) + text.substring(cut);
+                if (suffix.length() > SEGMENT_MAX) {
+                    suffix = suffix.substring(0, SEGMENT_MAX);
                 }
             }
+            board.teams[i].setPrefix(prefix);
+            board.teams[i].setSuffix(suffix);
         }
 
         if (!player.getScoreboard().equals(board.scoreboard)) {
@@ -138,23 +136,14 @@ public final class BoardManager implements Runnable {
             return;
         }
 
-        Board board = new Board();
-        // Keep whatever another plugin already put on the player, only the main scoreboard is shared.
-        board.scoreboard = player.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard())
-                ? Bukkit.getScoreboardManager().getNewScoreboard()
-                : player.getScoreboard();
-
-        Objective existing = board.scoreboard.getObjective("sb");
-        if (existing != null) {
-            existing.unregister();
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard.equals(manager.getMainScoreboard())) {
+            scoreboard = manager.getNewScoreboard();
         }
-        board.objective = MODERN
-                ? Modern.objective(board.scoreboard)
-                : board.scoreboard.registerNewObjective("sb", "dummy");
-        board.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
+        Board board = new Board(scoreboard);
         boards.put(player.getUniqueId(), board);
-        // The board is empty and unassigned until it is filled, so do it here instead of waiting for the next update.
         update(player, board);
     }
 
@@ -165,19 +154,28 @@ public final class BoardManager implements Runnable {
     }
 
     private static final class Board {
-        final List<Entry> entries = new ArrayList<>();
-        Scoreboard scoreboard;
-        Objective objective;
+        final Team[] teams = new Team[KEYS.length];
+        final String[] texts = new String[KEYS.length];
+        final Scoreboard scoreboard;
+        final Objective objective;
         String title;
+        int size;
+
+        Board(Scoreboard scoreboard) {
+            this.scoreboard = scoreboard;
+            Objective existing = scoreboard.getObjective("sb");
+            if (existing != null) {
+                existing.unregister();
+            }
+            objective = MODERN
+                    ? Modern.objective(scoreboard)
+                    : scoreboard.registerNewObjective("sb", "dummy");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        }
     }
 
-    private static final class Entry {
-        Team team;
-        String text;
-    }
-
-    // Both calls hand a TextComponent to a Component parameter, which makes the verifier load Adventure, so they are
-    // kept apart from the class that has to link on servers below the gate.
+    // Criteria, NumberFormat, Adventure and Score#customName must not be mentioned on BoardManager
+    // or the verifier loads them on servers below the 1.20.4 gate.
     private static final class Modern {
 
         static Objective objective(Scoreboard scoreboard) {
@@ -186,7 +184,15 @@ public final class BoardManager implements Runnable {
             return objective;
         }
 
-        static Component component(String legacy) {
+        static void title(Objective objective, String legacy) {
+            objective.displayName(component(legacy));
+        }
+
+        static void line(Objective objective, String key, String legacy) {
+            objective.getScore(key).customName(component(legacy));
+        }
+
+        private static Component component(String legacy) {
             Component name = CC.legacy().deserialize(legacy);
             return TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name;
         }
