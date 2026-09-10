@@ -32,16 +32,16 @@ public final class BoardManager implements Runnable {
     private static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
     private static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     private static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
-    private static final String[] KEYS;
+    // A legacy entry has to render as nothing, so lines are told apart by a unique colour pair,
+    // and running out of codes is what caps the board height.
+    private static final String CODES = "0123456789abcdefklmor";
+    private static final String[] KEYS = new String[CODES.length()];
 
     static {
-        // Legacy lines are told apart by a unique colour pair, which is what caps the board height.
-        var codes = "0123456789abcdefklmor";
-        KEYS = new String[codes.length()];
         for (int i = 0; i < KEYS.length; i++) {
             KEYS[i] = MODERN
                     ? Integer.toString(i)
-                    : String.valueOf(ChatColor.COLOR_CHAR) + codes.charAt(i) + ChatColor.COLOR_CHAR + 'f';
+                    : String.valueOf(ChatColor.COLOR_CHAR) + CODES.charAt(i) + ChatColor.COLOR_CHAR + 'f';
         }
     }
 
