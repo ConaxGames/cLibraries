@@ -26,14 +26,12 @@ public final class BoardManager implements Runnable {
 
     public static final String SKIP_BOARD_METADATA = "cElement";
 
-    // Criteria, NumberFormat and ShadowColor only ship with servers new enough for their gate below,
-    // so a use of them can never be hoisted out of the branch that guards it.
+    // Criteria, NumberFormat and ShadowColor only exist above their gate, so uses cannot leave the branch.
     private static final boolean MODERN = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
     private static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
     private static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
     private static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
-    // A legacy entry has to render as nothing, so lines are told apart by a unique colour pair,
-    // and running out of codes is what caps the board height.
+    // A legacy entry has to render as nothing, so a unique colour pair per line is what caps the height.
     private static final String CODES = "0123456789abcdefklmor";
     private static final String[] KEYS = new String[CODES.length()];
 
@@ -90,19 +88,17 @@ public final class BoardManager implements Runnable {
 
         // The sidebar puts the highest score on top, so the board is filled from the last line up.
         for (int i = 0; i < count; i++) {
-            Entry entry;
-            if (i < board.entries.size()) {
-                entry = board.entries.get(i);
-            } else {
-                entry = new Entry();
-                if (!MODERN) {
-                    var team = board.scoreboard.getTeam("board_" + i);
-                    entry.team = team != null ? team : board.scoreboard.registerNewTeam("board_" + i);
-                    entry.team.addEntry(KEYS[i]);
-                }
-                board.entries.add(entry);
+            if (i == board.entries.size()) {
+                board.entries.add(new Entry());
                 // The score is the line's slot, which holds for as long as the entry does.
                 board.objective.getScore(KEYS[i]).setScore(i + 1);
+            }
+
+            var entry = board.entries.get(i);
+            if (!MODERN && entry.team == null) {
+                var team = board.scoreboard.getTeam("board_" + i);
+                entry.team = team != null ? team : board.scoreboard.registerNewTeam("board_" + i);
+                entry.team.addEntry(KEYS[i]);
             }
 
             var line = lines.get(count - 1 - i);
@@ -124,9 +120,7 @@ public final class BoardManager implements Runnable {
                     int cut = text.charAt(SEGMENT_MAX - 1) == ChatColor.COLOR_CHAR ? SEGMENT_MAX - 1 : SEGMENT_MAX;
                     prefix = text.substring(0, cut);
                     suffix = CC.getLastColors(prefix) + text.substring(cut);
-                    if (suffix.length() > SEGMENT_MAX) {
-                        suffix = suffix.substring(0, SEGMENT_MAX);
-                    }
+                    suffix = suffix.substring(0, Math.min(suffix.length(), SEGMENT_MAX));
                 }
                 if (!prefix.equals(entry.team.getPrefix())) {
                     entry.team.setPrefix(prefix);
