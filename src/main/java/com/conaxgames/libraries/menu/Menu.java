@@ -3,6 +3,7 @@ package com.conaxgames.libraries.menu;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.menu.listener.ButtonListener;
 import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.util.VersioningChecker;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.inventory.XInventoryView;
@@ -84,7 +85,12 @@ public final class Menu {
             }
 
             Holder holder = new Holder(this, player.getUniqueId());
-            Inventory inv = Bukkit.createInventory(holder, size, title.apply(player));
+            String name = title.apply(player);
+            // 1.8 rejects titles over 32 characters, the limit was dropped in 1.9.
+            if (!VersioningChecker.supports("1.9") && name.length() > 32) {
+                name = name.substring(0, 32);
+            }
+            Inventory inv = Bukkit.createInventory(holder, size, name);
             holder.inventory = inv;
             fill(holder, layout, size);
             player.openInventory(inv);
