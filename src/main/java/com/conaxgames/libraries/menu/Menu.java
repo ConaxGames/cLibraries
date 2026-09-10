@@ -117,15 +117,9 @@ public final class Menu {
     }
 
     private Holder holderFor(Player player) {
-        Inventory top = XInventoryView.of(player.getOpenInventory()).getTopInventory();
-        InventoryHolder inventoryHolder = top.getHolder();
-        if (inventoryHolder instanceof Holder) {
-            Holder holder = (Holder) inventoryHolder;
-            if (holder.menu == this && holder.viewerId.equals(player.getUniqueId())) {
-                return holder;
-            }
-        }
-        return null;
+        InventoryHolder top = XInventoryView.of(player.getOpenInventory()).getTopInventory().getHolder();
+        Holder holder = top instanceof Holder ? (Holder) top : null;
+        return holder != null && holder.menu == this && holder.viewerId.equals(player.getUniqueId()) ? holder : null;
     }
 
     public boolean updateAfterClick() {

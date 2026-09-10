@@ -1,6 +1,6 @@
 package com.conaxgames.libraries.message;
 
-import com.conaxgames.libraries.util.VersioningChecker;
+import com.cryptomorin.xseries.reflection.XReflection;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 
@@ -13,12 +13,6 @@ public final class CC {
 
     private CC() {}
 
-    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
-            .character(LegacyComponentSerializer.SECTION_CHAR)
-            .hexColors()
-            .useUnusualXRepeatedCharacterHexFormat()
-            .build();
-
     private static final char SECTION = ChatColor.COLOR_CHAR;
     private static final Pattern HEX = Pattern.compile("(?i)[&" + SECTION + "]#([0-9a-f]{6})");
     private static final Pattern STRIP = Pattern.compile("(?i)" + SECTION + "x(?:" + SECTION + "[0-9a-f]){6}"
@@ -29,7 +23,14 @@ public final class CC {
     };
 
     private static String primary = "", secondary = "", tertiary = "";
-    private static Boolean hexSupported;
+
+    /**
+     * Shared legacy serializer for the modern (Adventure) code paths. Adventure is only loaded on first call, so
+     * this class still initialises on servers without it.
+     */
+    public static LegacyComponentSerializer legacy() {
+        return Legacy.SERIALIZER;
+    }
 
     public static void setColors(String primary, String secondary, String tertiary) {
         CC.primary = primary == null ? "" : primary;
@@ -72,14 +73,7 @@ public final class CC {
     }
 
     private static String hex(String rgb) {
-        if (hexSupported == null) {
-            try {
-                hexSupported = !VersioningChecker.getInstance().isServerVersionBefore("1.16");
-            } catch (Throwable ignored) {
-                hexSupported = true;
-            }
-        }
-        if (hexSupported) {
+        if (XReflection.supports(1, 16)) {
             StringBuilder sb = new StringBuilder(14).append(SECTION).append('x');
             for (int i = 0; i < 6; i++) sb.append(SECTION).append(rgb.charAt(i));
             return sb.toString();
@@ -96,5 +90,13 @@ public final class CC {
             }
         }
         return String.valueOf(SECTION) + Character.forDigit(best, 16);
+    }
+
+    private static final class Legacy {
+        static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder()
+                .character(LegacyComponentSerializer.SECTION_CHAR)
+                .hexColors()
+                .useUnusualXRepeatedCharacterHexFormat()
+                .build();
     }
 }

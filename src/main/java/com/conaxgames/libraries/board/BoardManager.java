@@ -1,7 +1,7 @@
 package com.conaxgames.libraries.board;
 
 import com.conaxgames.libraries.message.CC;
-import com.conaxgames.libraries.util.VersioningChecker;
+import com.cryptomorin.xseries.reflection.XReflection;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -26,11 +27,11 @@ public final class BoardManager implements Runnable {
 
     public static final String SKIP_BOARD_METADATA = "cElement";
 
-    // Criteria, NumberFormat and ShadowColor only exist above their gate, so uses cannot leave the branch.
-    private static final boolean MODERN = !VersioningChecker.getInstance().isServerVersionBefore("1.20.4");
-    private static final boolean TEXT_SHADOW = !VersioningChecker.getInstance().isServerVersionBefore("1.21.4");
-    private static final int SEGMENT_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 16 : 64;
-    private static final int TITLE_MAX = VersioningChecker.getInstance().isServerVersionBefore("1.13") ? 32 : 128;
+    // Criteria, NumberFormat and Adventure only exist above their gate, so their uses live in Modern below.
+    private static final boolean MODERN = XReflection.supports(1, 20, 4);
+    private static final boolean TEXT_SHADOW = XReflection.supports(1, 21, 4);
+    private static final int SEGMENT_MAX = XReflection.supports(1, 13) ? 64 : 16;
+    private static final int TITLE_MAX = XReflection.supports(1, 13) ? 128 : 32;
     // A legacy entry has to render as nothing, so a unique colour pair per line is what caps the height.
     private static final String CODES = "0123456789abcdefklmor";
     private static final String[] KEYS = new String[CODES.length()];
@@ -73,8 +74,7 @@ public final class BoardManager implements Runnable {
         if (!title.equals(board.title)) {
             board.title = title;
             if (MODERN) {
-                Component name = CC.LEGACY.deserialize(title);
-                board.objective.displayName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
+                Modern.title(board.objective, title);
             } else {
                 board.objective.setDisplayName(title);
             }
@@ -109,9 +109,7 @@ public final class BoardManager implements Runnable {
 
             String text = CC.translate(line);
             if (MODERN) {
-                Component name = CC.LEGACY.deserialize(text);
-                board.objective.getScore(KEYS[i])
-                        .customName(TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name);
+                Modern.line(board.objective.getScore(KEYS[i]), text);
             } else {
                 String prefix = text;
                 String suffix = "";
@@ -151,12 +149,9 @@ public final class BoardManager implements Runnable {
         if (existing != null) {
             existing.unregister();
         }
-        if (MODERN) {
-            board.objective = board.scoreboard.registerNewObjective("sb", Criteria.DUMMY, Component.empty());
-            board.objective.numberFormat(NumberFormat.blank());
-        } else {
-            board.objective = board.scoreboard.registerNewObjective("sb", "dummy");
-        }
+        board.objective = MODERN
+                ? Modern.objective(board.scoreboard)
+                : board.scoreboard.registerNewObjective("sb", "dummy");
         board.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         boards.put(player.getUniqueId(), board);
@@ -180,5 +175,28 @@ public final class BoardManager implements Runnable {
     private static final class Entry {
         Team team;
         String text;
+    }
+
+    // Kept apart so the verifier never has to resolve Adventure or Criteria on servers below the gate.
+    private static final class Modern {
+
+        static Objective objective(Scoreboard scoreboard) {
+            Objective objective = scoreboard.registerNewObjective("sb", Criteria.DUMMY, Component.empty());
+            objective.numberFormat(NumberFormat.blank());
+            return objective;
+        }
+
+        static void title(Objective objective, String legacy) {
+            objective.displayName(component(legacy));
+        }
+
+        static void line(Score score, String legacy) {
+            score.customName(component(legacy));
+        }
+
+        private static Component component(String legacy) {
+            Component name = CC.legacy().deserialize(legacy);
+            return TEXT_SHADOW ? name.shadowColor(ShadowColor.shadowColor(0xFF000000)) : name;
+        }
     }
 }

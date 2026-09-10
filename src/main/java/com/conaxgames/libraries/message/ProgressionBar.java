@@ -96,15 +96,12 @@ public final class ProgressionBar {
         String sym = String.valueOf(symbol);
         StringBuilder out = new StringBuilder();
         if (brackets) out.append(bracketColor).append(openBracket);
-        out.append(repeat(completedColor + sym, filled)).append(repeat(remainingColor + sym, empty));
+        out.append(String.join("", Collections.nCopies(filled, completedColor + sym)));
+        out.append(String.join("", Collections.nCopies(empty, remainingColor + sym)));
         if (brackets) out.append(bracketColor).append(closeBracket);
         if (percent) out.append(' ').append(percentColor).append(Math.round(ratio * 100)).append('%');
         if (suffix != null) out.append(suffix);
         return CC.translate(out.toString());
-    }
-
-    private static String repeat(String s, int count) {
-        return String.join("", Collections.nCopies(count, s));
     }
 
     @Override

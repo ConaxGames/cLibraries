@@ -8,6 +8,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
+import com.cryptomorin.xseries.reflection.XReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Fluent, cross-version {@link ItemStack} builder backed by XSeries.
@@ -66,8 +69,7 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder name(String name) {
-        itemStack.editMeta(meta -> meta.setDisplayName(CC.translate(name)));
-        return this;
+        return meta(meta -> meta.setDisplayName(CC.translate(name)));
     }
 
     public ItemBuilder lore(String... lore) {
@@ -79,8 +81,7 @@ public final class ItemBuilder {
         for (String line : lore) {
             wrapped.addAll(FormatUtil.wordWrap(line == null ? "" : line));
         }
-        itemStack.editMeta(meta -> meta.setLore(CC.translate(wrapped)));
-        return this;
+        return meta(meta -> meta.setLore(CC.translate(wrapped)));
     }
 
     public ItemBuilder appendLore(String... lines) {
@@ -88,14 +89,13 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder appendLore(List<String> lines) {
-        itemStack.editMeta(meta -> {
+        return meta(meta -> {
             List<String> lore = meta.getLore() != null ? new ArrayList<>(meta.getLore()) : new ArrayList<String>();
             for (String line : lines) {
                 lore.addAll(CC.translate(FormatUtil.wordWrap(line == null ? "" : line)));
             }
             meta.setLore(lore);
         });
-        return this;
     }
 
     public ItemBuilder amount(int amount) {
@@ -105,18 +105,17 @@ public final class ItemBuilder {
 
     @SuppressWarnings("deprecation")
     public ItemBuilder durability(int damage) {
-        if (!itemStack.editMeta(Damageable.class, meta -> meta.setDamage(damage))) {
-            itemStack.setDurability((short) damage);
+        // Damageable only exists from 1.13, older servers keep damage on the stack itself.
+        if (XReflection.supports(1, 13)) {
+            return meta(Damageable.class, meta -> meta.setDamage(damage));
         }
+        itemStack.setDurability((short) damage);
         return this;
     }
 
     public ItemBuilder enchant(XEnchantment enchantment, int level) {
         Enchantment resolved = enchantment.get();
-        if (resolved != null) {
-            itemStack.editMeta(meta -> meta.addEnchant(resolved, level, true));
-        }
-        return this;
+        return resolved == null ? this : meta(meta -> meta.addEnchant(resolved, level, true));
     }
 
     public ItemBuilder removeEnchant(XEnchantment enchantment) {
@@ -128,25 +127,23 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder flags(XItemFlag... flags) {
-        itemStack.editMeta(meta -> {
+        return meta(meta -> {
             for (XItemFlag flag : flags) {
                 flag.set(meta);
             }
         });
-        return this;
     }
 
     public ItemBuilder removeFlags(XItemFlag... flags) {
-        itemStack.editMeta(meta -> {
+        return meta(meta -> {
             for (XItemFlag flag : flags) {
                 flag.removeFrom(meta);
             }
         });
-        return this;
     }
 
     public ItemBuilder glow(boolean glow) {
-        itemStack.editMeta(meta -> {
+        return meta(meta -> {
             Enchantment unbreaking = XEnchantment.UNBREAKING.get();
             if (glow) {
                 if (unbreaking != null) {
@@ -162,17 +159,16 @@ public final class ItemBuilder {
                 XItemFlag.HIDE_ENCHANTS.removeFrom(meta);
             }
         });
-        return this;
     }
 
     public ItemBuilder unbreakable(boolean unbreakable) {
-        itemStack.editMeta(meta -> meta.setUnbreakable(unbreakable));
-        return this;
+        // ItemMeta#setUnbreakable only exists from 1.11.
+        return XReflection.supports(1, 11) ? meta(meta -> meta.setUnbreakable(unbreakable)) : this;
     }
 
     public ItemBuilder modelData(int modelData) {
-        itemStack.editMeta(meta -> meta.setCustomModelData(modelData));
-        return this;
+        // Custom model data only exists from 1.14.
+        return XReflection.supports(1, 14) ? meta(meta -> meta.setCustomModelData(modelData)) : this;
     }
 
     public ItemBuilder skull(String name) {
@@ -195,11 +191,15 @@ public final class ItemBuilder {
     }
 
     private static Profileable profileOf(Player player) {
+        // Paper exposes the live profile (so custom skins are kept) from 1.12.2, older servers look the player up.
+        if (!XReflection.supports(1, 12, 2)) {
+            return Profileable.of(player);
+        }
         return player.getPlayerProfile().getProperties().stream()
                 .filter(property -> property.getName().equals("textures"))
                 .findFirst()
                 .map(property -> Profileable.detect(property.getValue()))
-                .orElseGet(() -> Profileable.of(player.getUniqueId()));
+                .orElseGet(() -> Profileable.of(player));
     }
 
     private ItemBuilder skull(Profileable profile) {
@@ -210,36 +210,33 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder leatherColor(Color color) {
-        itemStack.editMeta(meta -> {
-            if (meta instanceof LeatherArmorMeta) {
-                ((LeatherArmorMeta) meta).setColor(color);
-            }
-        });
-        return this;
+        return meta(LeatherArmorMeta.class, meta -> meta.setColor(color));
     }
 
     public ItemBuilder potionEffect(XPotion type, int durationTicks, int level) {
-        itemStack.editMeta(PotionMeta.class, meta -> {
+        return meta(PotionMeta.class, meta -> {
             PotionEffect effect = type.buildPotionEffect(durationTicks, level);
             if (effect != null) {
                 meta.addCustomEffect(effect, true);
             }
         });
-        return this;
     }
 
     public ItemBuilder potionColor(Color color) {
-        itemStack.editMeta(PotionMeta.class, meta -> meta.setColor(color));
-        return this;
+        // PotionMeta#setColor only exists from 1.11.
+        return XReflection.supports(1, 11) ? meta(PotionMeta.class, meta -> meta.setColor(color)) : this;
     }
 
     public ItemBuilder fireworkPower(int power) {
-        itemStack.editMeta(FireworkMeta.class, meta -> meta.setPower(power));
-        return this;
+        return meta(FireworkMeta.class, meta -> meta.setPower(power));
     }
-    
+
     public ItemBuilder unstackable(boolean unstackable) {
-        itemStack.editMeta(meta -> {
+        // Persistent data containers only exist from 1.14.
+        if (!XReflection.supports(1, 14)) {
+            return this;
+        }
+        return meta(meta -> {
             NamespacedKey key = new NamespacedKey("conaxgames", "unstackable");
             PersistentDataContainer container = meta.getPersistentDataContainer();
             if (unstackable) {
@@ -248,10 +245,23 @@ public final class ItemBuilder {
             }
             container.remove(key);
         });
-        return this;
     }
 
     public ItemStack build() {
         return itemStack;
+    }
+
+    // Bukkit's get/set meta round trip works on every version, unlike Paper's ItemStack#editMeta (1.17+).
+    private ItemBuilder meta(Consumer<ItemMeta> edit) {
+        return meta(ItemMeta.class, edit);
+    }
+
+    private <M extends ItemMeta> ItemBuilder meta(Class<M> type, Consumer<M> edit) {
+        ItemMeta meta = itemStack.getItemMeta();
+        if (type.isInstance(meta)) {
+            edit.accept(type.cast(meta));
+            itemStack.setItemMeta(meta);
+        }
+        return this;
     }
 }
