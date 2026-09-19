@@ -28,6 +28,8 @@ public final class BoardManager implements Runnable {
 
     private static final boolean MODERN = VersioningChecker.supports("1.20.4");
     private static final boolean TEXT_SHADOW = VersioningChecker.supports("1.21.4");
+    // Paper added Score.resetScore in 1.18. 1.8.8 only has Scoreboard.resetScores(entry).
+    private static final boolean SCORE_RESET = VersioningChecker.supports("1.18");
     private static final int SEGMENT_MAX = VersioningChecker.supports("1.13") ? 64 : 16;
     private static final int TITLE_MAX = VersioningChecker.supports("1.13") ? 128 : 32;
     // Legacy entries have to render as nothing; a unique colour pair per line is the height cap.
@@ -68,7 +70,7 @@ public final class BoardManager implements Runnable {
         int count = Math.min(lines.size(), KEYS.length);
 
         String title = CC.translate(this.title.apply(player));
-        if (!MODERN && title.length() > TITLE_MAX) {
+        if (title.length() > TITLE_MAX) {
             title = title.substring(0, TITLE_MAX);
         }
         if (!title.equals(board.title)) {
@@ -82,12 +84,14 @@ public final class BoardManager implements Runnable {
 
         while (board.size > count) {
             int index = --board.size;
-            // Scoreboard.resetScores() wipes this entry on every objective, including nametag cBelow.
-            board.objective.getScore(KEYS[index]).resetScore();
+            if (SCORE_RESET) {
+                board.objective.getScore(KEYS[index]).resetScore();
+            } else {
+                board.scoreboard.resetScores(KEYS[index]);
+            }
             board.texts[index] = null;
         }
 
-        // Highest score sits at the top, so the list is written from the bottom up.
         for (int i = 0; i < count; i++) {
             if (i == board.size) {
                 if (!MODERN && board.teams[i] == null) {
@@ -101,8 +105,6 @@ public final class BoardManager implements Runnable {
                 }
                 board.objective.getScore(KEYS[i]).setScore(i + 1);
                 board.size++;
-                // resetScore drops customName. Stale texts[i] would skip the write and show the raw key.
-                board.texts[i] = null;
             }
 
             String line = lines.get(count - 1 - i);
@@ -158,10 +160,7 @@ public final class BoardManager implements Runnable {
             return;
         }
         // Sidebar only. setScoreboard(main) would flash leftover nametag teams from other plugins.
-        Objective objective = board.scoreboard.getObjective("sb");
-        if (objective != null) {
-            objective.unregister();
-        }
+        board.objective.unregister();
     }
 
     private static final class Board {
