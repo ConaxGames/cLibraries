@@ -37,7 +37,7 @@ public final class BoardManager implements Runnable {
     static {
         for (int i = 0; i < KEYS.length; i++) {
             KEYS[i] = MODERN
-                    ? Integer.toString(i)
+                    ? "b" + i
                     : String.valueOf(ChatColor.COLOR_CHAR) + CODES.charAt(i) + ChatColor.COLOR_CHAR + 'f';
         }
     }
@@ -81,7 +81,10 @@ public final class BoardManager implements Runnable {
         }
 
         while (board.size > count) {
-            board.scoreboard.resetScores(KEYS[--board.size]);
+            int index = --board.size;
+            // Scoreboard.resetScores() wipes this entry on every objective, including nametag cBelow.
+            board.objective.getScore(KEYS[index]).resetScore();
+            board.texts[index] = null;
         }
 
         // Highest score sits at the top, so the list is written from the bottom up.
@@ -98,6 +101,8 @@ public final class BoardManager implements Runnable {
                 }
                 board.objective.getScore(KEYS[i]).setScore(i + 1);
                 board.size++;
+                // resetScore drops customName. Stale texts[i] would skip the write and show the raw key.
+                board.texts[i] = null;
             }
 
             String line = lines.get(count - 1 - i);
