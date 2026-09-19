@@ -148,8 +148,14 @@ public final class BoardManager implements Runnable {
     }
 
     public void removeBoard(Player player) {
-        if (boards.remove(player.getUniqueId()) != null && player.isOnline()) {
-            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        Board board = boards.remove(player.getUniqueId());
+        if (board == null) {
+            return;
+        }
+        // Sidebar only. setScoreboard(main) would flash leftover nametag teams from other plugins.
+        Objective objective = board.scoreboard.getObjective("sb");
+        if (objective != null) {
+            objective.unregister();
         }
     }
 
