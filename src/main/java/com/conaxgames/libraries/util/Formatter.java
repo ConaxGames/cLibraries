@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 public class Formatter {
 
@@ -31,25 +30,7 @@ public class Formatter {
         return NumberFormat.getIntegerInstance().format(integer);
     }
 
-    public static String oneDecimalFormat(Double number) {
-        return String.format("%.1f", number);
-    }
-
-    public static String twoDecimalFormat(Double number) {
-        return String.format("%.2f", number);
-    }
-
-    public static String formatMoneyKMBT(long value) {
-        return formatMoneyKMBT((double) value);
-    }
-
-    public static String formatMoneyKMBT(int value) {
-        return formatMoneyKMBT((double) value);
-    }
-
     public static String formatMoneyKMBT(double value) {
-
-        if (value == Double.MIN_VALUE) return formatMoneyKMBT(Double.MIN_VALUE + 1);
         if (value < 0) return "-" + formatMoneyKMBT(-value);
         if (value < 1000) return Integer.toString((int) value);
 
@@ -62,22 +43,28 @@ public class Formatter {
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 
-    public static String formatTimeMMSS(long secs) {
-        return formatTimeMMSS((int) TimeUnit.MILLISECONDS.toSeconds(secs));
+    public static Double parseMoney(String input) {
+        if (input == null) {
+            return null;
+        }
+
+        String raw = input.replace(",", "").replace("$", "").trim();
+        int end = raw.length();
+        double multiplier = 1D;
+        for (Map.Entry<Double, String> entry : suffixes.entrySet()) {
+            String candidate = entry.getValue();
+            int at = raw.length() - candidate.length();
+            if (at > 0 && at < end && raw.regionMatches(true, at, candidate, 0, candidate.length())) {
+                end = at;
+                multiplier = entry.getKey();
+            }
+        }
+
+        Double value = JavaUtils.tryParseDouble(raw.substring(0, end));
+        if (value == null) {
+            return null;
+        }
+        double parsed = value * multiplier;
+        return Double.isFinite(parsed) ? parsed : null;
     }
-
-    public static String formatTimeMMSS(int secs) {
-
-        int seconds = secs % 60;
-        secs -= seconds;
-
-        long minutesCount = secs / 60;
-        long minutes = minutesCount % 60;
-        minutesCount -= minutes;
-
-        long hours = minutesCount / 60;
-
-        return (hours > 0 ? (hours < 10 ? "0" : "") + hours + ":" : "") + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-    }
-
 }
