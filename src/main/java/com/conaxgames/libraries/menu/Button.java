@@ -111,6 +111,11 @@ public final class Button {
             return this;
         }
 
+        public Builder skullTexture(String texture) {
+            item.skullTexture(texture);
+            return this;
+        }
+
         public Builder enchant(XEnchantment enchantment, int level) {
             item.enchant(enchantment, level);
             return this;
