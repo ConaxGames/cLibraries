@@ -3,6 +3,7 @@ package com.conaxgames.libraries.message;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -122,5 +123,28 @@ public final class FormatUtil {
 
     public static String getItemName(ItemStack item) {
         return item.getType().toString().replace("_", "");
+    }
+
+    public static String countdown(Duration duration) {
+        if (duration.getSeconds() <= 0) {
+            return "Now";
+        }
+        long days = duration.toDays();
+        int hours = (int) (duration.toHours() % 24);
+        int minutes = (int) (duration.toMinutes() % 60);
+        int seconds = (int) (duration.getSeconds() % 60);
+        if (days > 0) {
+            return days + (days == 1 ? " day" : " days")
+                    + (hours > 0 ? " " + hours + (hours == 1 ? " hour" : " hours") : "");
+        }
+        if (hours > 0) {
+            return hours + (hours == 1 ? " hour" : " hours")
+                    + (minutes > 0 ? " " + minutes + (minutes == 1 ? " minute" : " minutes") : "");
+        }
+        if (minutes > 0) {
+            return minutes + (minutes == 1 ? " minute" : " minutes")
+                    + (seconds > 0 ? " " + seconds + (seconds == 1 ? " second" : " seconds") : "");
+        }
+        return seconds + (seconds == 1 ? " second" : " seconds");
     }
 }
