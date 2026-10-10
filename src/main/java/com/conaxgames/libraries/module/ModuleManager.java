@@ -50,7 +50,7 @@ public class ModuleManager {
         }
 
         modules.put(id, module);
-        if (module.isConfiguredToEnable()) {
+        if (module.getBoolean("enabled", false)) {
             enableModule(module, false);
         }
         library.getLibraryLogger().toConsole("ModuleManager", "Registered " + id + "!");

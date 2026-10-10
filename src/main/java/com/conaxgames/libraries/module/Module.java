@@ -46,10 +46,6 @@ public abstract class Module {
         return getName().toLowerCase(Locale.ROOT);
     }
 
-    public boolean isConfiguredToEnable() {
-        return getBoolean("enabled", false);
-    }
-
     public String getRequiredPlugin() {
         return null;
     }
