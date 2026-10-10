@@ -31,6 +31,12 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      # ubuntu-latest shipped Maven 3.10.0, which leaves non-POM metadata in the
+      # Central bundle and fails validation ("does NOT have a .pom file").
+      # cSuiteAPI published successfully on Maven 3.9.16 — pin to that.
+      - uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.16
       - uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: pom.xml
