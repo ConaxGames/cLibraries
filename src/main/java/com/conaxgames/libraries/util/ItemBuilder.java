@@ -174,6 +174,14 @@ public final class ItemBuilder {
         return VersioningChecker.supports("1.14") ? meta(meta -> meta.setCustomModelData(modelData)) : this;
     }
 
+    public ItemBuilder itemModel(String key) {
+        // Item models only exist from 1.21.4.
+        NamespacedKey namespacedKey = key == null ? null : NamespacedKey.fromString(key);
+        return namespacedKey != null && VersioningChecker.supports("1.21.4")
+                ? meta(meta -> meta.setItemModel(namespacedKey))
+                : this;
+    }
+
     public ItemBuilder skull(String name) {
         Player online = Bukkit.getPlayerExact(name);
         return skull(online != null ? profileOf(online) : Profileable.detect(name));
