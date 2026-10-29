@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.cryptomorin.xseries.XItemStack;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,7 +20,7 @@ final class ButtonListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onClick(InventoryClickEvent event) {
         Inventory top = event.getInventory();
-        if (!(top.getHolder() instanceof Menu.Holder) || !(event.getWhoClicked() instanceof Player)) {
+        if (!(top.getHolder() instanceof Menu.Holder)) {
             return;
         }
         Menu.Holder holder = (Menu.Holder) top.getHolder();
@@ -67,11 +69,12 @@ final class ButtonListener implements Listener {
         } else {
             event.setCancelled(true);
             Button button = holder.buttons.get(slot);
-            if (button == null) {
+            if (button == null || button.click == null) {
                 return;
             }
-            button.click(player, event.getClick());
-            if (holder.menu.updateAfterClick) {
+            button.click.on(player, event.getClick());
+            // Skipped when the click already swapped the inventory, the new one is freshly rendered.
+            if (holder.menu.updateAfterClick && XInventoryView.of(player.getOpenInventory()).getTopInventory().getHolder() == holder) {
                 holder.menu.update(player);
             }
         }
@@ -96,7 +99,7 @@ final class ButtonListener implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        if (!(event.getInventory().getHolder() instanceof Menu.Holder) || !(event.getPlayer() instanceof Player)) {
+        if (!(event.getInventory().getHolder() instanceof Menu.Holder)) {
             return;
         }
         Menu.Holder holder = (Menu.Holder) event.getInventory().getHolder();
@@ -104,16 +107,22 @@ final class ButtonListener implements Listener {
         if (holder.updater != null) {
             holder.updater.cancel();
         }
+        // The menu swapped its own inventory, so the viewer never left it.
+        if (holder.replacing) {
+            return;
+        }
         if (holder.menu.onClose != null) {
             holder.menu.onClose.accept(player);
         }
-        Menu previous = holder.menu.previous != null ? holder.menu.previous.apply(player) : null;
+        Menu previous = !holder.exiting && holder.menu.previous != null ? holder.menu.previous.apply(player) : null;
         if (previous == null) {
             return;
         }
         // The client ignores an open sent while it is still closing, and a click may already be opening the next menu.
         LibraryPlugin.getInstance().getScheduler().runTaskLater(LibraryPlugin.getInstance().getPlugin(), () -> {
-            if (player.isOnline() && Menu.opened(player) == null) {
+            // Only when nothing else took the screen, the crafting view is what a player sees with no inventory open.
+            if (player.isOnline() && !player.isDead()
+                    && XInventoryView.of(player.getOpenInventory()).getTopInventory().getType() == InventoryType.CRAFTING) {
                 previous.open(player);
             }
         }, 2L);

@@ -9,19 +9,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Menu {
 
-    static {
-        Bukkit.getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
-    }
+    private static boolean listening;
 
     @FunctionalInterface
     public interface Renderer {
@@ -43,7 +39,7 @@ public final class Menu {
     private Menu(Builder builder) {
         this.title = builder.title;
         this.rows = builder.rows;
-        this.buttons = builder.buttons;
+        this.buttons = new HashMap<>(builder.buttons);
         this.renderer = builder.renderer;
         this.filler = builder.filler;
         this.updateTicks = builder.updateTicks;
@@ -68,116 +64,121 @@ public final class Menu {
         return holder != null ? holder.menu : null;
     }
 
+    public static void close(Player player) {
+        Holder holder = holder(player);
+        if (holder != null) {
+            holder.exiting = true;
+            player.closeInventory();
+        }
+    }
+
     private static Holder holder(Player player) {
         InventoryHolder top = XInventoryView.of(player.getOpenInventory()).getTopInventory().getHolder();
         return top instanceof Holder ? (Holder) top : null;
     }
 
     public void open(Player player) {
+        show(player, false);
+    }
+
+    public void update(Player player) {
+        show(player, true);
+    }
+
+    private void show(Player player, boolean update) {
         if (!Bukkit.isPrimaryThread()) {
-            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> open(player));
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> show(player, update));
             return;
         }
-        Map<Integer, Button> layout = render(player);
-        int size = size(layout);
-        Holder holder = holder(player);
-        if (holder != null && holder.menu == this && refreshInPlace && holder.inventory.getSize() == size) {
-            fill(holder, layout, size);
-        } else {
+        // Registered on first use, menus may be built before the library is enabled.
+        if (!listening) {
+            listening = true;
+            Bukkit.getPluginManager().registerEvents(new ButtonListener(), LibraryPlugin.getInstance().getPlugin());
+        }
+        Holder current = holder(player);
+        boolean reopening = current != null && current.menu == this;
+        if (update && !reopening) {
+            return;
+        }
+        Map<Integer, Button> layout = new HashMap<>(buttons);
+        if (renderer != null) {
+            renderer.render(player, new Layout(layout));
+        }
+        int size = rows * 9;
+        if (size == 0) {
+            for (int slot : layout.keySet()) {
+                size = Math.max(size, slot / 9 * 9 + 9);
+            }
+            size = Math.min(54, Math.max(9, size));
+        }
+        // Updates always refresh in place, the title only changes when the inventory is replaced.
+        Holder holder = reopening && (update || refreshInPlace) && current.inventory.getSize() == size ? current : null;
+        if (holder == null) {
             String name = title.apply(player);
             // 1.8 rejects titles over 32 characters, the limit was dropped in 1.9.
             if (!VersioningChecker.supports("1.9") && name.length() > 32) {
                 name = name.substring(0, 32);
             }
-            holder = new Holder(this, player.getUniqueId(), size, name);
-            fill(holder, layout, size);
-            // Null when another plugin cancelled the InventoryOpenEvent, so nothing is on screen to keep updated.
-            if (player.openInventory(holder.inventory) == null) {
-                return;
+            holder = new Holder(this, size, name);
+        }
+        boolean hasEditable = false;
+        for (int slot = 0; slot < size; slot++) {
+            if (filler != null) {
+                layout.putIfAbsent(slot, filler);
             }
-            if (updateTicks > 0L) {
-                holder.updater = LibraryPlugin.getInstance().getScheduler()
-                        .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> update(player), updateTicks, updateTicks);
+            Button button = layout.get(slot);
+            boolean editable = button != null && button.editable;
+            hasEditable |= editable;
+            // Editable slots belong to the viewer once seeded, refreshes must not wipe what they placed.
+            if (editable && reopening && slot < current.inventory.getSize() && current.editable(slot)) {
+                holder.inventory.setItem(slot, current.inventory.getItem(slot));
+            } else {
+                holder.inventory.setItem(slot, button != null ? button.icon : null);
             }
         }
-        if (onOpen != null) {
+        holder.buttons = layout;
+        holder.hasEditable = hasEditable;
+        if (holder == current) {
+            return;
+        }
+        if (reopening) {
+            current.replacing = true;
+        }
+        // Null when another plugin cancelled the InventoryOpenEvent, so nothing is on screen to keep updated.
+        boolean opened = player.openInventory(holder.inventory) != null;
+        if (reopening) {
+            current.replacing = false;
+        }
+        if (!opened) {
+            return;
+        }
+        if (updateTicks > 0L) {
+            holder.updater = LibraryPlugin.getInstance().getScheduler()
+                    .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> update(player), updateTicks, updateTicks);
+        }
+        if (!reopening && onOpen != null) {
             onOpen.accept(player);
         }
     }
 
-    public void update(Player player) {
-        Holder holder = holder(player);
-        if (holder == null || holder.menu != this) {
-            return;
-        }
-        Map<Integer, Button> layout = render(player);
-        int size = size(layout);
-        if (holder.inventory.getSize() == size) {
-            fill(holder, layout, size);
-        } else {
-            open(player);
-        }
-    }
+    static final class Holder implements InventoryHolder {
 
-    private Map<Integer, Button> render(Player player) {
-        Map<Integer, Button> layout = new HashMap<>(buttons);
-        if (renderer != null) {
-            renderer.render(player, new Layout(layout));
-        }
-        return layout;
-    }
-
-    private int size(Map<Integer, Button> layout) {
-        if (rows > 0) {
-            return rows * 9;
-        }
-        int needed = 1;
-        for (int slot : layout.keySet()) {
-            needed = Math.max(needed, slot / 9 + 1);
-        }
-        return Math.min(6, needed) * 9;
-    }
-
-    private void fill(Holder holder, Map<Integer, Button> layout, int size) {
-        if (filler != null) {
-            for (int slot = 0; slot < size; slot++) {
-                layout.putIfAbsent(slot, filler);
-            }
-        }
-        boolean seeded = holder.buttons != null;
-        holder.buttons = layout;
-        holder.hasEditable = false;
-        for (int slot = 0; slot < size; slot++) {
-            Button button = layout.get(slot);
-            if (button != null && button.editable()) {
-                holder.hasEditable = true;
-                // Editable slots belong to the viewer once seeded, refreshes must not wipe what they placed.
-                if (seeded) {
-                    continue;
-                }
-            }
-            holder.inventory.setItem(slot, button != null ? button.icon() : null);
-        }
-    }
-
-    public static final class Holder implements InventoryHolder {
-
-        public final Menu menu;
-        public final UUID viewerId;
+        final Menu menu;
         private final Inventory inventory;
         Map<Integer, Button> buttons;
         boolean hasEditable;
+        boolean replacing;
+        boolean exiting;
         Scheduler.CancellableTask updater;
 
-        private Holder(Menu menu, UUID viewerId, int size, String title) {
+        private Holder(Menu menu, int size, String title) {
             this.menu = menu;
-            this.viewerId = viewerId;
             this.inventory = Bukkit.createInventory(this, size, title);
         }
 
-        public boolean editable(int slot) {
+        boolean editable(int slot) {
             Button button = buttons.get(slot);
-            return button != null && button.editable();
+            return button != null && button.editable;
         }
 
         @Override
@@ -197,18 +198,6 @@ public final class Menu {
         public Layout set(int slot, Button button) {
             buttons.put(slot, button);
             return this;
-        }
-
-        public Layout set(int row, int col, Button button) {
-            return set(row * 9 + col, button);
-        }
-
-        public Layout editable(int slot) {
-            return editable(slot, null);
-        }
-
-        public Layout editable(int slot, ItemStack initial) {
-            return set(slot, Button.editable(initial));
         }
     }
 
@@ -231,6 +220,9 @@ public final class Menu {
         }
 
         public Builder rows(int rows) {
+            if (rows < 1 || rows > 6) {
+                throw new IllegalArgumentException("Menus have 1 to 6 rows: " + rows);
+            }
             this.rows = rows;
             return this;
         }
@@ -238,10 +230,6 @@ public final class Menu {
         public Builder set(int slot, Button button) {
             buttons.put(slot, button);
             return this;
-        }
-
-        public Builder set(int row, int col, Button button) {
-            return set(row * 9 + col, button);
         }
 
         public Builder fill(Button filler) {
@@ -252,10 +240,6 @@ public final class Menu {
         public Builder render(Renderer renderer) {
             this.renderer = renderer;
             return this;
-        }
-
-        public Builder autoUpdate() {
-            return autoUpdate(20L);
         }
 
         public Builder autoUpdate(long updateTicks) {
@@ -280,11 +264,6 @@ public final class Menu {
 
         public Builder onClose(Consumer<Player> onClose) {
             this.onClose = onClose;
-            return this;
-        }
-
-        public Builder previous(Menu previous) {
-            this.previous = player -> previous;
             return this;
         }
 

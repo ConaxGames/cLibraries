@@ -7,7 +7,9 @@ import com.conaxgames.libraries.message.CC;
 import com.conaxgames.libraries.message.FormatUtil;
 import com.conaxgames.libraries.module.Module;
 import com.conaxgames.libraries.module.ModuleManager;
+import com.conaxgames.libraries.util.ItemBuilder;
 import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,21 +44,21 @@ public final class ModuleMenu {
                         lore.add("&e" + (enabled ? "Click to disable." : "Click to enable."));
                         lore.addAll(FormatUtil.wordWrap("&7(Use a Shift-Click to not save this change over reboots)"));
 
-                        buttons.add(Button.builder(enabled ? XMaterial.GREEN_WOOL : XMaterial.RED_WOOL)
+                        ItemStack icon = ItemBuilder.of(enabled ? XMaterial.GREEN_WOOL : XMaterial.RED_WOOL)
                                 .name((enabled ? "&a" : "&c") + module.getName())
                                 .lore(lore)
-                                .onClick((p, type) -> {
-                                    boolean persistent = !type.isShiftClick();
-                                    String result = enabled
-                                            ? moduleManager.disableModule(module, persistent)
-                                            : moduleManager.enableModule(module, persistent);
-                                    p.sendMessage(CC.translate("&e" + result + "&7 (saved: " + persistent + ")"));
-                                })
-                                .build());
+                                .build();
+                        buttons.add(Button.of(icon, (p, type) -> {
+                            boolean persistent = !type.isShiftClick();
+                            String result = enabled
+                                    ? moduleManager.disableModule(module, persistent)
+                                    : moduleManager.enableModule(module, persistent);
+                            p.sendMessage(CC.translate("&e" + result + "&7 (saved: " + persistent + ")"));
+                        }));
                     }
                     return buttons;
                 })
-                .autoUpdate()
+                .autoUpdate(20L)
                 .build();
     }
 }

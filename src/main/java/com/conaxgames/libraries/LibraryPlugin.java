@@ -5,12 +5,14 @@ import com.conaxgames.libraries.commands.CommandRegistry;
 import com.conaxgames.libraries.debug.LibraryLogger;
 import com.conaxgames.libraries.event.impl.LibraryPluginEnableEvent;
 import com.conaxgames.libraries.hooks.HookManager;
+import com.conaxgames.libraries.menu.Menu;
 import com.conaxgames.libraries.module.ModuleManager;
 import com.conaxgames.libraries.timer.TimerManager;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.conaxgames.libraries.util.scheduler.Schedulers;
 import com.google.common.base.Joiner;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -63,6 +65,8 @@ public class LibraryPlugin {
     }
 
     public LibraryPlugin onDisable() {
+        // Menus stop being guarded once the listener unregisters, so nobody may keep one open.
+        Bukkit.getOnlinePlayers().forEach(Menu::close);
         return this;
     }
 

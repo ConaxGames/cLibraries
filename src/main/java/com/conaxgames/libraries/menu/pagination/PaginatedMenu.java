@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu.pagination;
 
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
+import com.conaxgames.libraries.util.ItemBuilder;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.entity.Player;
 
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -26,11 +28,10 @@ public final class PaginatedMenu {
         private final String title;
         private final Map<Integer, Button> globals = new HashMap<>();
         private int rows = 6;
-        private int maxPerPage = 45;
         private int[] contentSlots;
         private Function<Player, List<Button>> entries = player -> Collections.emptyList();
-        private int previousSlot = 48;
-        private int nextSlot = 50;
+        private int previousSlot = -1;
+        private int nextSlot = -1;
         private Button filler;
         private long updateTicks;
         private Function<Player, Menu> previousMenu;
@@ -45,17 +46,12 @@ public final class PaginatedMenu {
         }
 
         public Builder maxPerPage(int maxPerPage) {
-            this.maxPerPage = maxPerPage;
+            this.contentSlots = IntStream.range(0, maxPerPage).toArray();
             return this;
         }
 
         public Builder contentSlots(int... contentSlots) {
             this.contentSlots = contentSlots;
-            return this;
-        }
-
-        public Builder entries(List<Button> entries) {
-            this.entries = player -> entries;
             return this;
         }
 
@@ -84,18 +80,9 @@ public final class PaginatedMenu {
             return this;
         }
 
-        public Builder previous(Menu previousMenu) {
-            this.previousMenu = player -> previousMenu;
-            return this;
-        }
-
         public Builder previous(Function<Player, Menu> previousMenu) {
             this.previousMenu = previousMenu;
             return this;
-        }
-
-        public Builder autoUpdate() {
-            return autoUpdate(20L);
         }
 
         public Builder autoUpdate(long updateTicks) {
@@ -104,30 +91,38 @@ public final class PaginatedMenu {
         }
 
         public Menu build() {
-            int[] slots = contentSlots != null ? contentSlots : IntStream.range(0, maxPerPage).toArray();
-            Menu[] self = new Menu[1];
-            int[] page = {0};
-            int[] total = {1};
-            Button back = Button.builder(XMaterial.RED_DYE).name("&cPrevious Page").onClick((player, type) -> {
-                page[0]--;
-                self[0].open(player);
-            }).build();
-            Button next = Button.builder(XMaterial.GREEN_DYE).name("&aNext Page").onClick((player, type) -> {
-                page[0]++;
-                self[0].open(player);
-            }).build();
+            int footer = (rows - 1) * 9;
+            int[] slots = contentSlots != null ? contentSlots : IntStream.range(0, footer).toArray();
+            int previousSlot = this.previousSlot >= 0 ? this.previousSlot : footer + 3;
+            int nextSlot = this.nextSlot >= 0 ? this.nextSlot : footer + 5;
+            // The menu is shared between viewers, so each keeps its own {page, total} until they close it.
+            Map<Player, int[]> pages = new WeakHashMap<>();
+            Function<Player, int[]> state = player -> pages.computeIfAbsent(player, p -> new int[]{0, 1});
+            Button back = Button.of(ItemBuilder.of(XMaterial.RED_DYE).name("&cPrevious Page").build(), (player, type) -> {
+                state.apply(player)[0]--;
+                Menu.opened(player).open(player);
+            });
+            Button next = Button.of(ItemBuilder.of(XMaterial.GREEN_DYE).name("&aNext Page").build(), (player, type) -> {
+                state.apply(player)[0]++;
+                Menu.opened(player).open(player);
+            });
 
             // Menu renders before resolving the title, so the counters are already current when it is built.
-            Menu.Builder builder = Menu.builder(player -> title + " (" + (page[0] + 1) + "/" + total[0] + ")")
+            Menu.Builder builder = Menu.builder(player -> {
+                        int[] page = state.apply(player);
+                        return title + " (" + (page[0] + 1) + "/" + page[1] + ")";
+                    })
                     .rows(rows)
                     .refreshInPlace(false)
                     .previous(previousMenu)
                     .autoUpdate(updateTicks)
                     .fill(filler)
+                    .onClose(pages::remove)
                     .render((player, layout) -> {
+                        int[] page = state.apply(player);
                         List<Button> all = entries.apply(player);
-                        total[0] = Math.max(1, (all.size() + slots.length - 1) / slots.length);
-                        page[0] = Math.min(page[0], total[0] - 1);
+                        page[1] = Math.max(1, (all.size() + slots.length - 1) / slots.length);
+                        page[0] = Math.min(page[0], page[1] - 1);
                         int start = page[0] * slots.length;
                         for (int i = 0; i < slots.length && start + i < all.size(); i++) {
                             layout.set(slots[i], all.get(start + i));
@@ -135,13 +130,12 @@ public final class PaginatedMenu {
                         if (page[0] > 0) {
                             layout.set(previousSlot, back);
                         }
-                        if (page[0] < total[0] - 1) {
+                        if (page[0] < page[1] - 1) {
                             layout.set(nextSlot, next);
                         }
                     });
             globals.forEach(builder::set);
-            self[0] = builder.build();
-            return self[0];
+            return builder.build();
         }
     }
 }
