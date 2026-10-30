@@ -7,63 +7,57 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Clickable {
 
-    private final List<TextComponent> components = new ArrayList<>();
+    private final List<BaseComponent> components = new ArrayList<>();
 
     public Clickable() {}
 
-    public Clickable(String msg) {
-        add(msg);
+    public Clickable(String message) {
+        add(message);
     }
 
-    public Clickable(String msg, String hoverMsg, String clickString) {
-        add(msg, hoverMsg, clickString);
-    }
-
-    public TextComponent add(String msg, String hoverMsg, String clickString) {
-        return append(msg, hoverMsg,
-                clickString == null ? null : new ClickEvent(ClickEvent.Action.RUN_COMMAND, clickString));
-    }
-
-    public TextComponent addUrl(String msg, String hoverMsg, String url) {
-        return append(msg, hoverMsg,
-                url == null ? null : new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+    public Clickable(String message, String hover, String command) {
+        add(message, hover, command);
     }
 
     public void add(String message) {
-        if (message == null) {
-            return;
+        addRaw(CC.translate(message));
+    }
+
+    // Skips '&' translation, for player written text that must not gain color codes.
+    public void addRaw(String message) {
+        if (message != null) {
+            Collections.addAll(components, TextComponent.fromLegacyText(message));
         }
-        for (BaseComponent part : TextComponent.fromLegacyText(CC.translate(message))) {
-            components.add((TextComponent) part);
-        }
+    }
+
+    public void add(String message, String hover, String command) {
+        append(message, hover, command == null ? null : new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+    }
+
+    public void addSuggest(String message, String hover, String command) {
+        append(message, hover, command == null ? null : new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+    }
+
+    public void addUrl(String message, String hover, String url) {
+        append(message, hover, url == null ? null : new ClickEvent(ClickEvent.Action.OPEN_URL, url));
     }
 
     public void sendToPlayer(Player player) {
-        player.spigot().sendMessage(asComponents());
+        player.spigot().sendMessage(components.toArray(new BaseComponent[0]));
     }
 
-    public TextComponent[] asComponents() {
-        return components.toArray(new TextComponent[0]);
-    }
-
-    private TextComponent append(String msg, String hoverMsg, ClickEvent clickEvent) {
-        BaseComponent[] parts = TextComponent.fromLegacyText(CC.translate(msg));
-        TextComponent root = (TextComponent) parts[0];
-        for (int i = 1; i < parts.length; i++) {
-            root.addExtra(parts[i]);
+    // An empty hover or click counts as none, so a blank config value disables it.
+    private void append(String message, String hover, ClickEvent click) {
+        TextComponent component = new TextComponent(TextComponent.fromLegacyText(CC.translate(message)));
+        if (hover != null && !hover.isEmpty()) {
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(CC.translate(hover))));
         }
-        if (hoverMsg != null) {
-            root.setHoverEvent(new HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(CC.translate(hoverMsg))));
-        }
-        if (clickEvent != null) {
-            root.setClickEvent(clickEvent);
-        }
-        components.add(root);
-        return root;
+        component.setClickEvent(click == null || click.getValue().isEmpty() ? null : click);
+        components.add(component);
     }
 }
