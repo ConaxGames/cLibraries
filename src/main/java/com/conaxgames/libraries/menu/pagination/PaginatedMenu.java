@@ -93,6 +93,9 @@ public final class PaginatedMenu {
         public Menu build() {
             int footer = (rows - 1) * 9;
             int[] slots = contentSlots != null ? contentSlots : IntStream.range(0, footer).toArray();
+            if (slots.length == 0) {
+                throw new IllegalArgumentException("Paginated menus need at least one content slot, a single row leaves none above the footer.");
+            }
             int previousSlot = this.previousSlot >= 0 ? this.previousSlot : footer + 3;
             int nextSlot = this.nextSlot >= 0 ? this.nextSlot : footer + 5;
             // The menu is shared between viewers, so each keeps its own {page, total} until they close it.

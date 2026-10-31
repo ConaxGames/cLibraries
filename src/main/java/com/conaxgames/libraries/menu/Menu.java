@@ -65,6 +65,10 @@ public final class Menu {
     }
 
     public static void close(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> close(player));
+            return;
+        }
         Holder holder = holder(player);
         if (holder != null) {
             holder.exiting = true;
