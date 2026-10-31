@@ -8,6 +8,9 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
@@ -26,7 +29,9 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -180,6 +185,20 @@ public final class ItemBuilder {
         return namespacedKey != null && VersioningChecker.supports("1.21.4")
                 ? meta(meta -> meta.setItemModel(namespacedKey))
                 : this;
+    }
+
+    public ItemBuilder hideComponents(DataComponentType... components) {
+        // Tooltip display only exists from 1.21.5.
+        if (!VersioningChecker.supports("1.21.5")) {
+            return this;
+        }
+        TooltipDisplay current = itemStack.getData(DataComponentTypes.TOOLTIP_DISPLAY);
+        Set<DataComponentType> hidden = current == null ? new HashSet<>() : new HashSet<>(current.hiddenComponents());
+        hidden.addAll(Arrays.asList(components));
+        itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
+                .hideTooltip(current != null && current.hideTooltip())
+                .hiddenComponents(hidden));
+        return this;
     }
 
     public ItemBuilder skull(String name) {
