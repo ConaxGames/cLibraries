@@ -2,7 +2,9 @@ package com.conaxgames.libraries.commands;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.commands.impl.LibraryCommands;
+import com.conaxgames.libraries.module.Module;
 import com.conaxgames.libraries.util.resolvers.EnchantmentProcessor;
 import com.conaxgames.libraries.util.resolvers.ItemTypeProcessor;
 import com.conaxgames.libraries.util.resolvers.PotionProcessor;
@@ -16,19 +18,20 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
-    public CommandRegistry(PaperCommandManager commandManager) {
+    public CommandRegistry(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         new CommandMessages(commandManager);
         commandManager.enableUnstableAPI("help");
-        loadContexts(commandManager);
-        loadCompletions(commandManager);
+        loadContexts(libraryPlugin, commandManager);
+        loadCompletions(libraryPlugin, commandManager);
 
         commandManager.registerCommand(new LibraryCommands());
     }
 
-    public void loadContexts(PaperCommandManager commandManager) {
+    public void loadContexts(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandContexts().registerContext(Plugin.class, c -> {
             String argument = c.popFirstArg();
             Plugin plugin = Bukkit.getPluginManager().getPlugin(argument);
@@ -75,9 +78,20 @@ public class CommandRegistry {
                 throw new InvalidCommandArgument("No potion effect matching " + argument + " could be found.");
             }
         });
+
+        commandManager.getCommandContexts().registerContext(Module.class, c -> {
+            String argument = c.popFirstArg();
+
+            Module module = libraryPlugin.getModuleManager().getModuleByIdentifier(argument);
+            if (module == null) {
+                throw new InvalidCommandArgument("No module matching " + argument + " could be found.");
+            }
+
+            return module;
+        });
     }
 
-    public void loadCompletions(PaperCommandManager commandManager) {
+    public void loadCompletions(LibraryPlugin libraryPlugin, PaperCommandManager commandManager) {
         commandManager.getCommandCompletions().registerAsyncCompletion("plugins", c -> {
             List<String> values = new ArrayList<>();
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -94,5 +108,12 @@ public class CommandRegistry {
 
         commandManager.getCommandCompletions().registerAsyncCompletion("potions", c ->
                 PotionProcessor.completions());
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("modules", c ->
+                libraryPlugin.getModuleManager().getModules()
+                        .keySet()
+                        .stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toList()));
     }
 }

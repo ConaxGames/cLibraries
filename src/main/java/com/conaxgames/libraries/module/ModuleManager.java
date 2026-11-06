@@ -1,6 +1,5 @@
 package com.conaxgames.libraries.module;
 
-import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.util.VersioningChecker;
@@ -27,15 +26,6 @@ public class ModuleManager {
                 "moduleCommandAlias", commandAlias,
                 "moduleCommandPermission", commandPermission
         );
-        commandManager.getCommandContexts().registerContext(Module.class, c -> {
-            String argument = c.popFirstArg();
-            Module module = getModuleByIdentifier(argument);
-            if (module == null) {
-                throw new InvalidCommandArgument("No module matching " + argument + " could be found.");
-            }
-            return module;
-        });
-        commandManager.getCommandCompletions().registerAsyncCompletion("modules", c -> modules.keySet());
         commandManager.registerCommand(new ModuleCommands(this));
     }
 
