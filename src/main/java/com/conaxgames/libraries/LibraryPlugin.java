@@ -51,7 +51,7 @@ public class LibraryPlugin {
 
         this.libraryLogger = new LibraryLogger(plugin, debugPrimary, debugSecondary);
         this.paperCommandManager = new PaperCommandManager(this.plugin);
-        this.commandRegistry = new CommandRegistry(this, paperCommandManager);
+        this.commandRegistry = new CommandRegistry(paperCommandManager);
         this.hookManager = new HookManager(this.plugin);
         this.timerManager = new TimerManager();
         this.moduleManager = new ModuleManager(this, moduleCommandAlias, moduleCommandPerm);

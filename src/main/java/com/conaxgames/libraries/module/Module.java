@@ -16,19 +16,21 @@ import java.util.Locale;
 public abstract class Module {
 
     private final JavaPlugin javaPlugin;
+    private final String identifier;
     private Config settings;
     boolean enabled;
 
     public Module(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
+        this.identifier = getName().toLowerCase(Locale.ROOT);
         reloadConfig();
     }
 
     public void reloadConfig() {
-        String id = getIdentifier();
-        this.settings = new Config("/modules/" + id + "/settings", javaPlugin);
+        String path = "modules/" + identifier + "/settings";
+        this.settings = new Config(path, javaPlugin);
 
-        try (InputStream in = javaPlugin.getResource("modules/" + id + "/settings.yml")) {
+        try (InputStream in = javaPlugin.getResource(path + ".yml")) {
             if (in != null) {
                 CommentedConfiguration.loadConfiguration(settings.getConfigFile())
                         .syncWithConfig(settings.getConfigFile(), in, noSync().toArray(new String[0]));
@@ -36,15 +38,11 @@ public abstract class Module {
             }
         } catch (Exception exception) {
             LibraryPlugin.getInstance().getLibraryLogger().toConsole("Module",
-                    "Unable to sync /modules/" + id + "/settings.yml with config.", exception);
+                    "Unable to sync " + path + ".yml with config.", exception);
         }
     }
 
     public abstract String getName();
-
-    public String getIdentifier() {
-        return getName().toLowerCase(Locale.ROOT);
-    }
 
     public String getRequiredPlugin() {
         return null;

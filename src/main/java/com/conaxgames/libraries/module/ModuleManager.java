@@ -1,5 +1,6 @@
 package com.conaxgames.libraries.module;
 
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.util.VersioningChecker;
@@ -26,42 +27,40 @@ public class ModuleManager {
                 "moduleCommandAlias", commandAlias,
                 "moduleCommandPermission", commandPermission
         );
+        commandManager.getCommandContexts().registerContext(Module.class, c -> {
+            String argument = c.popFirstArg();
+            Module module = getModuleByIdentifier(argument);
+            if (module == null) {
+                throw new InvalidCommandArgument("No module matching " + argument + " could be found.");
+            }
+            return module;
+        });
+        commandManager.getCommandCompletions().registerAsyncCompletion("modules", c -> modules.keySet());
         commandManager.registerCommand(new ModuleCommands(this));
     }
 
     public void registerModule(Module module) {
+        String id = module.getIdentifier();
         String required = module.getRequiredPlugin();
         if (required != null && !Bukkit.getPluginManager().isPluginEnabled(required)) {
-            library.getLibraryLogger().toConsole("Module",
-                    "Required plugin " + required + " is missing. Module " + module.getIdentifier() + " cannot be registered.");
+            log("Required plugin " + required + " is missing. Module " + id + " cannot be registered.");
             return;
         }
-
         String version = module.getSupportedVersion();
         if (version != null && !VersioningChecker.supports(version)) {
-            library.getLibraryLogger().toConsole("Module",
-                    "Supported version " + version + " is not met. Module " + module.getIdentifier() + " cannot be registered.");
+            log("Supported version " + version + " is not met. Module " + id + " cannot be registered.");
             return;
         }
-
-        String id = module.getIdentifier();
-        if (modules.containsKey(id)) {
+        if (modules.putIfAbsent(id, module) != null) {
             return;
         }
-
-        modules.put(id, module);
+        log("Registered " + id + "!");
         if (module.getBoolean("enabled", false)) {
             enableModule(module, false);
         }
-        library.getLibraryLogger().toConsole("ModuleManager", "Registered " + id + "!");
     }
 
     public String enableModule(Module module, boolean save) {
-        String id = module.getIdentifier();
-        if (!modules.containsKey(id)) {
-            return "Cannot enable " + id + " as it is not registered.";
-        }
-
         if (!module.enabled) {
             module.reloadConfig();
             try {
@@ -74,48 +73,39 @@ public class ModuleManager {
                 if (module instanceof Listener) {
                     HandlerList.unregisterAll((Listener) module);
                 }
-                library.getLibraryLogger().toConsole("ModuleManager", "Failed to enable module " + module.getName(), t);
-                return "Failed to enable " + id;
+                return log("Failed to enable " + module.getIdentifier(), t);
             }
         }
-
         if (save) {
             module.set("enabled", true);
         }
-        String message = "Enabled " + id + "!";
-        library.getLibraryLogger().toConsole("ModuleManager", message);
-        return message;
+        return log("Enabled " + module.getIdentifier() + "!");
     }
 
     public String disableModule(Module module, boolean save) {
-        String id = module.getIdentifier();
-        if (!modules.containsKey(id)) {
-            return "Cannot disable " + id + " as it is not registered.";
-        }
-        if (!module.enabled) {
-            return id + " is not enabled, so you cannot disable it.";
-        }
-
-        try {
-            module.onDisable();
-            if (module instanceof Listener) {
-                HandlerList.unregisterAll((Listener) module);
+        if (module.enabled) {
+            try {
+                module.onDisable();
+                if (module instanceof Listener) {
+                    HandlerList.unregisterAll((Listener) module);
+                }
+                module.enabled = false;
+            } catch (Throwable t) {
+                return log("Failed to disable " + module.getIdentifier(), t);
             }
-            module.enabled = false;
-        } catch (Throwable t) {
-            library.getLibraryLogger().toConsole("ModuleManager", "Failed to disable module " + module.getName(), t);
-            return "Failed to disable " + id;
         }
-
         if (save) {
             module.set("enabled", false);
         }
-        String message = "Disabled " + id + "!";
-        library.getLibraryLogger().toConsole("ModuleManager", message);
-        return message;
+        return log("Disabled " + module.getIdentifier() + "!");
     }
 
     public Module getModuleByIdentifier(String identifier) {
         return modules.get(identifier.toLowerCase(Locale.ROOT));
+    }
+
+    private String log(String message, Throwable... throwables) {
+        library.getLibraryLogger().toConsole("ModuleManager", message, throwables);
+        return message;
     }
 }
