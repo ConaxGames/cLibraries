@@ -99,7 +99,8 @@ public final class PaginatedMenu {
             }
             int previousSlot = this.previousSlot >= 0 ? this.previousSlot : footer + 3;
             int nextSlot = this.nextSlot >= 0 ? this.nextSlot : footer + 5;
-            // The menu is shared between viewers, so each keeps its own {page, total} until they close it.
+            // The menu is shared between viewers, so each keeps their own {page, total}, which brings them back to the
+            // same page from a sub-menu.
             Map<Player, int[]> pages = new WeakHashMap<>();
             Function<Player, int[]> state = player -> pages.computeIfAbsent(player, p -> new int[]{0, 1});
             Button back = Button.of(ItemBuilder.of(XMaterial.RED_DYE).name("&cPrevious Page").build(), (player, type) -> {
@@ -113,17 +114,16 @@ public final class PaginatedMenu {
                 Menu.opened(player).open(player);
             });
 
-            // Menu renders before resolving the title, so the counters are already current when it is built.
+            // Menu renders before resolving the title, so the counters are already current when it is built. A page
+            // turn changes the title, which makes opening the menu again replace the inventory instead of refreshing it.
             Menu.Builder builder = Menu.builder(player -> {
                         int[] page = state.apply(player);
                         return title + " (" + (page[0] + 1) + "/" + page[1] + ")";
                     })
                     .rows(rows)
-                    .refreshInPlace(false)
                     .previous(previousMenu)
                     .autoUpdate(updateTicks)
                     .fill(filler)
-                    .onClose(pages::remove)
                     .render((player, layout) -> {
                         int[] page = state.apply(player);
                         List<Button> all = entries.apply(player);

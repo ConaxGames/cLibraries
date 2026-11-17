@@ -31,13 +31,13 @@ final class ButtonListener implements Listener {
             event.setCancelled(true);
         } else if (slot >= top.getSize()) {
             if (!event.getClick().isShiftClick()) {
-                event.setCancelled(!holder.hasEditable);
+                event.setCancelled(!holder.hasEditable());
                 return;
             }
             // Vanilla would shift the stack into any menu slot, so move it into editable slots ourselves.
             event.setCancelled(true);
             ItemStack moving = event.getCurrentItem();
-            if (!holder.hasEditable || XItemStack.isEmpty(moving)) {
+            if (!holder.hasEditable() || XItemStack.isEmpty(moving)) {
                 return;
             }
             int remaining = moving.getAmount();
@@ -74,7 +74,7 @@ final class ButtonListener implements Listener {
             }
             button.click.on(player, event.getClick());
             // Skipped when the click already swapped the inventory, the new one is freshly rendered.
-            if (holder.menu.updateAfterClick && XInventoryView.of(player.getOpenInventory()).getTopInventory().getHolder() == holder) {
+            if (holder.menu.updateAfterClick && Menu.holder(player) == holder) {
                 holder.menu.update(player);
             }
         }

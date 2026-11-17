@@ -31,8 +31,6 @@ public final class Menu {
     private final Renderer renderer;
     private final Button filler;
     private final long updateTicks;
-    private final boolean refreshInPlace;
-    private final Consumer<Player> onOpen;
     final boolean updateAfterClick;
     final Consumer<Player> onClose;
     final Function<Player, Menu> previous;
@@ -45,15 +43,12 @@ public final class Menu {
         this.filler = builder.filler;
         this.updateTicks = builder.updateTicks;
         this.updateAfterClick = builder.updateAfterClick;
-        this.refreshInPlace = builder.refreshInPlace;
-        this.onOpen = builder.onOpen;
         this.onClose = builder.onClose;
         this.previous = builder.previous;
     }
 
     public static Builder builder(String title) {
-        String translated = CC.translate(title);
-        return new Builder(player -> translated);
+        return builder(player -> title);
     }
 
     public static Builder builder(Function<Player, String> title) {
@@ -77,16 +72,20 @@ public final class Menu {
         }
     }
 
-    private static Holder holder(Player player) {
+    static Holder holder(Player player) {
         InventoryHolder top = XInventoryView.of(player.getOpenInventory()).getTopInventory().getHolder();
         return top instanceof Holder ? (Holder) top : null;
     }
 
+    /**
+     * Opens the menu. When the player already has it open it is refreshed in place, unless its title or size changed.
+     */
     public void open(Player player) {
         show(player, false, false);
     }
 
-    public void update(Player player) {
+    // After a click and on the auto-update timer, only while the player still has the menu open.
+    void update(Player player) {
         show(player, true, false);
     }
 
@@ -114,40 +113,28 @@ public final class Menu {
         if (renderer != null) {
             renderer.render(player, new Layout(layout));
         }
-        int size = rows * 9;
-        if (size == 0) {
-            for (int slot : layout.keySet()) {
-                size = Math.max(size, slot / 9 * 9 + 9);
-            }
-            size = Math.min(54, Math.max(9, size));
+        // Without a row count the menu grows to fit its last button.
+        int size = rows > 0 ? rows * 9
+                : Math.min(54, Math.max(9, layout.keySet().stream().mapToInt(slot -> slot / 9 * 9 + 9).max().orElse(0)));
+        String name = title.apply(player);
+        // 1.8 rejects titles over 32 characters, the limit was dropped in 1.9.
+        if (!VersioningChecker.supports("1.9") && name.length() > 32) {
+            name = name.substring(0, 32);
         }
-        // Updates always refresh in place, the title only changes when the inventory is replaced.
-        Holder holder = reopening && (update || refreshInPlace) && current.inventory.getSize() == size ? current : null;
-        if (holder == null) {
-            String name = title.apply(player);
-            // 1.8 rejects titles over 32 characters, the limit was dropped in 1.9.
-            if (!VersioningChecker.supports("1.9") && name.length() > 32) {
-                name = name.substring(0, 32);
-            }
-            holder = new Holder(this, size, name);
-        }
-        boolean hasEditable = false;
+        // Refreshed in place unless the size or title changed, which only a new inventory can show. Updates ignore the
+        // title, so the timer never reopens the menu just to change it.
+        Holder holder = reopening && current.inventory.getSize() == size && (update || current.title.equals(name))
+                ? current : new Holder(this, size, name);
         for (int slot = 0; slot < size; slot++) {
             if (filler != null) {
                 layout.putIfAbsent(slot, filler);
             }
             Button button = layout.get(slot);
-            boolean editable = button != null && button.editable;
-            hasEditable |= editable;
             // Editable slots belong to the viewer once seeded, refreshes must not wipe what they placed.
-            if (editable && reopening && slot < current.inventory.getSize() && current.editable(slot)) {
-                holder.inventory.setItem(slot, current.inventory.getItem(slot));
-            } else {
-                holder.inventory.setItem(slot, button != null ? button.icon : null);
-            }
+            boolean kept = button != null && button.editable && reopening && slot < current.inventory.getSize() && current.editable(slot);
+            holder.inventory.setItem(slot, kept ? current.inventory.getItem(slot) : button != null ? button.icon : null);
         }
         holder.buttons = layout;
-        holder.hasEditable = hasEditable;
         if (holder == current) {
             return;
         }
@@ -170,29 +157,31 @@ public final class Menu {
         if (current == null && !returning) {
             Sfx.MENU_OPEN.play(player);
         }
-        if (!reopening && onOpen != null) {
-            onOpen.accept(player);
-        }
     }
 
     static final class Holder implements InventoryHolder {
 
         final Menu menu;
+        final String title;
         private final Inventory inventory;
         Map<Integer, Button> buttons;
-        boolean hasEditable;
         boolean replacing;
         boolean exiting;
         Scheduler.CancellableTask updater;
 
         private Holder(Menu menu, int size, String title) {
             this.menu = menu;
+            this.title = title;
             this.inventory = Bukkit.createInventory(this, size, title);
         }
 
         boolean editable(int slot) {
             Button button = buttons.get(slot);
             return button != null && button.editable;
+        }
+
+        boolean hasEditable() {
+            return buttons.values().stream().anyMatch(button -> button != null && button.editable);
         }
 
         @Override
@@ -224,8 +213,6 @@ public final class Menu {
         private Button filler;
         private long updateTicks;
         private boolean updateAfterClick = true;
-        private boolean refreshInPlace = true;
-        private Consumer<Player> onOpen;
         private Consumer<Player> onClose;
         private Function<Player, Menu> previous;
 
@@ -263,16 +250,6 @@ public final class Menu {
 
         public Builder updateAfterClick(boolean updateAfterClick) {
             this.updateAfterClick = updateAfterClick;
-            return this;
-        }
-
-        public Builder refreshInPlace(boolean refreshInPlace) {
-            this.refreshInPlace = refreshInPlace;
-            return this;
-        }
-
-        public Builder onOpen(Consumer<Player> onOpen) {
-            this.onOpen = onOpen;
             return this;
         }
 
