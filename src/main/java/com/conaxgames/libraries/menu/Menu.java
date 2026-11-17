@@ -84,17 +84,9 @@ public final class Menu {
         show(player, false, false);
     }
 
-    // After a click and on the auto-update timer, only while the player still has the menu open.
-    void update(Player player) {
-        show(player, true, false);
-    }
-
-    // Back from a sub-menu, which is moving between menus, so it stays as quiet as any other move.
-    void reopen(Player player) {
-        show(player, false, true);
-    }
-
-    private void show(Player player, boolean update, boolean returning) {
+    // An update only refreshes a menu the player still has open. Returning is coming back from a sub-menu, which is
+    // moving between menus, so it stays as quiet as any other move.
+    void show(Player player, boolean update, boolean returning) {
         if (!Bukkit.isPrimaryThread()) {
             LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> show(player, update, returning));
             return;
@@ -151,7 +143,7 @@ public final class Menu {
         }
         if (updateTicks > 0L) {
             holder.updater = LibraryPlugin.getInstance().getScheduler()
-                    .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> update(player), updateTicks, updateTicks);
+                    .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> show(player, true, false), updateTicks, updateTicks);
         }
         // Only when coming from the world, moving between menus is voiced by the button that did it.
         if (current == null && !returning) {
@@ -178,10 +170,6 @@ public final class Menu {
         boolean editable(int slot) {
             Button button = buttons.get(slot);
             return button != null && button.editable;
-        }
-
-        boolean hasEditable() {
-            return buttons.values().stream().anyMatch(button -> button != null && button.editable);
         }
 
         @Override

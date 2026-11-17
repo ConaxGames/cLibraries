@@ -30,14 +30,16 @@ final class ButtonListener implements Listener {
             // Collecting to the cursor pulls from every slot of the view, including menu icons.
             event.setCancelled(true);
         } else if (slot >= top.getSize()) {
+            // The viewer's own inventory only stays usable when the menu has somewhere to put things.
+            boolean hasEditable = holder.buttons.values().stream().anyMatch(button -> button != null && button.editable);
             if (!event.getClick().isShiftClick()) {
-                event.setCancelled(!holder.hasEditable());
+                event.setCancelled(!hasEditable);
                 return;
             }
             // Vanilla would shift the stack into any menu slot, so move it into editable slots ourselves.
             event.setCancelled(true);
             ItemStack moving = event.getCurrentItem();
-            if (!holder.hasEditable() || XItemStack.isEmpty(moving)) {
+            if (!hasEditable || XItemStack.isEmpty(moving)) {
                 return;
             }
             int remaining = moving.getAmount();
@@ -75,7 +77,7 @@ final class ButtonListener implements Listener {
             button.click.on(player, event.getClick());
             // Skipped when the click already swapped the inventory, the new one is freshly rendered.
             if (holder.menu.updateAfterClick && Menu.holder(player) == holder) {
-                holder.menu.update(player);
+                holder.menu.show(player, true, false);
             }
         }
         // The client already predicted the vanilla outcome, resync once the server state has settled.
@@ -123,7 +125,7 @@ final class ButtonListener implements Listener {
             // Only when nothing else took the screen, the crafting view is what a player sees with no inventory open.
             if (player.isOnline() && !player.isDead()
                     && XInventoryView.of(player.getOpenInventory()).getTopInventory().getType() == InventoryType.CRAFTING) {
-                previous.reopen(player);
+                previous.show(player, false, true);
             }
         }, 2L);
     }
