@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu;
 
 import com.conaxgames.libraries.LibraryPlugin;
 import com.conaxgames.libraries.message.CC;
+import com.conaxgames.libraries.sound.Sfx;
 import com.conaxgames.libraries.util.VersioningChecker;
 import com.conaxgames.libraries.util.scheduler.Scheduler;
 import com.cryptomorin.xseries.inventory.XInventoryView;
@@ -82,16 +83,21 @@ public final class Menu {
     }
 
     public void open(Player player) {
-        show(player, false);
+        show(player, false, false);
     }
 
     public void update(Player player) {
-        show(player, true);
+        show(player, true, false);
     }
 
-    private void show(Player player, boolean update) {
+    // Back from a sub-menu, which is moving between menus, so it stays as quiet as any other move.
+    void reopen(Player player) {
+        show(player, false, true);
+    }
+
+    private void show(Player player, boolean update, boolean returning) {
         if (!Bukkit.isPrimaryThread()) {
-            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> show(player, update));
+            LibraryPlugin.getInstance().getScheduler().runTask(LibraryPlugin.getInstance().getPlugin(), () -> show(player, update, returning));
             return;
         }
         // Registered on first use, menus may be built before the library is enabled.
@@ -159,6 +165,10 @@ public final class Menu {
         if (updateTicks > 0L) {
             holder.updater = LibraryPlugin.getInstance().getScheduler()
                     .runTaskTimerCancellable(LibraryPlugin.getInstance().getPlugin(), () -> update(player), updateTicks, updateTicks);
+        }
+        // Only when coming from the world, moving between menus is voiced by the button that did it.
+        if (current == null && !returning) {
+            Sfx.MENU_OPEN.play(player);
         }
         if (!reopening && onOpen != null) {
             onOpen.accept(player);

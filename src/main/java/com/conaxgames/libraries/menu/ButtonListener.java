@@ -123,7 +123,7 @@ final class ButtonListener implements Listener {
             // Only when nothing else took the screen, the crafting view is what a player sees with no inventory open.
             if (player.isOnline() && !player.isDead()
                     && XInventoryView.of(player.getOpenInventory()).getTopInventory().getType() == InventoryType.CRAFTING) {
-                previous.open(player);
+                previous.reopen(player);
             }
         }, 2L);
     }

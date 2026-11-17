@@ -32,6 +32,7 @@
 - [XPUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/XPUtil.java) — Experience helpers
 - [ColorMaterialUtil](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/util/ColorMaterialUtil.java) — Chat colors to wool, terracotta, and carpet
 - [ProgressionBar](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/message/ProgressionBar.java) — Progress bars for chat or scoreboards
+- [Sfx](https://github.com/ConaxGames/cLibraries/tree/main/src/main/java/com/conaxgames/libraries/sound/Sfx.java) — Shared sound effects that respect each player's sound setting
 
 <h3>Install</h3>
 

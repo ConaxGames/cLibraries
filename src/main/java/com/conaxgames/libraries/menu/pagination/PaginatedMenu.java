@@ -2,6 +2,7 @@ package com.conaxgames.libraries.menu.pagination;
 
 import com.conaxgames.libraries.menu.Button;
 import com.conaxgames.libraries.menu.Menu;
+import com.conaxgames.libraries.sound.Sfx;
 import com.conaxgames.libraries.util.ItemBuilder;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.entity.Player;
@@ -103,10 +104,12 @@ public final class PaginatedMenu {
             Function<Player, int[]> state = player -> pages.computeIfAbsent(player, p -> new int[]{0, 1});
             Button back = Button.of(ItemBuilder.of(XMaterial.RED_DYE).name("&cPrevious Page").build(), (player, type) -> {
                 state.apply(player)[0]--;
+                Sfx.PAGE_TURN.play(player);
                 Menu.opened(player).open(player);
             });
             Button next = Button.of(ItemBuilder.of(XMaterial.GREEN_DYE).name("&aNext Page").build(), (player, type) -> {
                 state.apply(player)[0]++;
+                Sfx.PAGE_TURN.play(player);
                 Menu.opened(player).open(player);
             });
 
