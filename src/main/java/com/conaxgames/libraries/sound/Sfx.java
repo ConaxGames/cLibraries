@@ -1,10 +1,9 @@
 package com.conaxgames.libraries.sound;
 
+import com.conaxgames.libraries.util.VersioningChecker;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
@@ -51,8 +50,8 @@ public enum Sfx {
     /** Metadata a player carries while their sound effects are off. */
     public static final String MUTED = "sfx-muted";
 
-    // Servers that can bind a sound to an entity let it travel with the player, so one played as they teleport still reaches them.
-    private static final boolean FOLLOWS = followsPlayer();
+    // From 1.19 a sound can be bound to the player, so one played as they teleport travels with them and still reaches them.
+    private static final boolean FOLLOWS = VersioningChecker.supports("1.19");
 
     private final XSound sound;
     private final float volume;
@@ -66,12 +65,6 @@ public enum Sfx {
 
     public void play(Player player) {
         play(player, sound, volume, pitch);
-    }
-
-    public void play(Iterable<? extends Player> players) {
-        for (Player player : players) {
-            play(player);
-        }
     }
 
     /** Plays a sound the palette has no effect for, under the same rules. */
@@ -103,15 +96,6 @@ public enum Sfx {
         } catch (IllegalArgumentException e) {
             Bukkit.getLogger().warning("Skipping sound '" + sound + "': " + e.getMessage());
             return null;
-        }
-    }
-
-    private static boolean followsPlayer() {
-        try {
-            Player.class.getMethod("playSound", Entity.class, Sound.class, SoundCategory.class, float.class, float.class);
-            return true;
-        } catch (NoSuchMethodException | NoClassDefFoundError e) {
-            return false;
         }
     }
 
