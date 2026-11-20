@@ -36,6 +36,7 @@ public final class PaginatedMenu {
         private Button filler;
         private long updateTicks;
         private Function<Player, Menu> previousMenu;
+        private int startPage;
 
         private Builder(String title) {
             this.title = title;
@@ -86,6 +87,11 @@ public final class PaginatedMenu {
             return this;
         }
 
+        public Builder startPage(int startPage) {
+            this.startPage = startPage;
+            return this;
+        }
+
         public Builder autoUpdate(long updateTicks) {
             this.updateTicks = updateTicks;
             return this;
@@ -100,9 +106,9 @@ public final class PaginatedMenu {
             int previousSlot = this.previousSlot >= 0 ? this.previousSlot : footer + 3;
             int nextSlot = this.nextSlot >= 0 ? this.nextSlot : footer + 5;
             // The menu is shared between viewers, so each keeps their own {page, total}, which brings them back to the
-            // same page from a sub-menu.
+            // same page from a sub-menu. A start page past the end is clamped to the last page on render.
             Map<Player, int[]> pages = new WeakHashMap<>();
-            Function<Player, int[]> state = player -> pages.computeIfAbsent(player, p -> new int[]{0, 1});
+            Function<Player, int[]> state = player -> pages.computeIfAbsent(player, p -> new int[]{startPage, 1});
             Button back = Button.of(ItemBuilder.of(XMaterial.RED_DYE).name("&cPrevious Page").build(), (player, type) -> {
                 state.apply(player)[0]--;
                 Sfx.PAGE_TURN.play(player);
